@@ -63,7 +63,7 @@ http://www.latex-project.org/lppl.txt
 % open-acess journal in philosophy, neuroscience and related disciplines. 
 % The class is targeted at authors and editors of special issues to help in the 
 % preparation of submissions to the journal, as well as at editorial staff at the 
-% journal. \parencite{Talbot2015}
+% journal.
 % 
 % This technical documentation covers the entire source code of \texttt{phimisci}. 
 % A user guide as well as general submission guidelines to the journal are 
@@ -89,14 +89,6 @@ http://www.latex-project.org/lppl.txt
 \RequirePackage[autoenlargeheadfoot=off]{scrlayer-scrpage}
 \recalctypearea
 %    \end{macrocode}
-% \LaTeX3 loading.
-%    \begin{macrocode}
-\RequirePackage{expl3, l3keys2e}
-\ExplSyntaxOn
-\cs_generate_variant:Nn \seq_set_split:Nnn { NVn }
-\cs_generate_variant:Nn \seq_set_split:Nnn { NVx }
-\ExplSyntaxOff
-%    \end{macrocode}
 % \subsection{Basic packages}
 % Load a couple of packages that should be always available.
 %    \begin{macrocode}
@@ -105,13 +97,23 @@ http://www.latex-project.org/lppl.txt
                 amssymb,
                 array,
                 booktabs,
-                calc,
                 enumitem,
-                graphicx,
+                graphicx
+                }
+%    \end{macrocode}
+% And packages useful to making features of this class available.
+%    \begin{macrocode}
+\RequirePackage{calc,
+                etoolbox,
+                expl3,
+                l3keys2e,
                 microtype,
                 xcolor
-			   }
-
+                }
+\ExplSyntaxOn
+\cs_generate_variant:Nn \seq_set_split:Nnn { NVn }
+\cs_generate_variant:Nn \seq_set_split:Nnn { NVx }
+\ExplSyntaxOff
 %    \end{macrocode}
 % \subsection{Font loading}
 % Load the font.
@@ -151,7 +153,7 @@ http://www.latex-project.org/lppl.txt
 % \section{Key-value interface and data storage}
 %    \begin{macrocode}
 \ExplSyntaxOn
-\keys_define:nn{phimisci}
+\keys_define:nn { phimisci }
   {
     type .tl_set:N = \l_phimisci_type_tl,
     type .initial:n = {Original paper},
@@ -163,29 +165,55 @@ http://www.latex-project.org/lppl.txt
     doi .initial:n = {10.33735/phimisci.0000.0000},
     year .int_set:N = \l_phimisci_publication_year_int,
     year .initial:x = {\the\year},
-    settings / author-output-separator .tl_set:N = \l__phimisci_authors_osep_tl,
-    settings / author-output-separator .initial:n = {,~},
-    settings / author-output-final-separator .tl_set:N =
+  }
+\keys_define:nn { phimisci / settings}
+  {
+    author-output-separator .tl_set:N = \l__phimisci_authors_osep_tl,
+    author-output-separator .initial:n = {,~},
+    author-output-final-separator .tl_set:N =
       \l__phimisci_authors_osep_final_tl,
-    settings / author-output-final-separator .initial:n = {~\&~},
-    settings / affiliations-input-separator .tl_set:N =
+    author-output-final-separator .initial:n = {~\&~},
+    affiliations-input-separator .tl_set:N =
       \l__phimisci_affiliations_isep_tl,
-    settings / affiliations-input-separator .initial:n = { ; },
-    settings / affiliations-output-separator .tl_set:N =
+    affiliations-input-separator .initial:n = { ; },
+    affiliations-output-separator .tl_set:N =
       \l__phimisci_affiliation_line_sep_tl,
-    settings / affiliations-output-separator .initial:n = { ~ },
-    settings / affiliations-output-id-name-separator .tl_set:N = 
+    affiliations-output-separator .initial:n = { ~ },
+    affiliations-output-separator-single-author .tl_set:N =
+      \l__phimisci_affiliation_line_single_sep_tl,
+    affiliations-output-separator-single-author .initial:n = {,~},
+    affiliations-output-separator-single-author-last-two .tl_set:N =
+      \l__phimisci_affiliation_line_ampersand_sep_tl,
+    affiliations-output-separator-single-author-last-two .initial:n = {~\&~},
+    affiliations-output-id-name-separator .tl_set:N = 
       \l__phimisci_affiliation_id_name_sep_tl,
-    settings / affiliations-output-id-name-separator .initial:n = {},
-    settings / keyword-input-separator .tl_set:N = 
+    affiliations-output-id-name-separator .initial:n = {},
+    affiliations-output-multiple-separator .tl_set:N = 
+      \l__phimisci_affliation_multisep_tl,
+    affiliations-output-multiple-separator .initial:n = {,},
+    copyright-text .tl_set:N = 
+      \l__phimisci_copyright_tl,
+    copyright-text .initial:n = 
+      {
+        \copyright{}~The~author(s).~Distributed~with~open~access~under~the~
+         terms~of~the~Creative~Commons~Attribution~4.0~License.
+      },
+    keyword-input-separator .tl_set:N = 
       \l__phimisci_keywords_isep_tl,
-    settings / keyword-input-separator .initial:n = { ; },
-    settings / keyword-output-separator .tl_set:N = 
+    keyword-input-separator .initial:n = { ; },
+    keyword-output-separator .tl_set:N = 
       \l__phimisci_keywords_osep_tl,
-    settings / keyword-output-separator .initial:n = {~\textperiodcentered{}~},
-    settings / keyword-output-font .code:n = {\setkomafont{PhiMiSciKeywords}{#1}},
-    locale / keywords .tl_set:N = \l__phimisci_locale_keywords_tl,
-    locale / keywords .initial:n = {Keywords:~},
+    keyword-output-separator .initial:n = {~\textperiodcentered{}~},
+    keyword-output-font .code:n = {\setkomafont{PhiMiSciKeywords}{#1}},
+  }
+\keys_define:nn { phimisci / locale }
+  {
+    keywords .tl_set:N = \l__phimisci_locale_keywords_tl,
+    keywords .initial:n = {Keywords:},
+    volume .tl_set:N = \l__phimisci_locale_volume_tl,
+    volume .initial:n = {Volume},
+    number .tl_set:N = \l__phimisci_locale_number_tl,
+    number .initial:n = {Number},
   }
 %    \end{macrocode}
 % \begin{function}{\PhiMiSciSettings}
@@ -241,18 +269,15 @@ http://www.latex-project.org/lppl.txt
                    \l__phimisci_authors_to_orcids_prop
                    \l__phimisci_number_of_authors_int
                    \l__phimisci_number_of_affiliations_int
-    \int_log:N \l__phimisci_number_of_authors_int
-    \int_log:N \l__phimisci_number_of_affiliations_int
-    \prop_log:N \l__phimisci_authors_to_affiliations_prop
-    \prop_log:N \l__phimisci_affiliation_id_resolver_prop
-    \prop_log:N \l__phimisci_authors_to_orcids_prop
-    \phimisci_output_authors:NNN
+    \phimisci_output_authors:NNNN
                    \l__phimisci_authors_to_affiliations_prop
                    \l__phimisci_affiliation_id_resolver_prop
                    \l__phimisci_authors_to_orcids_prop
-    \phimisci_output_affiliations:NN
+                   \l__phimisci_number_of_authors_int
+    \phimisci_output_affiliations:NNN
       \l__phimisci_affiliation_id_resolver_prop
       \l__phimisci_number_of_affiliations_int
+      \l__phimisci_number_of_authors_int
     \group_end:
   }
 \ExplSyntaxOff
@@ -339,18 +364,21 @@ http://www.latex-project.org/lppl.txt
                              {2} 
                          }
       \seq_map_inline:Nn \l__phimisci_current_author_affils_seq
-        {                            
-          \prop_get:NnNF { #2 }
-                         { ####1 }
-                         \l__phimisci_tmp_affiliation_id_tl
-                           {  
-                             \prop_put:Nnx 
-                               { #2 }
-                               { ####1 }
-                               { \prop_count:N { #2 } }
-                             \tl_if_empty:nF { ####1 } { \int_incr:N #6}
-                           }
-        }
+        {
+          \tl_if_empty:nF { ####1 }
+            {
+              \prop_get:NnNF { #2 }
+                             { ####1 }
+                             \l__phimisci_tmp_affiliation_id_tl
+                               {  
+                                 \prop_put:Nnx 
+                                   { #2 }
+                                   { ####1 }
+                                   { \prop_count:N { #2 } }
+                                 \tl_if_empty:nF { ####1 } { \int_incr:N #6}
+                               }
+            }
+          }
         
       \prop_put:Nxx { #3 }
                     { \tl_use:N \l__phimisci_author_tmp_tl }
@@ -365,55 +393,118 @@ http://www.latex-project.org/lppl.txt
 %    \end{macrocode}
 % We have now sorted our data in two mappings, a \{author: <affiliations>\} and 
 % an \{author: orcid\} mapping. These two are now output.
-% \begin{function}{\phimisci_output_authors:NNN}
+% \begin{function}{\phimisci_output_authors:NNNN}
 % \begin{arguments}
 % \item A property mapping that assigns each author to a list of affiliations.
 % \item A mapping from affiliations to their IDs.
 % \item A mapping from authors to ORCIDs.
+% \item The number of authors
 % \end{arguments}
 % \end{function}
 %    \begin{macrocode}
 \ExplSyntaxOn
-\cs_new:Npn \phimisci_output_authors:NNN #1#2#3
+\cs_new:Npn \phimisci_output_authors:NNNN #1#2#3#4
   {
     \prop_map_inline:Nn { #1 }
       {
+        \seq_clear_new:N \l__phimisci_current_author_affils_id_input_seq
+        \seq_clear_new:N \l__phimisci_current_author_affils_id_output_seq
+        \tl_clear_new:N \l__phimisci_current_affiliation_key_tl
+        \seq_set_split:NVn \l__phimisci_current_author_affils_id_input_seq
+                           \l__phimisci_affiliations_isep_tl
+                           { ##2 }
+%    \end{macrocode}
+% We now assign each affiliation of the current author to its output index,
+% which is later printed next to the author in superscript. The current 
+% affiliation is known to the loop as |####1|.
+%    \begin{macrocode}
+        \seq_map_inline:Nn \l__phimisci_current_author_affils_id_input_seq
+          {
+            \prop_get:NnNT
+              #2 
+              {####1}
+              \l__phimisci_current_affiliation_key_tl
+              {
+                \seq_put_right:Nx \l__phimisci_current_author_affils_id_output_seq
+                  {
+                    \int_to_alph:n
+                      {  
+                        \int_eval:n 
+                          { 
+                            \l__phimisci_current_affiliation_key_tl + 1 
+                          }
+                      }
+                  }
+              }
+          }
+                
         \seq_put_right:Nx \l__phimisci_output_authors_seq
           {
             \tl_rescan:nn {} {##1}
+            \int_compare:nNnT { #4 } > { 1 }
+              {
+                \exp_not:N \textsuperscript
+                  {
+                    \seq_use:Nn \l__phimisci_current_author_affils_id_output_seq
+                                {\l__phimisci_affliation_multisep_tl}
+                  }
+              }
           }
       }
     \seq_use:Nnnn \l__phimisci_output_authors_seq 
-                  {\l__phimisci_authors_osep_final_tl} 
-                  {\l__phimisci_authors_osep_tl} 
-                  {\l__phimisci_authors_osep_final_tl} 
+                  { \l__phimisci_authors_osep_final_tl } 
+                  { \l__phimisci_authors_osep_tl } 
+                  { \l__phimisci_authors_osep_final_tl } 
   }
 \ExplSyntaxOff  
 %    \end{macrocode}
-% \begin{function}{\phimisci_output_affiliations:NN}
+% \begin{function}{\phimisci_output_affiliations:NNN}
 % \begin{arguments}
 % \item A property map assigning each affiliation to an ID
 % \item The number of affiliations
+% \item The number of authors
 % \end{arguments}
 % \end{function}
 %    \begin{macrocode}
 \ExplSyntaxOn
-\cs_new:Npn \phimisci_output_affiliations:NN #1#2
+\cs_new:Npn \phimisci_output_affiliations:NNN #1#2#3
   {
     \int_compare:nNnT { #2 } > { 0 }
       {
         \__phimisci_affiliation_line_separator:
+        \seq_clear_new:N \l__phimisci_affiliation_output_seq
         \group_begin:
         \usekomafont{PhiMiSciAffiliationLine}
         \prop_map_inline:Nn { #1 }
           {
-            \tl_if_empty:nF { ##1 }
-              { 
-                \textsuperscript { \int_to_alph:n { \int_eval:n { ##2 + 1 } } }
-                \tl_use:N \l__phimisci_affiliation_id_name_sep_tl
-                \tl_rescan:nn {} { ##1 } 
-                \tl_use:N \l__phimisci_affiliation_line_sep_tl
+            \int_compare:nNnTF { #3 } > { 1 }
+              {
+                \seq_put_right:Nx \l__phimisci_affiliation_output_seq
+                  {
+                    \exp_not:N \textsuperscript 
+                      { 
+                        \int_to_alph:n { \int_eval:n { ##2 + 1 } } 
+                      }
+                    \tl_use:N \l__phimisci_affiliation_id_name_sep_tl
+                    \tl_rescan:nn {} { ##1 } 
+                  }
               }
+              {
+                \seq_put_right:Nx \l__phimisci_affiliation_output_seq
+                  { \tl_rescan:nn {} { ##1 } }
+              }
+          }
+        
+        \int_compare:nNnTF { #3 } = { 1 }
+          {
+            \seq_use:Nnnn \l__phimisci_affiliation_output_seq
+              { \l__phimisci_affiliation_line_ampersand_sep_tl }
+              { \l__phimisci_affiliation_line_single_sep_tl }
+              { \l__phimisci_affiliation_line_ampersand_sep_tl }
+          }
+          {
+            \seq_use:Nn \l__phimisci_affiliation_output_seq
+              { \l__phimisci_affiliation_line_sep_tl }
           }
         \group_end:
       }
@@ -427,7 +518,7 @@ http://www.latex-project.org/lppl.txt
 \DeclareDocumentCommand {\keywords} {m} 
   {% 
     \group_begin:
-    \usekomafont{PhiMiSciKeywords} \tl_use:N \l__phimisci_locale_keywords_tl
+    \usekomafont{PhiMiSciKeywords} \tl_use:N \l__phimisci_locale_keywords_tl \
     \group_end:
     \phimisci_keywords:n {#1}
   }
@@ -480,7 +571,7 @@ http://www.latex-project.org/lppl.txt
   \null
   \vskip 2em%
     \ifx\@subject\@empty \else
-      {\usekomafont{subject}{\PhiMiSci@ColouredBox{\@subject} \par}}%
+      {\usekomafont{subject}{\PhiMiSci@ColouredBox{~~\@subject~~} \par}}%
       \vskip 1em
     \fi
     {\usekomafont{title}{\@title \par}}%
@@ -528,12 +619,17 @@ http://www.latex-project.org/lppl.txt
             \normalfont%
             \textcolor{PhiMiSciBlue}{%
               \textbf{Philosophy~and~the~Mind~Sciences}}
-              ,~Vol.~\tl_use:N \l_phimisci_volume_tl
-              ,~No.~\l_phimisci_number_tl
-              \ (\int_use:N \l_phimisci_publication_year_int)\par
+              \ \textperiodcentered\ 
+              \tl_use:N \l__phimisci_locale_volume_tl 
+              \ \tl_use:N \l_phimisci_volume_tl
+              \ \textperiodcentered\
+              \tl_use:N \l__phimisci_locale_number_tl
+              \ \tl_use:N \l_phimisci_number_tl
+              \ \textperiodcentered\
+              \int_use:N \l_phimisci_publication_year_int\par
               \textsc{doi}:~\href{https://doi.org/\tl_use:N \l_phimisci_doi_tl}
                       {\oldstylenums{\tl_use:N \l_phimisci_doi_tl}}\par
-              \copyright{}~The~author(s).~Distributed~with~open~access~under~the~terms~of~the~Creative~Commons~Attribution~4.0~License.}
+              \tl_use:N \l__phimisci_copyright_tl}
       }
       {%
         \small
@@ -547,6 +643,30 @@ http://www.latex-project.org/lppl.txt
 \ExplSyntaxOff
 %    \end{macrocode}
 % \end{function}
+% \section{Automatic paragraph numbering}
+% Following an idea by Nicola Talbot \parencite[\S6.5.2]{Talbot2015}. 
+% \begin{function}{PhiMiSciNumberedParagraphs}
+% \end{function}
+%    \begin{macrocode}
+\ExplSyntaxOn
+\newcounter{ PhiMiSciParagraph }
+\cs_new_nopar:Nn \phimisci_print_par_num:
+                 {
+                   \marginpar
+                     {
+                       \refstepcounter{PhiMiSciParagraph}
+                       \PhiMiSci@ColouredBox { \thePhiMiSciParagraph }
+                     }
+                 }
+                 
+\NewDocumentEnvironment { PhiMiSciNumberedParagraphs } {}
+  {%
+    \everypar{ \phimisci_print_par_num: }%
+  }
+  {}
+
+\ExplSyntaxOff
+%    \end{macrocode}
 %    \begin{macrocode}
 %</class>
 %    \end{macrocode}
