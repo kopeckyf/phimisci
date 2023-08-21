@@ -140,15 +140,17 @@ http://www.latex-project.org/lppl.txt
 % Hyperref.
 %    \begin{macrocode}
 \RequirePackage[final,
-			    breaklinks=true,
-			    pdfusetitle=true,
-			    colorlinks=true,
-			    linkcolor=PhiMiSciBlue,
-			    citecolor=PhiMiSciBlue,
-			    urlcolor=PhiMiSciBlue,
-			    hyperfootnotes=false]{hyperref}
-\hypersetup{pdfauthor = {Fix me!},
-           }
+                breaklinks=true,
+                pdfusetitle=true,
+                colorlinks=true,
+                linkcolor=PhiMiSciBlue,
+                citecolor=PhiMiSciBlue,
+                urlcolor=PhiMiSciBlue,
+                hyperfootnotes=false]{hyperref}
+
+\ExplSyntaxOn
+\hypersetup{pdfauthor = {Fix me!}}
+\ExplSyntaxOff
 %    \end{macrocode}
 % \section{Key-value interface and data storage}
 %    \begin{macrocode}
@@ -195,8 +197,8 @@ http://www.latex-project.org/lppl.txt
       \l__phimisci_copyright_tl,
     copyright-text .initial:n = 
       {
-        \copyright{}~The~author(s).~Distributed~with~open~access~under~the~
-         terms~of~the~Creative~Commons~Attribution~4.0~License.
+        \copyright{}~The~author(s).~This~is~an~open~access~article~distributed~
+         under~the~terms~of~the~Creative~Commons~Attribution~4.0~license.
       },
     keyword-input-separator .tl_set:N = 
       \l__phimisci_keywords_isep_tl,
@@ -205,6 +207,9 @@ http://www.latex-project.org/lppl.txt
       \l__phimisci_keywords_osep_tl,
     keyword-output-separator .initial:n = {~\textperiodcentered{}~},
     keyword-output-font .code:n = {\setkomafont{PhiMiSciKeywords}{#1}},
+    number-authors-header .int_set:N =
+      \l__phimisci_authors_in_header_int,
+    number-authors-header .initial:n = { 1 },
   }
 \keys_define:nn { phimisci / locale }
   {
@@ -239,6 +244,7 @@ http://www.latex-project.org/lppl.txt
 \prop_new:N \l__phimisci_authors_to_affiliations_prop
 \prop_new:N \l__phimisci_authors_to_orcids_prop
 \prop_new:N \l__phimisci_affiliation_id_resolver_prop
+\tl_new:N \l__phimisci_header_authors_tl
 \int_new:N \l__phimisci_number_of_authors_int
 \int_new:N \l__phimisci_number_of_affiliations_int
 \int_new:N \l__phimisci_current_affiliation_id_int
@@ -297,6 +303,7 @@ http://www.latex-project.org/lppl.txt
 \ExplSyntaxOn
 \cs_new:Npn \phimisci_process_author_data:nNNNNN #1#2#3#4#5#6
   {
+    \seq_clear_new:N \l__phimisci_authors_header_tmp_seq
     \int_zero:N #5
     \int_zero:N #6
 %    \end{macrocode}
@@ -350,6 +357,11 @@ http://www.latex-project.org/lppl.txt
                              {}
                              \l__phimisci_author_tmp_tl
 %    \end{macrocode}
+% Next, we store the name of the author in a sequence. 
+%    \begin{macrocode}
+      \seq_put_right:NV \l__phimisci_authors_header_tmp_seq
+                        \l__phimisci_author_tmp_tl
+%    \end{macrocode}
 % We now store all the data in three separate property lists. In the first we 
 % assign authors to (lists of) affiliation IDs. These IDs are resolved to 
 % affiliation names. And third, we map authors to their ORCIDs in a separate 
@@ -388,6 +400,19 @@ http://www.latex-project.org/lppl.txt
                     { \tl_use:N \l__phimisci_author_tmp_tl }
                     { \seq_item:Nn \l__phimisci_tmp_author_orcid_seq {2} }
     }
+%    \end{macrocode}
+% When all authors are parsed, create a token list of authors to be placed 
+% in the header. If there is more than one author, add an \textit{et al.} string.
+%    \begin{macrocode}
+    \tl_set:Nx \l__phimisci_header_authors_tl
+      {
+         \seq_item:Nn \l__phimisci_authors_header_tmp_seq { 1 }
+         \int_compare:nNnT
+           { \seq_count:N \l__phimisci_authors_header_tmp_seq }
+           >
+           1
+           { ~et~al. }
+      }
   }
 \ExplSyntaxOff
 %    \end{macrocode}
@@ -558,49 +583,51 @@ http://www.latex-project.org/lppl.txt
 % \section{Titling}
 % Document the |\and\relax| and |-1\baselineskip|
 %    \begin{macrocode}
-\renewcommand*{\@maketitle}{%
-  \let\and\relax
-  \enlargethispage{-1\baselineskip}
-  \global\@topnum=\z@
-  \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
-  \ifx\@titlehead\@empty \else
-    \begin{minipage}[t]{\textwidth}
-      \usekomafont{titlehead}{\@titlehead\par}%
-    \end{minipage}\par
-  \fi
-  \null
-  \vskip 2em%
-    \ifx\@subject\@empty \else
-      {\usekomafont{subject}{\PhiMiSci@ColouredBox{~~\@subject~~} \par}}%
-      \vskip 1em
+\RenewDocumentCommand {\@maketitle} {} 
+  {%
+    \let\and\relax
+    \enlargethispage{-1\baselineskip}
+    \global\@topnum=\z@
+    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+    \ifx\@titlehead\@empty \else
+      \begin{minipage}[t]{\textwidth}
+        \usekomafont{titlehead}{\@titlehead\par}%
+      \end{minipage}\par
     \fi
-    {\usekomafont{title}{\@title \par}}%
-    \vskip .5em%
-    {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\fi}%
-    \vskip 1em%
-    {%
-      \usekomafont{author}{%
-        \lineskip .5em%
-          \PhiMiSci@AuthorData{\@author}\par
+    \null
+    \vskip 2em%
+      \ifx\@subject\@empty \else
+        {\usekomafont{subject}{\PhiMiSci@ColouredBox{~~\@subject~~} \par}}%
+        \vskip 1em
+      \fi
+      {\usekomafont{title}{\@title \par}}%
+      \vskip .5em%
+      {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\fi}%
+      \vskip 1em%
+      {%
+        \usekomafont{author}{%
+          \lineskip .5em%
+            \PhiMiSci@AuthorData{\@author}\par
+        }%
       }%
-    }%
-    \vskip \z@ \@plus 1em
-    \ifx\@dedication\@empty \else
-      \vskip 2em
-      {\usekomafont{dedication}{\@dedication \par}}%
-    \fi
-  \par
-  \vskip 2em
-  \@afterindentfalse\@afterheading
-}
+      \vskip \z@ \@plus 1em
+      \ifx\@dedication\@empty \else
+        \vskip 2em
+        {\usekomafont{dedication}{\@dedication \par}}%
+      \fi
+    \par
+    \vskip 2em
+    \@afterindentfalse\@afterheading
+  }
 %    \end{macrocode}
 % \section{Headers \& footers}
 %    \begin{macrocode}
+\ExplSyntaxOn
 \AddToLayerPageStyleOptions{plain.scrheadings}
     {onselect={\setlength{\footheight}{3\baselineskip}}}
-\cfoot[{\small\PhiMiSci@Footer*{}}]
-      {\PhiMiSci@Footer{}}
-\chead{Fix me!\hfill \@title}
+\cfoot[\PhiMiSci@Footer*{}]{\PhiMiSci@Footer{}}
+\chead{\PhiMiSci@HeaderAuthor \hfill \@title}
+\ExplSyntaxOff
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@Footer, \PhiMiSci@Footer*}
 % Two macros for the content of the footer.  The starred variant produces the 
@@ -608,6 +635,9 @@ http://www.latex-project.org/lppl.txt
 % pages.
 %    \begin{macrocode}
 \ExplSyntaxOn
+
+\NewDocumentCommand {\PhiMiSci@HeaderAuthor} {} {Default}
+
 \NewDocumentCommand {\PhiMiSci@Footer} {s}
   {%
     \IfBooleanTF {#1}
@@ -616,7 +646,7 @@ http://www.latex-project.org/lppl.txt
           \includegraphics[width=\linewidth]{branding/phimisci-logo-mini.pdf}
         \end{minipage}
           \hfill\parbox[c]{\linewidth-2cm}{\raggedright%
-            \normalfont%
+            \normalfont\small%
             \textcolor{PhiMiSciBlue}{%
               \textbf{Philosophy~and~the~Mind~Sciences}}
               \ \textperiodcentered\ 
@@ -652,7 +682,7 @@ http://www.latex-project.org/lppl.txt
 \newcounter{ PhiMiSciParagraph }
 \cs_new_nopar:Nn \phimisci_print_par_num:
                  {
-                   \marginpar
+                   \leavevmode\marginpar
                      {
                        \refstepcounter{PhiMiSciParagraph}
                        \PhiMiSci@ColouredBox { \thePhiMiSciParagraph }
