@@ -137,7 +137,9 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \RequirePackage[style=apa, natbib=true]{biblatex}
 %    \end{macrocode}
-% Hyperref.
+% We load hyperref and set all links to our blue color. We delay setting the 
+% PDF meta data (author, title) to the end of the preamble to allow for meta
+% data processing first.
 %    \begin{macrocode}
 \RequirePackage[final,
                 breaklinks=true,
@@ -149,7 +151,14 @@ http://www.latex-project.org/lppl.txt
                 hyperfootnotes=false]{hyperref}
 
 \ExplSyntaxOn
-\hypersetup{pdfauthor = {Fix me!}}
+\AtEndPreamble
+  {
+    \hypersetup
+      {
+        pdfauthor = { Fix me! },
+        pdftitle = { \tl_use:N \l_phimisci_document_title_tl },
+      }
+  }
 \ExplSyntaxOff
 %    \end{macrocode}
 % \section{Key-value interface and data storage}
@@ -536,6 +545,19 @@ http://www.latex-project.org/lppl.txt
   }
 \ExplSyntaxOff
 %    \end{macrocode}
+% \subsection{Managing the title and a short title (\texttt{\textbackslash title})}
+%    \begin{macrocode}
+\ExplSyntaxOn
+\tl_new:N \l_phimisci_document_title_tl
+\tl_new:N \l_phimisci_short_document_title_tl
+\RenewDocumentCommand {\title} {O{#2} m}
+  {
+    \tl_set:Nn \l_phimisci_document_title_tl { #2 }
+    \tl_set:Nn \l_phimisci_short_document_title_tl { #1 }
+    \RenewDocumentCommand {\@title} {} { #2 }
+  }
+\ExplSyntaxOff
+%    \end{macrocode}
 % \subsection{Manage keywords (\texttt{\textbackslash keywords})}
 % \begin{function}{\keywords}
 %    \begin{macrocode}
@@ -626,7 +648,12 @@ http://www.latex-project.org/lppl.txt
 \AddToLayerPageStyleOptions{plain.scrheadings}
     {onselect={\setlength{\footheight}{3\baselineskip}}}
 \cfoot[\PhiMiSci@Footer*{}]{\PhiMiSci@Footer{}}
-\chead{\PhiMiSci@HeaderAuthor \hfill \@title}
+\chead
+  {
+    \PhiMiSci@HeaderAuthor 
+    \hfill 
+    \tl_use:N \l_phimisci_short_document_title_tl
+  }
 \ExplSyntaxOff
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@Footer, \PhiMiSci@Footer*}
