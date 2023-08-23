@@ -119,14 +119,14 @@ http://www.latex-project.org/lppl.txt
 % Load the font.
 %    \begin{macrocode}
 \RequirePackage{libertinus}
-\setkomafont{title}{\normalfont\normalsize\huge\bfseries}
+\setkomafont{title}{\raggedright\normalfont\normalsize\huge\bfseries}
 \setkomafont{author}{\normalfont\normalsize\large\bfseries}
 \setkomafont{subject}{\normalfont\normalsize}
 \setkomafont{pageheadfoot}{\normalfont}
 \addtokomafont{section}{\rmfamily}
 \addtokomafont{subsection}{\rmfamily}
 \addtokomafont{subsubsection}{\rmfamily}
-\newkomafont{PhiMiSciKeywords}{\bfseries\color{PhiMiSciBlue}}
+\newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries\color{PhiMiSciBlue}}
 \newkomafont{PhiMiSciAffiliationLine}{\normalfont}
 %    \end{macrocode}
 % \subsection{Bibliography}
@@ -215,13 +215,17 @@ http://www.latex-project.org/lppl.txt
     keyword-output-separator .tl_set:N = 
       \l__phimisci_keywords_osep_tl,
     keyword-output-separator .initial:n = {~\textperiodcentered{}~},
-    keyword-output-font .code:n = {\setkomafont{PhiMiSciKeywords}{#1}},
+    meta-data-output-font .code:n = {\setkomafont{PhiMiSciMetadataItem}{#1}},
     number-authors-header .int_set:N =
       \l__phimisci_authors_in_header_int,
     number-authors-header .initial:n = { 1 },
   }
 \keys_define:nn { phimisci / locale }
   {
+    abstract .tl_set:N = \l__phimisci_locale_abstract_tl,
+    abstract .initial:n = {Abstract:},
+    contact .tl_set:N = \l__phimisci_locale_contact_tl,
+    contact .initial:n = {Contact:},
     keywords .tl_set:N = \l__phimisci_locale_keywords_tl,
     keywords .initial:n = {Keywords:},
     volume .tl_set:N = \l__phimisci_locale_volume_tl,
@@ -254,11 +258,17 @@ http://www.latex-project.org/lppl.txt
 \prop_new:N \l__phimisci_authors_to_orcids_prop
 \prop_new:N \l__phimisci_affiliation_id_resolver_prop
 \tl_new:N \l__phimisci_header_authors_tl
+\tl_new:N \l__phimisci_keywords_tl
 \int_new:N \l__phimisci_number_of_authors_int
 \int_new:N \l__phimisci_number_of_affiliations_int
 \int_new:N \l__phimisci_current_affiliation_id_int
+\int_new:N \l__phimisci_abstract_length_int
 \cs_new:Nn \__phimisci_affiliation_line_separator:
   {  \smallskip\\ }
+\bool_new:N \l__phimisci_output_keywords_bool
+\bool_new:N \l__phimisci_output_abstract_bool
+\bool_new:N \l__phimisci_output_contact_bool
+\bool_new:N \l__phimisci_output_authors_bool
 \ExplSyntaxOff
 %    \end{macrocode}
 % \section{Metadata processing}
@@ -558,26 +568,56 @@ http://www.latex-project.org/lppl.txt
   }
 \ExplSyntaxOff
 %    \end{macrocode}
-% \subsection{Manage keywords (\texttt{\textbackslash keywords})}
-% \begin{function}{\keywords}
+% \subsection{Manage the abstract, keywords and contact information
+% (\texttt{\textbackslash keywords})}
+% \begin{function}{\contact, \abstract, \keywords}
 %    \begin{macrocode}
 \ExplSyntaxOn
+\DeclareDocumentCommand {\contact} {m} 
+  {%
+    \tl_if_blank:nF { #1 }
+      {
+        \tl_set:Nn \l__phimisci_contact_tl { #1 }
+        \bool_set_true:N \l__phimisci_output_contact_bool
+      }
+  }
+\DeclareDocumentCommand {\abstract} {m} 
+  {%
+    \tl_if_blank:nF { #1 }
+      {
+        \phimisci_check_abstract_length:n { #1 }
+        \tl_set:Nn \l__phimisci_abstract_tl { #1 }
+        \bool_set_true:N \l__phimisci_output_abstract_bool
+      }
+  }
 \DeclareDocumentCommand {\keywords} {m} 
-  {% 
-    \group_begin:
-    \usekomafont{PhiMiSciKeywords} \tl_use:N \l__phimisci_locale_keywords_tl \
-    \group_end:
-    \phimisci_keywords:n {#1}
+  {%
+    \tl_if_blank:nF { #1 }
+      {
+        \tl_set:No \l__phimisci_keywords_tl 
+          { 
+            \phimisci_process_keywords:n { #1 } 
+          }
+        \bool_set_true:N \l__phimisci_output_keywords_bool
+      }
   }
 \ExplSyntaxOff
 %    \end{macrocode}
 % \end{function}
 % 
-% \begin{function}{\phimisci_keywords:n}
+% \begin{function}{\phimisci_check_abstract_length:n, \phimisci_process_keywords:n}
 % A function that 
 %    \begin{macrocode}
 \ExplSyntaxOn
-\cs_new:Npn \phimisci_keywords:n #1 
+\cs_new:Npn \phimisci_check_abstract_length:n #1
+  {
+    \int_set:Nn \l__phimisci_abstract_length_int { \tl_count:o { #1 } }
+    \int_compare:nNnT { \l__phimisci_abstract_length_int } < { 30 }
+      { \AtEndDocument{ \ClassWarning {phimisci} {Very~short~abstract.} } }
+    \int_compare:nNnT { \l__phimisci_abstract_length_int } > { 1000 }
+      { \AtEndDocument { \ClassWarning {phimisci} {Very~long~abstract.} } }
+  }
+\cs_new:Npn \phimisci_process_keywords:n #1
   {
     \seq_set_split:NVn \l__phimisci_keywords_seq   
                        \l__phimisci_keywords_isep_tl 
@@ -588,6 +628,61 @@ http://www.latex-project.org/lppl.txt
 \ExplSyntaxOff
 %    \end{macrocode}
 % \end{function}
+% \begin{function}{\PhiMiSci@OutputMetadata}
+% Conditionally output meta data if supplied in the preamble. This function is
+% called by \cs{maketitle}.
+%    \begin{macrocode}
+\ExplSyntaxOn
+\NewDocumentCommand {\PhiMiSci@OutputMetadata} {}
+  {
+    \bool_if:nT 
+      { 
+        \l__phimisci_output_keywords_bool || \l__phimisci_output_abstract_bool
+        || \l__phimisci_output_contact_bool
+      }
+      {
+        \begin{description}
+        \bool_if:NT \l__phimisci_output_contact_bool
+          {
+            \item [\usekomafont{PhiMiSciMetadataItem} 
+                   \tl_use:N \l__phimisci_locale_contact_tl] 
+                   \tl_use:N \l__phimisci_contact_tl
+          }
+        \bool_if:NT \l__phimisci_output_abstract_bool
+          {
+            \item [\usekomafont{PhiMiSciMetadataItem} 
+                   \tl_use:N \l__phimisci_locale_abstract_tl]
+                   \tl_use:N \l__phimisci_abstract_tl
+          }
+        \bool_if:NT \l__phimisci_output_keywords_bool
+          {
+            \item [\usekomafont{PhiMiSciMetadataItem} 
+                   \tl_use:N \l__phimisci_locale_keywords_tl] 
+                   \tl_use:N \l__phimisci_keywords_tl
+          }
+        \end{description}
+      }
+  }
+\ExplSyntaxOff
+%    \end{macrocode}
+% \end{function}
+% We make sure that the meta data is only provided in the preamble so that we
+% can process it before using \cs{maketitle}.
+%    \begin{macrocode}
+\ExplSyntaxOn
+\AtBeginDocument
+  {
+    \RenewDocumentCommand {\keywords} {m} 
+      {
+        \ClassError {phimisci} {Command~can~only~be~used~in~preamble}
+          {
+            The command \string\keywords can only be used in the preamble.
+            Please move your keywords before \string\begin\string{document\string}.
+          }
+      }
+  }
+\ExplSyntaxOff
+%    \end{macrocode}
 % \section{Colours}
 % \begin{function}{PhiMiSciRed, PhiMiSciBlue}
 %    \begin{macrocode}
@@ -637,7 +732,8 @@ http://www.latex-project.org/lppl.txt
         \vskip 2em
         {\usekomafont{dedication}{\@dedication \par}}%
       \fi
-    \par
+    \vskip 1em%
+    \PhiMiSci@OutputMetadata{}
     \vskip 2em
     \@afterindentfalse\@afterheading
   }
@@ -695,6 +791,8 @@ http://www.latex-project.org/lppl.txt
               \ \tl_use:N \l_phimisci_volume_tl.\l_phimisci_number_tl
               \ (\int_use:N \l_phimisci_publication_year_int)
         \hfill \textsc{page~\oldstylenums{\thepage}}
+        \ \textperiodcentered\
+        \textsc{paragraphs~\oldstylenums{11--22}}
       }
   }
 \ExplSyntaxOff
