@@ -140,6 +140,7 @@ http://www.latex-project.org/lppl.txt
 \bool_new:N \l__phimisci_output_abstract_bool
 \bool_new:N \l__phimisci_output_contact_bool
 \bool_new:N \l__phimisci_output_authors_bool
+\bool_new:N \l__phimisci_output_publication_footer_bool
 \bool_new:N \l__phimisci_output_reviewed_book_bool
 \ExplSyntaxOff
 %    \end{macrocode}
@@ -202,6 +203,7 @@ http://www.latex-project.org/lppl.txt
     \KOMAoptions{draft=false}
     \bool_set_false:N \l__phimisci_output_authors_bool
     \bool_set_false:N \l__phimisci_output_contact_bool
+    \bool_set_false:N \l__phimisci_output_publication_footer_bool
   }
 \ExplSyntaxOff
 %    \end{macrocode}
@@ -214,6 +216,7 @@ http://www.latex-project.org/lppl.txt
     \KOMAoptions{draft=true}
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
+    \bool_set_true:N \l__phimisci_output_publication_footer_bool
   }
 \ExplSyntaxOff
 %    \end{macrocode}
@@ -226,6 +229,7 @@ http://www.latex-project.org/lppl.txt
     \KOMAoptions{draft=false}
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
+    \bool_set_true:N \l__phimisci_output_publication_footer_bool
   }
 \ExplSyntaxOff
 %    \end{macrocode}
@@ -240,7 +244,7 @@ http://www.latex-project.org/lppl.txt
     stage / submission .code:n = { \__phimisci_stage_submission: },
     stage / draft .code:n = { \__phimisci_stage_draft: },
     stage / final .code:n = { \__phimisci_stage_final: },
-    stage .default:n = {submission},
+    stage .default:n = {final},
     volume .tl_set:N = \l_phimisci_volume_tl,
     volume .initial:n = {00},
     number .tl_set:N = \l_phimisci_number_tl,
@@ -281,6 +285,11 @@ http://www.latex-project.org/lppl.txt
       {
         This~is~an~open~access~article~distributed~
         under~the~terms~of~the~Creative~Commons~Attribution~4.0~license.
+      },
+    submission-footer-text .tl_set:N = \l__phimisci_submission_footer_tl,
+    submission-footer-text .initial:n = 
+      {
+        Submission~to~\textit{Philosophy~and~the~Mind~Sciences}
       },
     keyword-input-separator .tl_set:N = 
       \l__phimisci_keywords_isep_tl,
@@ -888,37 +897,49 @@ http://www.latex-project.org/lppl.txt
 % \end{function}
 %    \begin{macrocode}
 \ExplSyntaxOn
-
 \NewDocumentCommand {\PhiMiSci@Footer} {s}
   {%
     \IfBooleanTF {#1}
       {%
-        \begin{minipage}[c]{1.5cm}
-          \includegraphics[width=\linewidth]{branding/phimisci-logo-mini.pdf}
-        \end{minipage}
-          \hfill\parbox[c]{\linewidth-2cm}{\raggedright%
-            \normalfont\small%
-            \textcolor{PhiMiSciBlue}{%
-              \textbf{Philosophy~and~the~Mind~Sciences}}
-              \ \textperiodcentered\ 
-              \tl_use:N \l__phimisci_locale_volume_tl 
-              \ \tl_use:N \l_phimisci_volume_tl
-              \ \textperiodcentered\
-              \tl_use:N \l__phimisci_locale_number_tl
-              \ \tl_use:N \l_phimisci_number_tl
-              \ \textperiodcentered\
-              \int_use:N \l_phimisci_publication_year_int\par
-              \textsc{doi}:~\href{https://doi.org/\tl_use:N \l_phimisci_doi_tl}
-                      {\oldstylenums{\tl_use:N \l_phimisci_doi_tl}}\par
-              \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
-              \tl_use:N \l__phimisci_copyright_tl}
+        \bool_if:NTF \l__phimisci_output_publication_footer_bool
+          {
+            \begin{minipage}[c]{1.5cm}
+            \includegraphics[width=\linewidth]{branding/phimisci-logo-mini.pdf}
+            \end{minipage}
+              \hfill\parbox[c]{\linewidth-2cm}{\raggedright%
+                \normalfont\small%
+                \textcolor{PhiMiSciBlue}{%
+                  \textbf{Philosophy~and~the~Mind~Sciences}}
+                  \ \textperiodcentered\ 
+                  \tl_use:N \l__phimisci_locale_volume_tl 
+                  \ \tl_use:N \l_phimisci_volume_tl
+                  \ \textperiodcentered\
+                  \tl_use:N \l__phimisci_locale_number_tl
+                  \ \tl_use:N \l_phimisci_number_tl
+                  \ \textperiodcentered\
+                  \int_use:N \l_phimisci_publication_year_int\par
+                  \textsc{doi}:~
+                  \href{https://doi.org/\tl_use:N \l_phimisci_doi_tl}
+                       {\oldstylenums{\tl_use:N \l_phimisci_doi_tl}}\par
+                  \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
+                  \tl_use:N \l__phimisci_copyright_tl}
+          }
+          {
+            \tl_use:N \l__phimisci_submission_footer_tl
+          }
       }
       {%
         \small
-        \textcolor{PhiMiSciBlue}{%
-              \textbf{Philosophy~and~the~Mind~Sciences}}
-              \ \tl_use:N \l_phimisci_volume_tl.\l_phimisci_number_tl
-              \ (\int_use:N \l_phimisci_publication_year_int)
+        \bool_if:NTF \l__phimisci_output_publication_footer_bool
+          {
+            \textcolor{PhiMiSciBlue}{%
+                  \textbf{Philosophy~and~the~Mind~Sciences}}
+                  \ \tl_use:N \l_phimisci_volume_tl.\l_phimisci_number_tl
+                  \ (\int_use:N \l_phimisci_publication_year_int)
+          }
+          {
+            \tl_use:N \l__phimisci_submission_footer_tl
+          }
         \hfill \textsc{page~\oldstylenums{\thepage}}
         \ \textperiodcentered\
         \textsc{paragraphs~\oldstylenums{12--34}}
