@@ -28,11 +28,14 @@ http://www.latex-project.org/lppl.txt
 %<*driver>
 \documentclass{l3doc}
 \usepackage{tgheros}
-\usepackage{tgcursor}
+\usepackage[zerostyle=d]{newtxtt}
 \let\familydefault\sfdefault
 \hypersetup{linkcolor=blue,citecolor=blue,urlcolor=blue}
 \usepackage[british]{babel}
 \usepackage{biblatex}
+\usepackage{xcolor}
+\definecolor{PhiMiSciRed}{cmyk}{0, 1, 0.91, 0.01}
+\definecolor{PhiMiSciBlue}{cmyk}{0.90, 0.73, 0, 0.62}
 \begin{filecontents}[overwrite]{\jobname.bib}
 @book{Talbot2015,
     author = {Talbot, Nicola L. C.},
@@ -110,11 +113,35 @@ http://www.latex-project.org/lppl.txt
                 microtype,
                 xcolor
                 }
+%    \end{macrocode}
+% \subsection{Data storage, Boolean switches and command variants}
+% Token lists and sequences for data storage.
+%    \begin{macrocode}
 \ExplSyntaxOn
 \cs_generate_variant:Nn \seq_set_split:Nnn { NVn }
 \cs_generate_variant:Nn \seq_set_split:Nnn { NVx }
+\seq_new:N \l__phimisci_keywords_seq
+\seq_new:N \l__phimisci_authors_seq
+\seq_new:N \l__phimisci_output_authors_seq
+\prop_new:N \l__phimisci_authors_to_affiliations_prop
+\prop_new:N \l__phimisci_authors_to_orcids_prop
+\prop_new:N \l__phimisci_affiliation_id_resolver_prop
+\tl_new:N \l_phimisci_header_authors_tl
+\tl_new:N \l__phimisci_keywords_tl
+\tl_new:N \l__phimisci_reviewed_book_tl
+\int_new:N \l__phimisci_number_of_authors_int
+\int_new:N \l__phimisci_number_of_affiliations_int
+\int_new:N \l__phimisci_current_affiliation_id_int
+\int_new:N \l__phimisci_abstract_length_int
+\cs_new:Nn \__phimisci_affiliation_line_separator: {  \smallskip\\ }
+\bool_new:N \l__phimisci_output_keywords_bool
+\bool_new:N \l__phimisci_output_abstract_bool
+\bool_new:N \l__phimisci_output_contact_bool
+\bool_new:N \l__phimisci_output_authors_bool
+\bool_new:N \l__phimisci_output_reviewed_book_bool
 \ExplSyntaxOff
 %    \end{macrocode}
+
 % \subsection{Font loading}
 % Load the font.
 %    \begin{macrocode}
@@ -129,7 +156,7 @@ http://www.latex-project.org/lppl.txt
 \newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries\color{PhiMiSciBlue}}
 \newkomafont{PhiMiSciAffiliationLine}{\normalfont}
 %    \end{macrocode}
-% \subsection{Bibliography}
+% \subsection{Bibliography management through \texttt{biblatex}}
 % The entire bibliography management is delegated to \pkg{biblatex}. We enable 
 % \pkg{natbib} as well so that authors can use traditional commands, most notably
 % \cs{citet}, \cs{citep} and \cs{citealt}. \emph{Philosophy and the Mind Sciences}
@@ -137,6 +164,7 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \RequirePackage[style=apa, natbib=true]{biblatex}
 %    \end{macrocode}
+% \subsection{PDF meta data and links through \texttt{hyperref}}
 % We load hyperref and set all links to our blue color. We delay setting the 
 % PDF meta data (author, title) to the end of the preamble to allow for meta
 % data processing first.
@@ -155,19 +183,62 @@ http://www.latex-project.org/lppl.txt
   {
     \hypersetup
       {
-        pdfauthor = { Fix me! },
-        pdftitle = { \tl_use:N \l_phimisci_document_title_tl },
+        pdfauthor = { \tl_use:N \l_phimisci_header_authors_tl },
+        pdftitle  = { \tl_use:N \l_phimisci_document_title_tl }
       }
   }
 \ExplSyntaxOff
 %    \end{macrocode}
-% \section{Key-value interface and data storage}
+% \subsection{Setting the stage (submission, draft, publication)}
+% These functions control settings implied by the stage selected by the user.
+% \begin{function}{\__phimisci_stage_submission:}
+% \end{function}
+%    \begin{macrocode}
+\ExplSyntaxOn
+\cs_new:Nn \__phimisci_stage_submission:
+  {
+    \KOMAoptions{draft=false}
+    \bool_set_false:N \l__phimisci_output_authors_bool
+    \bool_set_false:N \l__phimisci_output_contact_bool
+  }
+\ExplSyntaxOff
+%    \end{macrocode}
+% \begin{function}{\__phimisci_stage_draft:}
+% \end{function}
+%    \begin{macrocode}
+\ExplSyntaxOn
+\cs_new:Nn \__phimisci_stage_draft:
+  {
+    \KOMAoptions{draft=true}
+    \bool_set_true:N \l__phimisci_output_authors_bool
+    \bool_set_true:N \l__phimisci_output_contact_bool
+  }
+\ExplSyntaxOff
+%    \end{macrocode}
+% \begin{function}{\__phimisci_stage_final:}
+% \end{function}
+%    \begin{macrocode}
+\ExplSyntaxOn
+\cs_new:Nn \__phimisci_stage_final:
+  {
+    \KOMAoptions{draft=false}
+    \bool_set_true:N \l__phimisci_output_authors_bool
+    \bool_set_true:N \l__phimisci_output_contact_bool
+  }
+\ExplSyntaxOff
+%    \end{macrocode}
+% \section{Key-value interface for user-configurable options}
 %    \begin{macrocode}
 \ExplSyntaxOn
 \keys_define:nn { phimisci }
   {
     type .tl_set:N = \l_phimisci_type_tl,
     type .initial:n = {Original paper},
+    stage .choice:,
+    stage / submission .code:n = { \__phimisci_stage_submission: },
+    stage / draft .code:n = { \__phimisci_stage_draft: },
+    stage / final .code:n = { \__phimisci_stage_final: },
+    stage .default:n = {submission},
     volume .tl_set:N = \l_phimisci_volume_tl,
     volume .initial:n = {00},
     number .tl_set:N = \l_phimisci_number_tl,
@@ -232,6 +303,8 @@ http://www.latex-project.org/lppl.txt
     volume .initial:n = {Volume},
     number .tl_set:N = \l__phimisci_locale_number_tl,
     number .initial:n = {Number},
+    reviewed-book .tl_set:N = \l__phimisci_locale_reviewed_book_tl,
+    reviewed-book .initial:n = {Reviewed book}
   }
 %    \end{macrocode}
 % \begin{function}{\PhiMiSciSettings}
@@ -239,38 +312,14 @@ http://www.latex-project.org/lppl.txt
 % \item A list of key-value pairs
 % \end{arguments}
 %    \begin{macrocode}
-\NewDocumentCommand
-  {\PhiMiSciSettings}
-  {m}
-  {\keys_set:nn {phimisci} {#1}}
-  
+\NewDocumentCommand { \PhiMiSciSettings } { m } 
+  { 
+    \keys_set:nn { phimisci } { #1 }
+  }
 \ExplSyntaxOff
 \ProcessKeysOptions{phimisci}
 %    \end{macrocode}
 % \end{function}
-% Token lists and sequences for data storage.
-%    \begin{macrocode}
-\ExplSyntaxOn
-\seq_new:N \l__phimisci_keywords_seq
-\seq_new:N \l__phimisci_authors_seq
-\seq_new:N \l__phimisci_output_authors_seq
-\prop_new:N \l__phimisci_authors_to_affiliations_prop
-\prop_new:N \l__phimisci_authors_to_orcids_prop
-\prop_new:N \l__phimisci_affiliation_id_resolver_prop
-\tl_new:N \l__phimisci_header_authors_tl
-\tl_new:N \l__phimisci_keywords_tl
-\int_new:N \l__phimisci_number_of_authors_int
-\int_new:N \l__phimisci_number_of_affiliations_int
-\int_new:N \l__phimisci_current_affiliation_id_int
-\int_new:N \l__phimisci_abstract_length_int
-\cs_new:Nn \__phimisci_affiliation_line_separator:
-  {  \smallskip\\ }
-\bool_new:N \l__phimisci_output_keywords_bool
-\bool_new:N \l__phimisci_output_abstract_bool
-\bool_new:N \l__phimisci_output_contact_bool
-\bool_new:N \l__phimisci_output_authors_bool
-\ExplSyntaxOff
-%    \end{macrocode}
 % \section{Metadata processing}
 % \subsection{Manage author data (\texttt{\textbackslash author}, 
 %    \texttt{\textbackslash affiliation}, \texttt{\textbackslash orcid})}
@@ -278,32 +327,51 @@ http://www.latex-project.org/lppl.txt
 % commands here, but merely elements for the \LaTeX3 parsing of regex parsing to
 % hook to \parencite[see][46]{Interface3}.
 % 
+% \begin{function}{\author}
+\ExplSyntaxOn
+\RenewDocumentCommand {\author} { +m }
+ {
+   \gdef \@author { #1 }
+   \PhiMiSci@ProcessAuthorData { #1 }
+ }
+\ExplSyntaxOff
+% \end{function}
 %    \begin{macrocode}
 
 %    \end{macrocode}
-% \begin{function}{\PhiMiSci@AuthorData}
+% \begin{function}{\PhiMiSci@ProcessAuthorData}
 %    \begin{macrocode}
 \ExplSyntaxOn
-\NewDocumentCommand {\PhiMiSci@AuthorData} { O{} m}
+\NewDocumentCommand { \PhiMiSci@ProcessAuthorData } { m }
   {%
-    \group_begin:
     \exp_args:No \phimisci_process_author_data:nNNNNN
-                   { #2 }
+                   { #1 }
                    \l__phimisci_affiliation_id_resolver_prop
                    \l__phimisci_authors_to_affiliations_prop
                    \l__phimisci_authors_to_orcids_prop
                    \l__phimisci_number_of_authors_int
                    \l__phimisci_number_of_affiliations_int
-    \phimisci_output_authors:NNNN
-                   \l__phimisci_authors_to_affiliations_prop
-                   \l__phimisci_affiliation_id_resolver_prop
-                   \l__phimisci_authors_to_orcids_prop
-                   \l__phimisci_number_of_authors_int
-    \phimisci_output_affiliations:NNN
-      \l__phimisci_affiliation_id_resolver_prop
-      \l__phimisci_number_of_affiliations_int
-      \l__phimisci_number_of_authors_int
-    \group_end:
+  }
+  
+\NewDocumentCommand { \PhiMiSci@OutputAuthorData } { }
+  {
+    \bool_if:NT \l__phimisci_output_authors_bool
+      {
+        \group_begin:
+        \usekomafont{author}{\lineskip .5em%    
+        \phimisci_output_authors:NNNN
+                       \l__phimisci_authors_to_affiliations_prop
+                       \l__phimisci_affiliation_id_resolver_prop
+                       \l__phimisci_authors_to_orcids_prop
+                       \l__phimisci_number_of_authors_int
+        \phimisci_output_affiliations:NNN
+          \l__phimisci_affiliation_id_resolver_prop
+          \l__phimisci_number_of_affiliations_int
+          \l__phimisci_number_of_authors_int
+        \par}
+        \group_end:
+        \vskip 1em
+      }
   }
 \ExplSyntaxOff
 %    \end{macrocode}
@@ -423,14 +491,20 @@ http://www.latex-project.org/lppl.txt
 % When all authors are parsed, create a token list of authors to be placed 
 % in the header. If there is more than one author, add an \textit{et al.} string.
 %    \begin{macrocode}
-    \tl_set:Nx \l__phimisci_header_authors_tl
+    \bool_if:NTF \l__phimisci_output_authors_bool
       {
-         \seq_item:Nn \l__phimisci_authors_header_tmp_seq { 1 }
-         \int_compare:nNnT
-           { \seq_count:N \l__phimisci_authors_header_tmp_seq }
-           >
-           1
-           { ~et~al. }
+        \tl_set:Nx \l_phimisci_header_authors_tl
+          {
+             \seq_item:Nn \l__phimisci_authors_header_tmp_seq { 1 }
+             \int_compare:nNnT
+               { \seq_count:N \l__phimisci_authors_header_tmp_seq }
+               >
+               1
+               { ~et~al. }
+          }
+      }
+      {
+        \tl_set:Nn \l_phimisci_header_authors_tl { Anonymized }
       }
   }
 \ExplSyntaxOff
@@ -556,11 +630,16 @@ http://www.latex-project.org/lppl.txt
 \ExplSyntaxOff
 %    \end{macrocode}
 % \subsection{Managing the title and a short title (\texttt{\textbackslash title})}
+% \begin{function}{\title}
+% \begin{syntax}
+% \cs{title} \oarg{Abbreviated title} \marg{Full title}
+% \end{syntax}
+% \end{function}
 %    \begin{macrocode}
 \ExplSyntaxOn
 \tl_new:N \l_phimisci_document_title_tl
 \tl_new:N \l_phimisci_short_document_title_tl
-\RenewDocumentCommand {\title} {O{#2} m}
+\RenewDocumentCommand {\title} { O{#2} m }
   {
     \tl_set:Nn \l_phimisci_document_title_tl { #2 }
     \tl_set:Nn \l_phimisci_short_document_title_tl { #1 }
@@ -568,20 +647,35 @@ http://www.latex-project.org/lppl.txt
   }
 \ExplSyntaxOff
 %    \end{macrocode}
-% \subsection{Manage the abstract, keywords and contact information
-% (\texttt{\textbackslash keywords})}
-% \begin{function}{\contact, \abstract, \keywords}
+% \subsection{Manage the abstract, keywords, contact details and information 
+% about reviewed books}
+% \begin{function}{\contact}
+% \begin{syntax}
+% \cs{contact} \Arg{contact~details}
+% \end{syntax}
+% Store the contact information in free form input.
+% \end{function}
 %    \begin{macrocode}
 \ExplSyntaxOn
 \DeclareDocumentCommand {\contact} {m} 
   {%
-    \tl_if_blank:nF { #1 }
+    \bool_if:NT \l__phimisci_output_contact_bool
       {
-        \tl_set:Nn \l__phimisci_contact_tl { #1 }
-        \bool_set_true:N \l__phimisci_output_contact_bool
+        \tl_if_blank:nTF { #1 }
+          {
+            \bool_set_false:N \l__phimisci_output_contact_bool
+          }
+          {
+            \tl_set:Nn \l__phimisci_contact_tl { #1 }
+          }
       }
   }
-\DeclareDocumentCommand {\abstract} {m} 
+%    \end{macrocode}
+% \begin{function}{\abstract}
+% Store the abstract of the article.
+% \end{function}
+%    \begin{macrocode}
+\DeclareDocumentCommand {\abstract} {+m} 
   {%
     \tl_if_blank:nF { #1 }
       {
@@ -590,6 +684,11 @@ http://www.latex-project.org/lppl.txt
         \bool_set_true:N \l__phimisci_output_abstract_bool
       }
   }
+%    \end{macrocode}
+% \begin{function}{\keywords}
+% Store a list of keywords, separated by
+% \end{function}
+%    \begin{macrocode}
 \DeclareDocumentCommand {\keywords} {m} 
   {%
     \tl_if_blank:nF { #1 }
@@ -601,9 +700,17 @@ http://www.latex-project.org/lppl.txt
         \bool_set_true:N \l__phimisci_output_keywords_bool
       }
   }
+%    \end{macrocode}
+% \begin{function}{\reviewedbook}
+% Store a bib key 
+% \end{function}
+%    \begin{macrocode}
+\DeclareDocumentCommand {\reviewedbook} {m} 
+  {%
+    \tl_set:Nn \l__phimisci_reviewed_book_tl { #1 }
+  }
 \ExplSyntaxOff
 %    \end{macrocode}
-% \end{function}
 % 
 % \begin{function}{\phimisci_check_abstract_length:n, \phimisci_process_keywords:n}
 % A function that 
@@ -631,6 +738,7 @@ http://www.latex-project.org/lppl.txt
 % \begin{function}{\PhiMiSci@OutputMetadata}
 % Conditionally output meta data if supplied in the preamble. This function is
 % called by \cs{maketitle}.
+% \end{function}
 %    \begin{macrocode}
 \ExplSyntaxOn
 \NewDocumentCommand {\PhiMiSci@OutputMetadata} {}
@@ -654,6 +762,12 @@ http://www.latex-project.org/lppl.txt
                    \tl_use:N \l__phimisci_locale_abstract_tl]
                    \tl_use:N \l__phimisci_abstract_tl
           }
+        \bool_if:NT \l__phimisci_output_reviewed_book_bool
+          {
+            \item [\usekomafont{PhiMiSciMetadataItem} 
+                   \tl_use:N \l__phimisci_locale_reviewed_book_tl]
+                   \fullcite { \tl_use:N \l__phimisci_reviewed_book_tl }
+          }
         \bool_if:NT \l__phimisci_output_keywords_bool
           {
             \item [\usekomafont{PhiMiSciMetadataItem} 
@@ -661,11 +775,12 @@ http://www.latex-project.org/lppl.txt
                    \tl_use:N \l__phimisci_keywords_tl
           }
         \end{description}
+        \vskip 1em
       }
   }
 \ExplSyntaxOff
 %    \end{macrocode}
-% \end{function}
+%
 % We make sure that the meta data is only provided in the preamble so that we
 % can process it before using \cs{maketitle}.
 %    \begin{macrocode}
@@ -684,6 +799,9 @@ http://www.latex-project.org/lppl.txt
 \ExplSyntaxOff
 %    \end{macrocode}
 % \section{Colours}
+% The journal's identity has a blue: 
+% \fcolorbox{black}{PhiMiSciBlue}{\strut ~~~~} 
+% and a red: \fcolorbox{black}{PhiMiSciRed}{\strut ~~~~}
 % \begin{function}{PhiMiSciRed, PhiMiSciBlue}
 %    \begin{macrocode}
 \definecolor{PhiMiSciRed}{cmyk}{0, 1, 0.91, 0.01}
@@ -694,7 +812,10 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \NewDocumentCommand{\PhiMiSci@ColouredBox}{m}
   {%
+    \bgroup
+    \fboxrule=0pt
     \colorbox{PhiMiSciBlue}{\sffamily\bfseries\color{white}#1}%
+    \egroup
   }  
 %    \end{macrocode}
 % \section{Titling}
@@ -712,29 +833,17 @@ http://www.latex-project.org/lppl.txt
       \end{minipage}\par
     \fi
     \null
-    \vskip 2em%
+    \vskip 1em%
       \ifx\@subject\@empty \else
         {\usekomafont{subject}{\PhiMiSci@ColouredBox{~~\@subject~~} \par}}%
         \vskip 1em
       \fi
-      {\usekomafont{title}{\@title \par}}%
-      \vskip .5em%
-      {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\fi}%
-      \vskip 1em%
-      {%
-        \usekomafont{author}{%
-          \lineskip .5em%
-            \PhiMiSci@AuthorData{\@author}\par
-        }%
-      }%
-      \vskip \z@ \@plus 1em
-      \ifx\@dedication\@empty \else
-        \vskip 2em
-        {\usekomafont{dedication}{\@dedication \par}}%
-      \fi
+    {\usekomafont{title}{\@title \par}}%
+    \vskip .5em%
+    {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\fi}%
     \vskip 1em%
+    \PhiMiSci@OutputAuthorData{}
     \PhiMiSci@OutputMetadata{}
-    \vskip 2em
     \@afterindentfalse\@afterheading
   }
 %    \end{macrocode}
@@ -746,7 +855,7 @@ http://www.latex-project.org/lppl.txt
 \cfoot[\PhiMiSci@Footer*{}]{\PhiMiSci@Footer{}}
 \chead
   {
-    \PhiMiSci@HeaderAuthor 
+    \tl_use:N \l_phimisci_header_authors_tl
     \hfill 
     \tl_use:N \l_phimisci_short_document_title_tl
   }
@@ -756,10 +865,9 @@ http://www.latex-project.org/lppl.txt
 % Two macros for the content of the footer.  The starred variant produces the 
 % footer on the title page. The base variant produces the footer on all other
 % pages.
+% \end{function}
 %    \begin{macrocode}
 \ExplSyntaxOn
-
-\NewDocumentCommand {\PhiMiSci@HeaderAuthor} {} {Default}
 
 \NewDocumentCommand {\PhiMiSci@Footer} {s}
   {%
@@ -797,7 +905,6 @@ http://www.latex-project.org/lppl.txt
   }
 \ExplSyntaxOff
 %    \end{macrocode}
-% \end{function}
 % \section{Automatic paragraph numbering}
 % Following an idea by Nicola Talbot \parencite[\S6.5.2]{Talbot2015}. 
 % \begin{function}{PhiMiSciNumberedParagraphs}
