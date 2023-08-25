@@ -127,13 +127,15 @@ http://www.latex-project.org/lppl.txt
 \prop_new:N \l__phimisci_authors_to_orcids_prop
 \prop_new:N \l__phimisci_affiliation_id_resolver_prop
 \tl_new:N \l_phimisci_header_authors_tl
+\tl_new:N \l_phimisci_authors_tl
 \tl_new:N \l__phimisci_keywords_tl
 \tl_new:N \l__phimisci_reviewed_book_tl
+\tl_new:N \l__phimisci_copyright_holder_tl
 \int_new:N \l__phimisci_number_of_authors_int
 \int_new:N \l__phimisci_number_of_affiliations_int
 \int_new:N \l__phimisci_current_affiliation_id_int
 \int_new:N \l__phimisci_abstract_length_int
-\cs_new:Nn \__phimisci_affiliation_line_separator: {  \smallskip\\ }
+\cs_new:Nn \__phimisci_affiliation_line_separator: { \smallskip\\ }
 \bool_new:N \l__phimisci_output_keywords_bool
 \bool_new:N \l__phimisci_output_abstract_bool
 \bool_new:N \l__phimisci_output_contact_bool
@@ -147,14 +149,14 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \RequirePackage{libertinus}
 \setkomafont{title}{\raggedright\normalfont\normalsize\huge\bfseries}
-\setkomafont{author}{\normalfont\normalsize\large\bfseries}
+\setkomafont{author}{\raggedright\normalfont\normalsize\large\bfseries}
 \setkomafont{subject}{\normalfont\normalsize}
 \setkomafont{pageheadfoot}{\normalfont}
 \addtokomafont{section}{\rmfamily}
 \addtokomafont{subsection}{\rmfamily}
 \addtokomafont{subsubsection}{\rmfamily}
 \newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries\color{PhiMiSciBlue}}
-\newkomafont{PhiMiSciAffiliationLine}{\normalfont}
+\newkomafont{PhiMiSciAffiliationLine}{\normalfont\normalsize}
 %    \end{macrocode}
 % \subsection{Bibliography management through \texttt{biblatex}}
 % The entire bibliography management is delegated to \pkg{biblatex}. We enable 
@@ -183,7 +185,7 @@ http://www.latex-project.org/lppl.txt
   {
     \hypersetup
       {
-        pdfauthor = { \tl_use:N \l_phimisci_header_authors_tl },
+        pdfauthor = { \tl_use:N \l_phimisci_authors_tl },
         pdftitle  = { \tl_use:N \l_phimisci_document_title_tl }
       }
   }
@@ -277,8 +279,8 @@ http://www.latex-project.org/lppl.txt
       \l__phimisci_copyright_tl,
     copyright-text .initial:n = 
       {
-        \copyright{}~The~author(s).~This~is~an~open~access~article~distributed~
-         under~the~terms~of~the~Creative~Commons~Attribution~4.0~license.
+        This~is~an~open~access~article~distributed~
+        under~the~terms~of~the~Creative~Commons~Attribution~4.0~license.
       },
     keyword-input-separator .tl_set:N = 
       \l__phimisci_keywords_isep_tl,
@@ -501,6 +503,24 @@ http://www.latex-project.org/lppl.txt
                >
                1
                { ~et~al. }
+          }
+        \tl_set:Nx \l_phimisci_authors_tl
+          {
+            \seq_use:Nnnn \l__phimisci_authors_header_tmp_seq
+                          { \l__phimisci_authors_osep_final_tl } 
+                          { \l__phimisci_authors_osep_tl } 
+                          { \l__phimisci_authors_osep_final_tl } 
+          }
+        \int_compare:nNnTF
+          { \seq_count:N \l__phimisci_authors_header_tmp_seq } = 1
+          { 
+            \tl_set:Nx \l__phimisci_copyright_holder_tl
+              {
+                \seq_item:Nn \l__phimisci_authors_header_tmp_seq { 1 }
+              }
+          }
+          {
+            \tl_set:Nn \l__phimisci_copyright_holder_tl { The~authors }
           }
       }
       {
@@ -890,6 +910,7 @@ http://www.latex-project.org/lppl.txt
               \int_use:N \l_phimisci_publication_year_int\par
               \textsc{doi}:~\href{https://doi.org/\tl_use:N \l_phimisci_doi_tl}
                       {\oldstylenums{\tl_use:N \l_phimisci_doi_tl}}\par
+              \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
               \tl_use:N \l__phimisci_copyright_tl}
       }
       {%
