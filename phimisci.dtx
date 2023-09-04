@@ -252,12 +252,10 @@ http://www.latex-project.org/lppl.txt
     \bool_set_false:N \l__phimisci_output_contact_bool
     \bool_set_false:N \l__phimisci_output_publication_footer_bool
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 % \begin{function}{\__phimisci_stage_draft:}
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \cs_new:Nn \__phimisci_stage_draft:
   {
     \KOMAoptions{draft=true}
@@ -265,12 +263,10 @@ http://www.latex-project.org/lppl.txt
     \bool_set_true:N \l__phimisci_output_contact_bool
     \bool_set_true:N \l__phimisci_output_publication_footer_bool
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 % \begin{function}{\__phimisci_stage_final:}
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \cs_new:Nn \__phimisci_stage_final:
   {
     \KOMAoptions{draft=false}
@@ -278,12 +274,10 @@ http://www.latex-project.org/lppl.txt
     \bool_set_true:N \l__phimisci_output_contact_bool
     \bool_set_true:N \l__phimisci_output_publication_footer_bool
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 % \subsection{Publication type}
 %
 %    \begin{macrocode}
-\ExplSyntaxOn
 \cs_new:Nn \__phimisci_type_paper:
   {
     \bool_set_false:N \l__phimisci_output_related_bool
@@ -318,13 +312,11 @@ http://www.latex-project.org/lppl.txt
     \bool_set_false:N \l__phimisci_output_related_bool
     \subject{ \tl_use:N \l__phimisci_locale_si_introduction_tl }
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 % \section{Messages, errors and warnings}
 % 
 % \section{Key-value interface for user-configurable options}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \keys_define:nn { phimisci }
   {
     stage .choice:,
@@ -446,7 +438,6 @@ http://www.latex-project.org/lppl.txt
   { 
     \keys_set:nn { phimisci } { #1 }
   }
-\ExplSyntaxOff
 \ProcessKeysOptions{phimisci}
 %    \end{macrocode}
 % \end{function}
@@ -477,20 +468,17 @@ http://www.latex-project.org/lppl.txt
 % can be used in the argument passed to \cs{author} 
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \RenewDocumentCommand {\author} { +m }
  {
    \gdef \@author { #1 }
    \PhiMiSci@ProcessAuthorData { #1 }
  }
-\ExplSyntaxOff
 %    \end{macrocode}
 %    \begin{macrocode}
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@ProcessAuthorData}
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \NewDocumentCommand { \PhiMiSci@ProcessAuthorData } { +m }
   {%
     \exp_args:No \phimisci_process_author_data:nNNNNN
@@ -525,7 +513,6 @@ http://www.latex-project.org/lppl.txt
         \vskip 1em
       }
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 % \begin{function}{\phimisci_process_author_data:nNNNNN}
 % \begin{arguments}
@@ -538,7 +525,6 @@ http://www.latex-project.org/lppl.txt
 % \end{arguments}
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \cs_new:Npn \phimisci_process_author_data:nNNNNN #1#2#3#4#5#6
   {
     \seq_clear_new:N \l__phimisci_authors_header_tmp_seq
@@ -676,7 +662,6 @@ http://www.latex-project.org/lppl.txt
         \tl_set:Nn \l_phimisci_header_authors_tl { Anonymized }
       }
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 % We have now sorted our data in two mappings, a \{author: <affiliations>\} and 
 % an \{author: orcid\} mapping. These two are now output.
@@ -689,7 +674,6 @@ http://www.latex-project.org/lppl.txt
 % \end{arguments}
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \cs_new:Npn \phimisci_output_authors:NNNN #1#2#3#4
   {
     \prop_map_inline:Nn { #1 }
@@ -743,7 +727,6 @@ http://www.latex-project.org/lppl.txt
                   { \l__phimisci_authors_osep_tl } 
                   { \l__phimisci_authors_osep_final_tl } 
   }
-\ExplSyntaxOff  
 %    \end{macrocode}
 % \begin{function}{\phimisci_output_affiliations:NNN}
 % \begin{arguments}
@@ -753,7 +736,6 @@ http://www.latex-project.org/lppl.txt
 % \end{arguments}
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \cs_new:Npn \phimisci_output_affiliations:NNN #1#2#3
   {
     \int_compare:nNnT { #2 } > { 0 }
@@ -796,7 +778,6 @@ http://www.latex-project.org/lppl.txt
         \group_end:
       }
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 % \subsection{Managing the title and a short title (\texttt{\textbackslash title})}
 % \begin{function}{\title}
@@ -810,7 +791,6 @@ http://www.latex-project.org/lppl.txt
 % long to fit one line in the header.
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \tl_new:N \l_phimisci_document_title_tl
 \tl_new:N \l_phimisci_short_document_title_tl
 \RenewDocumentCommand {\title} { O{#2} m }
@@ -819,7 +799,6 @@ http://www.latex-project.org/lppl.txt
     \tl_set:Nn \l_phimisci_short_document_title_tl { #1 }
     \RenewDocumentCommand {\@title} {} { #2 }
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 % \subsection{Manage the abstract, keywords, contact details and information 
 % about reviewed books}
@@ -830,7 +809,6 @@ http://www.latex-project.org/lppl.txt
 % Store the contact information in free form input.
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \DeclareDocumentCommand {\contact} {m} 
   {%
     \bool_if:NT \l__phimisci_output_contact_bool
@@ -883,13 +861,11 @@ http://www.latex-project.org/lppl.txt
   {%
     \tl_set:Nn \l__phimisci_related_tl { #1 }
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 % 
 % \begin{function}{\phimisci_check_abstract_length:n, \phimisci_process_keywords:n}
 % A function that 
 %    \begin{macrocode}
-\ExplSyntaxOn
 \cs_new:Npn \phimisci_check_abstract_length:n #1
   {
     \int_set:Nn \l__phimisci_abstract_length_int { \tl_count:o { #1 } }
@@ -906,7 +882,6 @@ http://www.latex-project.org/lppl.txt
     \seq_use:Nn \l__phimisci_keywords_seq
                 { \l__phimisci_keywords_osep_tl }
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 % \end{function}
 % \begin{function}{\PhiMiSci@OutputMetadata}
@@ -914,7 +889,6 @@ http://www.latex-project.org/lppl.txt
 % called by \cs{maketitle}.
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \NewDocumentCommand {\PhiMiSci@OutputMetadata} {}
   {
     \bool_if:nT 
@@ -952,13 +926,11 @@ http://www.latex-project.org/lppl.txt
         \vskip 1em
       }
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 %
 % We make sure that the meta data is only provided in the preamble so that we
 % can process it before using \cs{maketitle}.
 %    \begin{macrocode}
-\ExplSyntaxOn
 \AtBeginDocument
   {
     \RenewDocumentCommand {\keywords} {m} 
@@ -1033,7 +1005,6 @@ http://www.latex-project.org/lppl.txt
     \hfill 
     \tl_use:N \l_phimisci_short_document_title_tl
   }
-\ExplSyntaxOff
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@Footer, \PhiMiSci@Footer*}
 % Two macros for the content of the footer.  The starred variant produces the 
@@ -1041,7 +1012,6 @@ http://www.latex-project.org/lppl.txt
 % pages.
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \NewDocumentCommand {\PhiMiSci@Footer} {s}
   {%
     \IfBooleanTF {#1}
