@@ -35,6 +35,7 @@ http://www.latex-project.org/lppl.txt
 \usepackage{biblatex}
 \usepackage{booktabs}
 \usepackage{xcolor}
+\usepackage{pifont}
 \definecolor{PhiMiSciRed}{cmyk}{0, 1, 0.91, 0.01}
 \definecolor{PhiMiSciBlue}{cmyk}{0.90, 0.73, 0, 0.62}
 \begin{filecontents}[overwrite]{\jobname.bib}
@@ -61,6 +62,7 @@ http://www.latex-project.org/lppl.txt
 % \fi
 % \title{Technical documentation of the \texttt{phimisci} class}
 % \author{Felix Kopecky}
+% \date{Version 1.0rc1 (\today)}
 % \maketitle
 % \texttt{phimisci} is a document class to aid in the editorial and production
 % process of \emph{Philosophy and the Mind Sciences} (PhiMiSci), a diamond 
@@ -100,7 +102,8 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \subsection{Class inheritance}
-% This class is based on .
+% This class is based on Markus Kohm's \texttt{scrartcl} class. We set load 
+% this class with apropriate settings and the package \texttt{scrlayer-scrpage}.
 %    \begin{macrocode}
 \LoadClass [12pt, 
             DIV=8,
@@ -108,63 +111,34 @@ http://www.latex-project.org/lppl.txt
             oneside] 
             {scrartcl}
 
-\RequirePackage[autoenlargeheadfoot=off]
-               {scrlayer-scrpage}
-
-\ExplSyntaxOn
-\NewDocumentCommand{\PhiMiSci@DetectKomaHeader} {}
-  {
-    \bool_set_true:N \l__phimisci_koma_head_mode_bool
-  }
-\ExplSyntaxOff
-
+\RequirePackage[autoenlargeheadfoot=off]{scrlayer-scrpage}
+%    \end{macrocode}
+% The option \texttt{onpsinit} from \texttt{scrartcl} allows us to detect 
+% paragraphs in the header and footer of the document. We use this anchor to 
+% call \cs{PhiMiSci@DetectKomaHeader} (see Section~\ref{sec:parnumbering} 
+% below).
+%    \begin{macrocode}
 \KOMAoption{onpsinit}{\protect\PhiMiSci@DetectKomaHeader{}}
 %    \end{macrocode}
 % \subsection{Basic packages}
-% Load a couple of packages that should be always available.
+% We load well-known packages that are used regularly in the preparation of 
+% scientific texts.
 %    \begin{macrocode}
-\RequirePackage{amsmath,
-                amsthm,
-                amssymb,
-                array,
-                booktabs,
-                enumitem,
-                graphicx
-                }
+\RequirePackage{amsmath, amsthm, amssymb, array, booktabs, enumitem, graphicx}
 %    \end{macrocode}
-% And packages useful to making features of this class available.
+% We also load helper packages that are necessary to program features of this
+% class.
 %    \begin{macrocode}
-\RequirePackage{calc,
-                etoolbox,
-                expl3,
-                l3keys2e,
-                microtype,
-                xcolor
-                }
+\RequirePackage{calc, etoolbox, expl3, l3keys2e, microtype, xcolor}
 %    \end{macrocode}
 % \subsection{Data storage, Boolean switches and command variants}
-% Token lists and sequences for data storage.
+% These Booleans, control sequences, integer variables, mappings, sequences and
+% token lists are used by the class internally to organise data, make 
+% decisions, and enable features of the class. They are only defined here but
+% not documented individually -- please refer to their usage within other 
+% functions.
 %    \begin{macrocode}
 \ExplSyntaxOn
-\cs_generate_variant:Nn \seq_set_split:Nnn { NVn }
-\cs_generate_variant:Nn \seq_set_split:Nnn { NVx }
-\seq_new:N \l__phimisci_keywords_seq
-\seq_new:N \l__phimisci_authors_seq
-\seq_new:N \l__phimisci_output_authors_seq
-\prop_new:N \l__phimisci_authors_to_affiliations_prop
-\prop_new:N \l__phimisci_authors_to_orcids_prop
-\prop_new:N \l__phimisci_affiliation_id_resolver_prop
-\tl_new:N \l_phimisci_header_authors_tl
-\tl_new:N \l_phimisci_authors_tl
-\tl_new:N \l__phimisci_keywords_tl
-\tl_new:N \l__phimisci_reviewed_book_tl
-\tl_new:N \l__phimisci_copyright_holder_tl
-\tl_new:N \l__phimisci_locale_related_tl
-\int_new:N \l__phimisci_number_of_authors_int
-\int_new:N \l__phimisci_number_of_affiliations_int
-\int_new:N \l__phimisci_current_affiliation_id_int
-\int_new:N \l__phimisci_abstract_length_int
-\cs_new:Nn \__phimisci_affiliation_line_separator: { \smallskip\\ }
 \bool_new:N \l__phimisci_output_keywords_bool
 \bool_new:N \l__phimisci_output_abstract_bool
 \bool_new:N \l__phimisci_output_contact_bool
@@ -172,13 +146,37 @@ http://www.latex-project.org/lppl.txt
 \bool_new:N \l__phimisci_output_publication_footer_bool
 \bool_new:N \l__phimisci_output_related_bool
 \bool_new:N \l__phimisci_koma_head_mode_bool
+\cs_new:Nn \__phimisci_affiliation_line_separator: { \smallskip\\ }
+\cs_generate_variant:Nn \seq_set_split:Nnn { NVn }
+\cs_generate_variant:Nn \seq_set_split:Nnn { NVx }
+\int_new:N \l__phimisci_number_of_authors_int
+\int_new:N \l__phimisci_number_of_affiliations_int
+\int_new:N \l__phimisci_current_affiliation_id_int
+\int_new:N \l__phimisci_abstract_length_int
+\prop_new:N \l__phimisci_authors_to_affiliations_prop
+\prop_new:N \l__phimisci_authors_to_orcids_prop
+\prop_new:N \l__phimisci_affiliation_id_resolver_prop
+\seq_new:N \l__phimisci_keywords_seq
+\seq_new:N \l__phimisci_authors_seq
+\seq_new:N \l__phimisci_output_authors_seq
+\tl_new:N \l_phimisci_header_authors_tl
+\tl_new:N \l_phimisci_authors_tl
+\tl_new:N \l__phimisci_keywords_tl
+\tl_new:N \l__phimisci_reviewed_book_tl
+\tl_new:N \l__phimisci_copyright_holder_tl
+\tl_new:N \l__phimisci_locale_related_tl
 \ExplSyntaxOff
 %    \end{macrocode}
 
 % \subsection{Font loading}
-% Load the font.
+% \textit{Philosophy and the Mind Sciences} uses Libertinus as its bread and
+% butter type, which we load through the \LaTeX\ package \texttt{libertinus}. 
 %    \begin{macrocode}
 \RequirePackage{libertinus}
+%    \end{macrocode}
+% We adjust the font settings inherited from \texttt{scrartcl} and create new
+% font commands for specific \textit{PhiMiSci} elements.
+%    \begin{macrocode}
 \setkomafont{title}{\raggedright\normalfont\normalsize\huge\bfseries}
 \setkomafont{author}{\raggedright\normalfont\normalsize\large\bfseries}
 \setkomafont{subject}{\normalfont\normalsize}
@@ -190,17 +188,15 @@ http://www.latex-project.org/lppl.txt
 \newkomafont{PhiMiSciAffiliationLine}{\normalfont\normalsize}
 %    \end{macrocode}
 % \subsection{Bibliography management through \texttt{biblatex}}
-% The entire bibliography management is delegated to \pkg{biblatex}. We enable 
-% \pkg{natbib} as well so that authors can use traditional commands, most notably
+% The entire bibliography management is delegated to \texttt{biblatex}. We enable 
+% \texttt{natbib} as well so that authors can use traditional commands, most notably
 % \cs{citet}, \cs{citep} and \cs{citealt}. \emph{Philosophy and the Mind Sciences}
 % strictly follows the citation rules of the APA.
 %    \begin{macrocode}
 \RequirePackage[style=apa, natbib=true]{biblatex}
 %    \end{macrocode}
 % \subsection{PDF meta data and links through \texttt{hyperref}}
-% We load hyperref and set all links to our blue color. We delay setting the 
-% PDF meta data (author, title) to the end of the preamble to allow for meta
-% data processing first.
+% We load hyperref and set all links to our blue color. 
 %    \begin{macrocode}
 \RequirePackage[final,
                 breaklinks=true,
@@ -210,7 +206,11 @@ http://www.latex-project.org/lppl.txt
                 citecolor=PhiMiSciBlue,
                 urlcolor=PhiMiSciBlue,
                 hyperfootnotes=false]{hyperref}
-
+%    \end{macrocode}
+% We delay setting the PDF meta data (author, title) to the end of the preamble 
+% to allow for meta data processing first. The meta data is output only in 
+% some publication stages (see Section~\ref{sec:stages}).
+%    \begin{macrocode}
 \ExplSyntaxOn
 \AtEndPreamble
   {
@@ -222,8 +222,29 @@ http://www.latex-project.org/lppl.txt
   }
 \ExplSyntaxOff
 %    \end{macrocode}
-% \subsection{Setting the stage (submission, draft, publication)}
-% These functions control settings implied by the stage selected by the user.
+% \subsection{Setting the stage (preparation, submission, draft, publication)}
+% \label{sec:stages}
+% Our \texttt{phimisci} class supports four document stages. These stages are
+% intended to support different steps in the preparation and publication of a
+% document: 
+%
+% \begin{description}
+% \item[Preparation:] Used by authors to compose a paper for submission to the
+% journal.
+% \item[Submission:] Used to compile the document for the peer review process.
+% \item[Draft:] Used internally by the PhiMiSci office for production of the
+% proofs.
+% \item[Final:] A stage to produce the publication PDF.
+% \end{description}
+%
+% These stages control the appearance of the generated document. For example,
+% no meta data are output in the \texttt{submission} stage to ensure anonymity
+% during peer review. 
+% The modes are activated by the choice \texttt{stage} (see Section~
+% \ref{sec:options} below). For example, \texttt{draft} mode is enabled with:
+% \begin{center}
+% \cs{documentclass}\texttt{[stage=draft]\{phimisci\}}.
+% \end{center}
 % Table~\ref{tab:stages} gives an overview of the information output by each
 % stage.
 %
@@ -233,22 +254,24 @@ http://www.latex-project.org/lppl.txt
 % at each stage.\label{tab:stages}}
 % \begin{tabular}{lcccc}
 % \toprule
-% Stage & Draft & Authors & Contact info & Footer\\\midrule
-% Preparation & N & Y & Y & N\\
-% Submission & N & N & N & N\\
-% Draft & Y & Y & Y & Y\\
-% Final & N & Y & Y & Y\\
+%       &            & \multicolumn{3}{c}{Output}\\\cmidrule(lr){3-5}
+% Stage & Draft mode & Authors & Contact info & Footer\\\midrule
+% Preparation & \ding{55} & \ding{51} & \ding{51} & \ding{55}\\
+% Submission & \ding{55} & \ding{55} & \ding{55} & \ding{55}\\
+% Draft & \ding{51} & \ding{51} & \ding{51} & \ding{51}\\
+% Final & \ding{55} & \ding{51} & \ding{51} & \ding{51}\\
 % \bottomrule
 % \end{tabular}
 % \end{table}
 % 
-% \begin{function}{\__phimisci_stage_preparation:}
+% \begin{function}{\__phimisci_stage_preparation:} 
+% Enable settings for the \texttt{preparation} stage.
 % \end{function}
 %    \begin{macrocode}
 \ExplSyntaxOn
 \cs_new:Nn \__phimisci_stage_preparation:
   {
-    \KOMAoptions{draft=false}
+    \KOMAoptions{overfullrule=false}
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
     \bool_set_false:N \l__phimisci_output_publication_footer_bool
@@ -256,46 +279,81 @@ http://www.latex-project.org/lppl.txt
 %    \end{macrocode}
 %
 % \begin{function}{\__phimisci_stage_submission:}
+% Enable settings for the \texttt{submission} stage.
 % \end{function}
 %    \begin{macrocode}
 \cs_new:Nn \__phimisci_stage_submission:
   {
-    \KOMAoptions{draft=false}
+    \KOMAoptions{overfullrule=false}
     \bool_set_false:N \l__phimisci_output_authors_bool
     \bool_set_false:N \l__phimisci_output_contact_bool
     \bool_set_false:N \l__phimisci_output_publication_footer_bool
   }
 %    \end{macrocode}
 % \begin{function}{\__phimisci_stage_draft:}
+% Enable settings for a \texttt{draft} after acceptance and during production.
 % \end{function}
 %    \begin{macrocode}
 \cs_new:Nn \__phimisci_stage_draft:
   {
-    \KOMAoptions{draft=true}
+    \KOMAoptions{overfullrule=true}
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
     \bool_set_true:N \l__phimisci_output_publication_footer_bool
   }
 %    \end{macrocode}
 % \begin{function}{\__phimisci_stage_final:}
+% Enable settings for the \texttt{final} publication PDF.
 % \end{function}
 %    \begin{macrocode}
 \cs_new:Nn \__phimisci_stage_final:
   {
-    \KOMAoptions{draft=false}
+    \KOMAoptions{overfullrule=false}
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
     \bool_set_true:N \l__phimisci_output_publication_footer_bool
   }
 %    \end{macrocode}
 % \subsection{Publication type}
+% Documents of different types are published in \textit{Philosophy and the Mind
+% Sciences}. We use \cs{subject} from \texttt{scrartcl} to mark the document's
+% type in the header of the title page.
 %
+% The document type can be set using the key \texttt{type}. For example, to 
+% write an introduction for a special issue, the setting would be:
+% \begin{center}
+% \cs{documentclass}\texttt{[type=introduction]\{phimisci\}}.
+% \end{center}
+% 
+% \begin{enumerate}
+% \item Original research (\texttt{paper})
+% \item Introductions to special issues (\texttt{introduction})
+% \item Book reviews\label{item:bookreview} (\texttt{book-review})
+% \item Book symposia\label{item:booksymposium} (\texttt{book-symposium})
+% \item Errata to previously published articles\label{item:errata}
+% (\texttt{correction})
+% \end{enumerate}
+% Documents of types \ref{item:bookreview}--\ref{item:errata} are inherently
+% linked to other publications. A book review and contributions to a book
+% symposium are always linked to a previous publication (such as a monograph
+% or edited volume), and a correction is always linked to an article previously
+% published in the journal. For this purpose, the command \cs{related} is 
+% available in this class (see Section~\ref{sec:data:other}). 
+%
+% \begin{function}{\__phimisci_type_paper:}
+%
+% \end{function}
 %    \begin{macrocode}
 \cs_new:Nn \__phimisci_type_paper:
   {
     \bool_set_false:N \l__phimisci_output_related_bool
     \subject{ \tl_use:N \l__phimisci_locale_original_research_tl }
   }
+%    \end{macrocode}
+% \begin{function}{\__phimisci_type_book_review:}
+%
+% \end{function}
+%    \begin{macrocode}
 \cs_new:Nn \__phimisci_type_book_review:
   {
     \bool_set_true:N \l__phimisci_output_related_bool
@@ -304,6 +362,11 @@ http://www.latex-project.org/lppl.txt
       \l__phimisci_locale_reviewed_book_tl
     \subject{ \tl_use:N \l__phimisci_locale_book_review_tl }
   }
+%    \end{macrocode}
+% \begin{function}{\__phimisci_type_book_symposium:}
+%
+% \end{function}
+%    \begin{macrocode}
 \cs_new:Nn \__phimisci_type_book_symposium:
   {
     \bool_set_true:N \l__phimisci_output_related_bool
@@ -312,6 +375,11 @@ http://www.latex-project.org/lppl.txt
       \l__phimisci_locale_reviewed_book_tl
     \subject{ \tl_use:N \l__phimisci_locale_book_symposium_tl }
   }
+%    \end{macrocode}
+% \begin{function}{\__phimisci_type_correction:}
+%
+% \end{function}
+%    \begin{macrocode}
 \cs_new:Nn \__phimisci_type_correction:
   {
     \bool_set_true:N \l__phimisci_output_related_bool
@@ -320,6 +388,11 @@ http://www.latex-project.org/lppl.txt
       \l__phimisci_locale_corrected_article_tl
     \subject{ \tl_use:N \l__phimisci_locale_correction_tl }
   }
+%    \end{macrocode}
+% \begin{function}{\__phimisci_type_si_introduction:}
+%
+% \end{function}
+%    \begin{macrocode}
 \cs_new:Nn \__phimisci_type_si_introduction:
   {
     \bool_set_false:N \l__phimisci_output_related_bool
@@ -329,6 +402,7 @@ http://www.latex-project.org/lppl.txt
 % \section{Messages, errors and warnings}
 % 
 % \section{Key-value interface for user-configurable options}
+% \label{sec:options}
 %    \begin{macrocode}
 \keys_define:nn { phimisci }
   {
@@ -815,7 +889,7 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \subsection{Manage the abstract, keywords, contact details and information 
-% about reviewed books}
+% about reviewed books}\label{sec:data:other}
 % \begin{function}{\contact}
 % \begin{syntax}
 % \cs{contact} \Arg{contact~details}
@@ -1079,7 +1153,7 @@ http://www.latex-project.org/lppl.txt
       }
   }
 %    \end{macrocode}
-% \section{Automatic paragraph numbering}
+% \section{Automatic paragraph numbering}\label{sec:parnumbering}
 % Alternative to an idea by Nicola Talbot \parencite[\S6.5.2]{Talbot2015}. 
 % Using the new hook management from lthooks.
 % \begin{variable}{PhiMiSci@Paragraph}
@@ -1155,6 +1229,16 @@ http://www.latex-project.org/lppl.txt
     \AddtoDoHook { heading/endgroup/#1 } { \PhiMiSci@AddParNum{} }
   }
 %    \end{macrocode}
+% \begin{function}{\PhiMiSci@DetectKomaHeader}
+% A macro that is executed in \cls{scrartcl}'s header and footer. It prevents
+% the paragraphs created there from being enumerated.
+% \end{function}
+%    \begin{macrocode}
+\NewDocumentCommand{\PhiMiSci@DetectKomaHeader} {}
+  {
+    \bool_set_true:N \l__phimisci_koma_head_mode_bool
+  }
+%    \end{macrocode}
 % \begin{function}{PhiMiSciNumberedParagraphs}
 % An environment for encapsulating content in which the paragraphs are counted.
 % Initialisation is made through commands previously defined in this section.
@@ -1181,6 +1265,7 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 %</class>
 %    \end{macrocode}
-% \section{Acknowledgments}
+% \section*{Acknowledgments}
+% \addcontentsline{toc}{section}{Acknowledgments}
 % The development of this class was funded by the DFG (project no. 514161146).
-% \printbibliography
+% \printbibliography[heading=bibintoc]
