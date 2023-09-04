@@ -234,17 +234,30 @@ http://www.latex-project.org/lppl.txt
 % \begin{tabular}{lcccc}
 % \toprule
 % Stage & Draft & Authors & Contact info & Footer\\\midrule
+% Preparation & N & Y & Y & N\\
 % Submission & N & N & N & N\\
 % Draft & Y & Y & Y & Y\\
 % Final & N & Y & Y & Y\\
 % \bottomrule
 % \end{tabular}
 % \end{table}
+% 
+% \begin{function}{\__phimisci_stage_preparation:}
+% \end{function}
+%    \begin{macrocode}
+\ExplSyntaxOn
+\cs_new:Nn \__phimisci_stage_preparation:
+  {
+    \KOMAoptions{draft=false}
+    \bool_set_true:N \l__phimisci_output_authors_bool
+    \bool_set_true:N \l__phimisci_output_contact_bool
+    \bool_set_false:N \l__phimisci_output_publication_footer_bool
+  }
+%    \end{macrocode}
 %
 % \begin{function}{\__phimisci_stage_submission:}
 % \end{function}
 %    \begin{macrocode}
-\ExplSyntaxOn
 \cs_new:Nn \__phimisci_stage_submission:
   {
     \KOMAoptions{draft=false}
@@ -320,10 +333,11 @@ http://www.latex-project.org/lppl.txt
 \keys_define:nn { phimisci }
   {
     stage .choice:,
+    stage / preparation .code:n = { \__phimisci_stage_preparation: },
     stage / submission .code:n = { \__phimisci_stage_submission: },
     stage / draft .code:n = { \__phimisci_stage_draft: },
     stage / final .code:n = { \__phimisci_stage_final: },
-    stage .default:n = {final},
+    stage .default:n = {preparation},
     type .choice:,
     type / paper .code:n = { \__phimisci_type_paper: },
     type / book-review .code:n = { \__phimisci_type_book_review: },
