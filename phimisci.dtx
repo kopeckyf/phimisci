@@ -46,12 +46,26 @@ http://www.latex-project.org/lppl.txt
     publisher = {Dickimaw Books},
     url = {https://www.dickimaw-books.com/latex/admin}
 }
-@book{Interface3,
+@misc{Interface3,
     author = {{The \LaTeX Project}},
     year = {2023},
     url = {https://ctan.org/pkg/l3kernel},
     title = {The \LaTeX3 Interfaces},
     note = {Version 2023-06-30},
+}
+@misc{lthooks,
+    author = {Frank Mittelbach},
+    year = {2022},
+    title = {\LaTeX's hook management},
+    url = {https://www.latex-project.org/help/documentation/lthooks-doc.pdf},
+    note = {Version 2022-05-19}
+}
+@misc{ltpara,
+    author = {Frank Mittelbach},
+    year = {2022},
+    title = {The \texttt{ltpara.dtx} code},
+    url = {https://www.latex-project.org/help/documentation/ltpara-doc.pdf},
+    note = {Version 2022-05-13}
 }
 \end{filecontents}
 \addbibresource{\jobname.bib}
@@ -159,6 +173,11 @@ http://www.latex-project.org/lppl.txt
 \seq_new:N \l__phimisci_keywords_seq
 \seq_new:N \l__phimisci_authors_seq
 \seq_new:N \l__phimisci_output_authors_seq
+\tl_const:Nn \l__phimisci_parnum_excluded_objects_base_tl
+  {
+    env/quote, env/quotation, env/itemize, env/enumerate, env/description, 
+    env/list, env/table, env/figure, env/tabbing, env/lstlisting, env/verbatim,
+  }
 \tl_new:N \l_phimisci_header_authors_tl
 \tl_new:N \l_phimisci_authors_tl
 \tl_new:N \l__phimisci_keywords_tl
@@ -403,6 +422,7 @@ http://www.latex-project.org/lppl.txt
 % 
 % \section{Key-value interface for user-configurable options}
 % \label{sec:options}
+% \subsection{Configure document data}
 %    \begin{macrocode}
 \keys_define:nn { phimisci }
   {
@@ -430,6 +450,14 @@ http://www.latex-project.org/lppl.txt
     issue .tl_set:N = \l_phimisci_issue_name_tl,
     issue .initial:n = {}
   }
+%    \end{macrocode}
+% \subsection{Settings}
+% \begin{variable}{phimisci/settings}
+% \begin{syntax}
+% \cs{PhiMiSciSettings} \{ settings / \meta{key} = value \}
+% \end{syntax}
+% \end{variable}
+%    \begin{macrocode}
 \keys_define:nn { phimisci / settings}
   {
     author-output-separator .tl_set:N = \l__phimisci_authors_osep_tl,
@@ -479,14 +507,11 @@ http://www.latex-project.org/lppl.txt
     number-authors-header .initial:n = { 1 },
     paragraph-numbering-excluded-objects .tl_set:N = 
       \l__phimisci_parnum_excluded_objects_tl,
-    paragraph-numbering-excluded-objects .initial:n = 
-      {
-        env/quote, env/quotation, 
-        env/itemize, env/enumerate, env/description, env/list,
-        env/table, env/figure, env/tabbing,
-        env/lstlisting, env/verbatim,
-      }
+    paragraph-numbering-excluded-objects .initial:n = {}
   }
+%    \end{macrocode}
+% \subsection{Locale settings}
+%    \begin{macrocode}
 \keys_define:nn { phimisci / locale }
   {
     abstract .tl_set:N = \l__phimisci_locale_abstract_tl,
@@ -535,7 +560,7 @@ http://www.latex-project.org/lppl.txt
 %    \texttt{\textbackslash affiliation}, \texttt{\textbackslash orcid})}
 % It should be noted that \cs{affiliation} and \cs{orcid} are \emph{not} defined
 % commands here, but merely elements for the \LaTeX3 parsing of regex parsing to
-% hook to \parencite[see][46]{Interface3}.
+% hook to \cite[see][46]{Interface3}.
 % 
 % \begin{function}{\author}
 % \begin{syntax}
@@ -1032,17 +1057,31 @@ http://www.latex-project.org/lppl.txt
   }
 \ExplSyntaxOff
 %    \end{macrocode}
-% \section{Colours}
+% \section{Colours and coloured boxes}
+% \begin{function}{PhiMiSciRed, PhiMiSciBlue}
 % The journal's identity has a blue: 
 % \fcolorbox{black}{PhiMiSciBlue}{\strut ~~~~} 
 % and a red: \fcolorbox{black}{PhiMiSciRed}{\strut ~~~~}
-% \begin{function}{PhiMiSciRed, PhiMiSciBlue}
 %    \begin{macrocode}
 \definecolor{PhiMiSciRed}{cmyk}{0, 1, 0.91, 0.01}
 \definecolor{PhiMiSciBlue}{cmyk}{0.90, 0.73, 0, 0.62}
 %    \end{macrocode}
 % \end{function}
-% \section{Graphical elements}
+%
+% \begin{function}{\PhiMiSci@ColouredBox}
+% \begin{syntax} \cs{PhiMiSci@ColouredBox}\marg{string}
+% \end{syntax}
+% A general-purpose function to put single line content into a blue box. This
+% function is called by our \texttt{type} settings and can be used to output
+% the paragraph number, possibly in combination with automatic paragraph
+% counting. 
+%
+% \begin{center}
+% \hbox{} \cs{PhiMiSci@ColouredBox}\texttt{\{string\}} \hskip 1em $\rightarrow$
+% \hskip 1em \bgroup \fboxrule=0pt \colorbox {PhiMiSciBlue}
+% { \strut\sffamily\bfseries\color{white} string } \egroup
+% \end{center}
+% \end{function}
 %    \begin{macrocode}
 \NewDocumentCommand{\PhiMiSci@ColouredBox}{m}
   {%
@@ -1054,6 +1093,8 @@ http://www.latex-project.org/lppl.txt
 %    \end{macrocode}
 % \section{Titling}
 % Document the |\and\relax| and |-1\baselineskip|
+% \begin{function}{\@maketitle}
+% \end{function}
 %    \begin{macrocode}
 \RenewDocumentCommand {\@maketitle} {} 
   {%
@@ -1154,8 +1195,48 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \section{Automatic paragraph numbering}\label{sec:parnumbering}
-% Alternative to an idea by Nicola Talbot \parencite[\S6.5.2]{Talbot2015}. 
-% Using the new hook management from lthooks.
+% Passages in journal articles have traditionaly been identified by their page
+% number. As journals move to publication on the web alongside PDF distribution,
+% a different mechanic becomes necessary to identify passages in non-paginated
+% media, such as web sites. The predominant approach has been to number 
+% paragraphs instead.
+%
+% The \texttt{phimisci} class offers mechanisms for automatic (as well as
+% manual) paragraph numbering. The classic implementation of this was described
+% by Nicola Talbot \cite[\S6.5]{Talbot2015}. This method uses 
+% \cs{everypar}, a command that does not appear to be advisable any longer 
+% \cite[1--3]{ltpara}. Instead, we implement a similar mechanism through \LaTeX's new 
+% hook management \cite{lthooks, ltpara}.
+%
+% The environment \env{PhiMiSciNumberedParagraphs} automatically numbers 
+% paragraphs according to the template \cs{PhiMiSci@PrintParNum}. 
+% The \texttt{phimisci} class takes great care to exclude certain elements from
+% paragraph counting, such as the document's header and footer (via
+% \cs{PhiMiSci@DetectKomaHeader}) and from a pre-defined list of environments
+% (using \cs{PhiMiSci@ParNumSwitch}) as well as the sectioning commands 
+% (\cs{section}, \cs{subsection} and \cs{subsubsection}). The user can extend 
+% this list in case additional environments should be included:
+%
+% \begin{quote}
+% \cs{PhiMiSciSettings} \texttt{\{ settings / 
+% paragraph-numbering-excluded-objects = \meta{list}\}}
+% \end{quote}
+%
+% \begin{variable}{\l__phimisci_parnum_excluded_objects_base_tl}
+% The following environments are excluded by default and do not need to be
+% added:
+% \end{variable}
+% \begin{itemize}
+% \item lists (\texttt{list}, \texttt{enumerate}, \texttt{itemize},
+%       \texttt{description})
+% \item quotes (\texttt{quote}, \texttt{quotation})
+% \item floats (\texttt{figure}, \texttt{table})
+% \item \texttt{tabbing}
+% \item computer code (\texttt{verbatim}, \texttt{lstlisting})
+% \end{itemize}
+% By convention, these objects are either identified by their own identifier
+% or through the paragraph that preceedes them.
+%
 % \begin{variable}{PhiMiSci@Paragraph}
 % A paragraph counter. It is set to reset at every section
 % \end{variable}
@@ -1195,12 +1276,9 @@ http://www.latex-project.org/lppl.txt
     \RemoveFromHook {para/begin} [PhiMiSciParNumber]
   }
 %    \end{macrocode}
-% \begin{function}{\PhiMiSci@ParNumSwitch, \PhiMiSci@ParNumSwitchDisable, 
-%                  \PhiMiSci@ParNumSwitchKOMA }
+% \begin{function}{\PhiMiSci@ParNumSwitch}
 % \begin{syntax}
 % \cs{PhiMiSci@ParNumSwitch} \marg{comma~separated~list}
-% \cs{PhiMiSci@ParNumSwitchDisable} \marg{comma~separated~list}
-% \cs{PhiMiSci@ParNumSwitchKOMA} \marg{KOMA~hook}
 % \end{syntax}
 % Functions to add and remove hooks.
 % \end{function}
@@ -1213,7 +1291,14 @@ http://www.latex-project.org/lppl.txt
         \AddToHook { ##1/after } [PhiMiSciParNumber] { \PhiMiSci@AddParNum{} }
       }
   }
-  
+%    \end{macrocode}
+% \begin{function}{\PhiMiSci@ParNumSwitchDisable }
+% \begin{syntax}
+% \cs{PhiMiSci@ParNumSwitchDisable} \marg{comma~separated~list}
+% \end{syntax}
+% Functions to add and remove hooks.
+% \end{function}
+%    \begin{macrocode}
 \NewDocumentCommand {\PhiMiSci@ParNumSwitchDisable} {+m}
   {
     \clist_map_inline:nn { #1 }
@@ -1222,7 +1307,14 @@ http://www.latex-project.org/lppl.txt
       \RemoveFromHook { ##1/after } [PhiMiSciParNumber]
     }
   }
-
+%    \end{macrocode}
+% \begin{function}{\PhiMiSci@ParNumSwitchKOMA }
+% \begin{syntax}
+% \cs{PhiMiSci@ParNumSwitchKOMA} \marg{KOMA~hook}
+% \end{syntax}
+% Functions to add and remove hooks.
+% \end{function}
+%    \begin{macrocode}
 \NewDocumentCommand {\PhiMiSci@ParNumSwitchKOMA} {m}
   {
     \AddtoDoHook { heading/begingroup/#1 } { \PhiMiSci@RemoveParNum{} }
@@ -1246,10 +1338,14 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \NewDocumentEnvironment { PhiMiSciNumberedParagraphs } {}
   {%
+    \tl_concat:NNN \l__phimisci_parnum_excluded_objects_combined_tl
+                   \l__phimisci_parnum_excluded_objects_base_tl
+                   \l__phimisci_parnum_excluded_objects_tl
     \parindent=0pt
     \parskip=.5\baselineskip
     \PhiMiSci@AddParNum{}
-    \PhiMiSci@ParNumSwitch{ \tl_use:N \l__phimisci_parnum_excluded_objects_tl }
+    \PhiMiSci@ParNumSwitch
+      { \tl_use:N \l__phimisci_parnum_excluded_objects_combined_tl }
     \PhiMiSci@ParNumSwitchKOMA{section}
     \PhiMiSci@ParNumSwitchKOMA{subsection}
     \PhiMiSci@ParNumSwitchKOMA{subsubsection}
