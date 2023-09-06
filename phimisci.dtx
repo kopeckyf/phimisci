@@ -505,6 +505,8 @@ http://www.latex-project.org/lppl.txt
     number-authors-header .int_set:N =
       \l__phimisci_authors_in_header_int,
     number-authors-header .initial:n = { 1 },
+    output-orcids .bool_set:N = \l__phimisci_output_orcids_bool,
+    output-orcids .initial:n = {true},
     paragraph-numbering-excluded-objects .tl_set:N = 
       \l__phimisci_parnum_excluded_objects_tl,
     paragraph-numbering-excluded-objects .initial:n = {}
@@ -1091,7 +1093,7 @@ http://www.latex-project.org/lppl.txt
     \egroup
   }  
 %    \end{macrocode}
-% \section{Titling}
+% \section{The document title}
 % Document the |\and\relax| and |-1\baselineskip|
 % \begin{function}{\@maketitle}
 % \end{function}
@@ -1102,11 +1104,6 @@ http://www.latex-project.org/lppl.txt
     \enlargethispage{-1\baselineskip}
     \global\@topnum=\z@
     \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
-    \ifx\@titlehead\@empty \else
-      \begin{minipage}[t]{\textwidth}
-        \usekomafont{titlehead}{\@titlehead\par}%
-      \end{minipage}\par
-    \fi
     \null
     \vskip 1em%
       \ifx\@subject\@empty \else
