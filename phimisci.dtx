@@ -176,7 +176,7 @@ http://www.latex-project.org/lppl.txt
 \tl_const:Nn \l__phimisci_parnum_excluded_objects_base_tl
   {
     env/quote, env/quotation, env/itemize, env/enumerate, env/description, 
-    env/list, env/table, env/figure, env/tabbing, env/lstlisting, env/verbatim,
+    env/list, env/table, env/figure, env/tabbing, env/lstlisting, env/verbatim
   }
 \tl_new:N \l_phimisci_header_authors_tl
 \tl_new:N \l_phimisci_authors_tl
@@ -1280,13 +1280,10 @@ http://www.latex-project.org/lppl.txt
 % Functions to add and remove hooks.
 % \end{function}
 %    \begin{macrocode}
-\NewDocumentCommand {\PhiMiSci@ParNumSwitch} {+m}
+\NewDocumentCommand {\PhiMiSci@ParNumSwitch} {m}
   {
-    \clist_map_inline:nn { #1 }
-      {
-        \AddToHook { ##1/before } [PhiMiSciParNumber] { \PhiMiSci@RemoveParNum{} }
-        \AddToHook { ##1/after } [PhiMiSciParNumber] { \PhiMiSci@AddParNum{} }
-      }
+    \AddToHook { #1/before } [PhiMiSciParNumber] { \PhiMiSci@RemoveParNum{} }
+    \AddToHook { #1/after } [PhiMiSciParNumber] { \PhiMiSci@AddParNum{} }
   }
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@ParNumSwitchDisable }
@@ -1296,13 +1293,10 @@ http://www.latex-project.org/lppl.txt
 % Functions to add and remove hooks.
 % \end{function}
 %    \begin{macrocode}
-\NewDocumentCommand {\PhiMiSci@ParNumSwitchDisable} {+m}
+\NewDocumentCommand {\PhiMiSci@ParNumSwitchDisable} {m}
   {
-    \clist_map_inline:nn { #1 }
-    {
-      \RemoveFromHook { ##1/before } [PhiMiSciParNumber]
-      \RemoveFromHook { ##1/after } [PhiMiSciParNumber]
-    }
+      \RemoveFromHook { #1/before } [PhiMiSciParNumber]
+      \RemoveFromHook { #1/after } [PhiMiSciParNumber]
   }
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@ParNumSwitchKOMA }
@@ -1341,16 +1335,34 @@ http://www.latex-project.org/lppl.txt
     \parindent=0pt
     \parskip=.5\baselineskip
     \PhiMiSci@AddParNum{}
-    \PhiMiSci@ParNumSwitch
-      { \tl_use:N \l__phimisci_parnum_excluded_objects_combined_tl }
+    \PhiMiSci@ParNumSwitch{env/quote}
+    \PhiMiSci@ParNumSwitch{env/quotation}
+    \PhiMiSci@ParNumSwitch{env/table}
+    \PhiMiSci@ParNumSwitch{env/figure}
+    \PhiMiSci@ParNumSwitch{env/list}
+    \PhiMiSci@ParNumSwitch{env/enumerate}
+    \PhiMiSci@ParNumSwitch{env/itemize}
+    \PhiMiSci@ParNumSwitch{env/description}
+    \PhiMiSci@ParNumSwitch{env/lstlisting}
+    \PhiMiSci@ParNumSwitch{env/verbatim}
+    \PhiMiSci@ParNumSwitch{env/tabbing}
     \PhiMiSci@ParNumSwitchKOMA{section}
     \PhiMiSci@ParNumSwitchKOMA{subsection}
     \PhiMiSci@ParNumSwitchKOMA{subsubsection}
   }
   {%
     \PhiMiSci@RemoveParNum{}
-    \PhiMiSci@ParNumSwitchDisable
-      { \tl_use:N \l__phimisci_parnum_excluded_objects_tl}
+    \PhiMiSci@ParNumSwitchDisable{env/quote}
+    \PhiMiSci@ParNumSwitchDisable{env/quotation}
+    \PhiMiSci@ParNumSwitchDisable{env/table}
+    \PhiMiSci@ParNumSwitchDisable{env/figure}
+    \PhiMiSci@ParNumSwitchDisable{env/list}
+    \PhiMiSci@ParNumSwitchDisable{env/enumerate}
+    \PhiMiSci@ParNumSwitchDisable{env/itemize}
+    \PhiMiSci@ParNumSwitchDisable{env/description}
+    \PhiMiSci@ParNumSwitchDisable{env/lstlisting}
+    \PhiMiSci@ParNumSwitchDisable{env/verbatim}
+    \PhiMiSci@ParNumSwitchDisable{env/tabbing}
   }
 
 \ExplSyntaxOff
