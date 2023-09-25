@@ -485,6 +485,14 @@ http://www.latex-project.org/lppl.txt
         This~is~an~open~access~article~distributed~
         under~the~terms~of~the~Creative~Commons~Attribution~4.0~license.
       },
+    emergency-stretch .dim_set:N = \l__phimisci_settings_emergencystretch_dim,
+    emergency-stretch .initial:n = { 0.5em },
+    extra-sentence-spacing .bool_set:N = 
+      \l__phimisci_settings_extra_sentence_spacing_bool,
+    extra-sentence-spacing .initial:n = {false},
+    footnote-break-penalty .int_set:N = 
+      \l__phimisci_settings_footnote_penalty_int,
+    footnote-break-penalty .initial:n = { 1000 },
     submission-footer-text .tl_set:N = \l__phimisci_submission_footer_tl,
     submission-footer-text .initial:n = 
       {
@@ -500,11 +508,17 @@ http://www.latex-project.org/lppl.txt
     number-authors-header .int_set:N =
       \l__phimisci_authors_in_header_int,
     number-authors-header .initial:n = { 1 },
+    orphan-penalty .int_set:N = \l__phimisci_settings_orphan_penalty_int,
+    orphan-penalty .initial:n = { 300 },
     output-orcids .bool_set:N = \l__phimisci_output_orcids_bool,
     output-orcids .initial:n = {true},
     paragraph-numbering-excluded-objects .tl_set:N = 
       \l__phimisci_parnum_excluded_objects_tl,
-    paragraph-numbering-excluded-objects .initial:n = {}
+    paragraph-numbering-excluded-objects .initial:n = {},
+    sloppy-bottom .bool_set:N = \l__phimisci_settings_sloppybottom_bool,
+    sloppy-bottom .initial:n = {true},
+    widow-penalty .int_set:N = \l__phimisci_settings_widow_penalty_int,
+    widow-penalty .initial:n = { 500 },
   }
 %    \end{macrocode}
 % \subsection{Locale settings}
@@ -1099,12 +1113,50 @@ http://www.latex-project.org/lppl.txt
 % These options configure how the footnotes are typed at the bottom of the
 % page. 
 %    \begin{macrocode}
-\deffootnote[1em]{1em}{\parindent}{\textsuperscript{\thefootnotemark\ }}
+\deffootnote[1.25em]{1.25em}{\parindent}{\textsuperscript{\thefootnotemark\ }}
 %    \end{macrocode}
 % Automatically type a superscripted comma in case two \cs{footnote}s are
 % called immediately following each other.
 %    \begin{macrocode}
 \KOMAoption{footnotes}{multiple}
+%    \end{macrocode}
+% \subsection{Tolerances and penalties: Optimisation of line and page breaks}
+% Configure the penalties for widows and orphans, that is, for last lines of
+% paragraphs on new pages and for first lines of a paragraph at the end of a 
+% page.
+%    \begin{macrocode}
+\ExplSyntaxOn
+\clubpenalty = \int_use:N \l__phimisci_settings_orphan_penalty_int
+\widowpenalty = \int_use:N \l__phimisci_settings_widow_penalty_int
+%    \end{macrocode}
+% To automatically treat widows and orphans, we use the following code from the
+% \texttt{memoir} class, originally due to Donald Arseneau.
+%     \begin{macrocode}
+\bool_if:NT \l__phimisci_settings_sloppybottom_bool
+  {
+    \def\@textbottom{\vskip \z@ \@plus.0001fil \@minus .95\topskip}
+    \topskip=1\topskip \@plus 0.625\topskip \@minus .95\topskip
+    \def\@texttop{\vskip \z@ \@plus -0.625\topskip \@minus -0.95\topskip}
+  }
+%    \end{macrocode}
+% Footnotes should break across pages only if everything else fails. Set a high
+% penalty to accomplish this. Sometimes, breaking a footnote is more desirable
+% than having a sub-optimal break in the main text.
+%    \begin{macrocode}
+\interfootnotelinepenalty=\int_use:N \l__phimisci_settings_footnote_penalty_int
+%    \end{macrocode}
+% We set \cs{emergencystretch} for automatic treatment of overful lines. It 
+% should be noted that overful lines can also be treated using better 
+% \cs{hyphenation} patterns.
+%    \begin{macrocode}
+\emergencystretch=\dim_use:N \l__phimisci_settings_emergencystretch_dim
+%    \end{macrocode}
+% \LaTeX\ inserts a special spacing after punctuation by default. If requested
+% by the user, use the usual inter-word space after punctuation.
+%    \begin{macrocode}
+\bool_if:NF \l__phimisci_settings_extra_sentence_spacing_bool
+  { \frenchspacing }
+\ExplSyntaxOff
 %    \end{macrocode}
 % \section{Document-level elements}
 % \subsection{The document title}
