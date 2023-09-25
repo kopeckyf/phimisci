@@ -119,12 +119,7 @@ http://www.latex-project.org/lppl.txt
 % This class is based on Markus Kohm's \texttt{scrartcl} class. We set load 
 % this class with apropriate settings and the package \texttt{scrlayer-scrpage}.
 %    \begin{macrocode}
-\LoadClass [12pt, 
-            DIV=8,
-            a4paper,
-            oneside] 
-            {scrartcl}
-
+\LoadClass [12pt, oneside] {scrartcl}
 \RequirePackage[autoenlargeheadfoot=off]{scrlayer-scrpage}
 %    \end{macrocode}
 % The option \texttt{onpsinit} from \texttt{scrartcl} allows us to detect 
@@ -1059,7 +1054,13 @@ http://www.latex-project.org/lppl.txt
   }
 \ExplSyntaxOff
 %    \end{macrocode}
-% \section{Colours and coloured boxes}
+% \section{Layout and design}
+% \subsection{Page geometry}
+% We configure the paper size and the type area through the margins.
+%    \begin{macrocode}
+\RequirePackage[a4paper, margin=4cm]{geometry}
+%    \end{macrocode}
+% \subsection{Colours and coloured boxes}
 % \begin{function}{PhiMiSciRed, PhiMiSciBlue}
 % The journal's identity has a blue: 
 % \fcolorbox{black}{PhiMiSciBlue}{\strut ~~~~} 
@@ -1093,7 +1094,20 @@ http://www.latex-project.org/lppl.txt
     \egroup
   }  
 %    \end{macrocode}
-% \section{The document title}
+% 
+% \subsection{Footnotes}
+% These options configure how the footnotes are typed at the bottom of the
+% page. 
+%    \begin{macrocode}
+\deffootnote[1em]{1em}{\parindent}{\textsuperscript{\thefootnotemark\ }}
+%    \end{macrocode}
+% Automatically type a superscripted comma in case two \cs{footnote}s are
+% called immediately following each other.
+%    \begin{macrocode}
+\KOMAoption{footnotes}{multiple}
+%    \end{macrocode}
+% \section{Document-level elements}
+% \subsection{The document title}
 % Document the |\and\relax| and |-1\baselineskip|
 % \begin{function}{\@maketitle}
 % \end{function}
@@ -1119,7 +1133,7 @@ http://www.latex-project.org/lppl.txt
     \@afterindentfalse\@afterheading
   }
 %    \end{macrocode}
-% \section{Headers \& footers}
+% \subsection{Headers \& footers}
 %    \begin{macrocode}
 \ExplSyntaxOn
 \AddToLayerPageStyleOptions{plain.scrheadings}
@@ -1191,7 +1205,7 @@ http://www.latex-project.org/lppl.txt
       }
   }
 %    \end{macrocode}
-% \section{Automatic paragraph numbering}\label{sec:parnumbering}
+% \subsection{Automatic paragraph numbering}\label{sec:parnumbering}
 % Passages in journal articles have traditionaly been identified by their page
 % number. As journals move to publication on the web alongside PDF distribution,
 % a different mechanic becomes necessary to identify passages in non-paginated
