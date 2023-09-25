@@ -151,6 +151,7 @@ http://www.latex-project.org/lppl.txt
 \bool_new:N \l__phimisci_output_keywords_bool
 \bool_new:N \l__phimisci_output_abstract_bool
 \bool_new:N \l__phimisci_output_contact_bool
+\bool_new:N \l__phimisci_output_rights_bool
 \bool_new:N \l__phimisci_output_authors_bool
 \bool_new:N \l__phimisci_output_publication_footer_bool
 \bool_new:N \l__phimisci_output_related_bool
@@ -168,6 +169,7 @@ http://www.latex-project.org/lppl.txt
 \seq_new:N \l__phimisci_keywords_seq
 \seq_new:N \l__phimisci_authors_seq
 \seq_new:N \l__phimisci_output_authors_seq
+\seq_new:N \l_phimisci_issue_editor_seq
 \tl_const:Nn \l__phimisci_parnum_excluded_objects_base_tl
   {
     env/quote, env/quotation, env/itemize, env/enumerate, env/description, 
@@ -289,6 +291,7 @@ http://www.latex-project.org/lppl.txt
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
     \bool_set_false:N \l__phimisci_output_publication_footer_bool
+    \bool_set_true:N \l__phimisci_output_rights_bool
   }
 %    \end{macrocode}
 %
@@ -302,6 +305,7 @@ http://www.latex-project.org/lppl.txt
     \bool_set_false:N \l__phimisci_output_authors_bool
     \bool_set_false:N \l__phimisci_output_contact_bool
     \bool_set_false:N \l__phimisci_output_publication_footer_bool
+    \bool_set_false:N \l__phimisci_output_rights_bool
   }
 %    \end{macrocode}
 % \begin{function}{\__phimisci_stage_draft:}
@@ -314,6 +318,7 @@ http://www.latex-project.org/lppl.txt
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
     \bool_set_true:N \l__phimisci_output_publication_footer_bool
+    \bool_set_true:N \l__phimisci_output_rights_bool
   }
 %    \end{macrocode}
 % \begin{function}{\__phimisci_stage_final:}
@@ -326,6 +331,7 @@ http://www.latex-project.org/lppl.txt
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
     \bool_set_true:N \l__phimisci_output_publication_footer_bool
+    \bool_set_true:N \l__phimisci_output_rights_bool
   }
 %    \end{macrocode}
 % \subsection{Publication type}
@@ -442,8 +448,10 @@ http://www.latex-project.org/lppl.txt
     doi .initial:n = {10.33735/phimisci.0000.0000},
     year .int_set:N = \l_phimisci_publication_year_int,
     year .initial:x = {\the\year},
-    issue .tl_set:N = \l_phimisci_issue_name_tl,
-    issue .initial:n = {}
+    issue .tl_set:N = \l_phimisci_issue_title_tl,
+    issue .initial:n = {},
+    editor .code:n = 
+      { \seq_set_split:Nnn \l_phimisci_issue_editor_seq { ; } { #1 } },
   }
 %    \end{macrocode}
 % \subsection{Settings}
@@ -537,6 +545,8 @@ http://www.latex-project.org/lppl.txt
     number .initial:n = {Number},
     reviewed-book .tl_set:N = \l__phimisci_locale_reviewed_book_tl,
     reviewed-book .initial:n = {Reviewed~book:},
+    rights .tl_set:N = \l__phimisci_locale_rights_tl,
+    rights .initial:n = {Rights~\&~permissions:},
     corrected-article .tl_set:N = \l__phimisci_locale_corrected_article_tl,
     corrected-article .initial:n = {Corrected~article:},
     original-research .tl_set:N = \l__phimisci_locale_original_research_tl,
@@ -1018,7 +1028,7 @@ http://www.latex-project.org/lppl.txt
     \bool_if:nT 
       { 
         \l__phimisci_output_keywords_bool || \l__phimisci_output_abstract_bool
-        || \l__phimisci_output_contact_bool
+        || \l__phimisci_output_contact_bool || \l__phimisci_output_rights_bool
       }
       {
         \begin{description}
@@ -1045,6 +1055,13 @@ http://www.latex-project.org/lppl.txt
             \item [\usekomafont{PhiMiSciMetadataItem} 
                    \tl_use:N \l__phimisci_locale_keywords_tl] 
                    \tl_use:N \l__phimisci_keywords_tl
+          }
+        \bool_if:NT \l__phimisci_output_rights_bool
+          {
+            \item [\usekomafont{PhiMiSciMetadataItem}
+                   \tl_use:N \l__phimisci_locale_rights_tl]
+                   \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
+                   \tl_use:N \l__phimisci_copyright_tl
           }
         \end{description}
         \vskip 1em
@@ -1073,40 +1090,6 @@ http://www.latex-project.org/lppl.txt
 % We configure the paper size and the type area through the margins.
 %    \begin{macrocode}
 \RequirePackage[a4paper, margin=4cm]{geometry}
-%    \end{macrocode}
-% \subsection{Colours and coloured boxes}
-% \begin{function}{PhiMiSciRed, PhiMiSciBlue}
-% The journal's identity has a blue: 
-% \fcolorbox{black}{PhiMiSciBlue}{\strut ~~~~} 
-% and a red: \fcolorbox{black}{PhiMiSciRed}{\strut ~~~~}
-%    \begin{macrocode}
-\definecolor{PhiMiSciRed}{cmyk}{0, 1, 0.91, 0.01}
-\definecolor{PhiMiSciBlue}{cmyk}{0.90, 0.73, 0, 0.62}
-%    \end{macrocode}
-% \end{function}
-%
-% \begin{function}{\PhiMiSci@ColouredBox}
-% \begin{syntax} \cs{PhiMiSci@ColouredBox}\marg{string}
-% \end{syntax}
-% A general-purpose function to put single line content into a blue box. This
-% function is called by our \texttt{type} settings and can be used to output
-% the paragraph number, possibly in combination with automatic paragraph
-% counting. 
-%
-% \begin{center}
-% \hbox{} \cs{PhiMiSci@ColouredBox}\texttt{\{string\}} \hskip 1em $\rightarrow$
-% \hskip 1em \bgroup \fboxrule=0pt \colorbox {PhiMiSciBlue}
-% { \strut\sffamily\bfseries\color{white} string } \egroup
-% \end{center}
-% \end{function}
-%    \begin{macrocode}
-\NewDocumentCommand{\PhiMiSci@ColouredBox}{m}
-  {%
-    \bgroup
-    \fboxrule=0pt
-    \colorbox {PhiMiSciBlue} { \strut\sffamily\bfseries\color{white} #1 }%
-    \egroup
-  }  
 %    \end{macrocode}
 % 
 % \subsection{Footnotes}
@@ -1157,6 +1140,21 @@ http://www.latex-project.org/lppl.txt
 \bool_if:NF \l__phimisci_settings_extra_sentence_spacing_bool
   { \frenchspacing }
 \ExplSyntaxOff
+%    \end{macrocode}
+% \subsection{Line and page breaks in the bibliography}
+% We allow (almost) no breaking within entries in the list of references, and
+% we are especially tolerant regarding interword spacing to avoid overful 
+% lines. Our code follows a post by Enrico Gregorio on TeX.SE.
+%    \begin{macrocode}
+\apptocmd {\thebibliography} 
+  {
+    \clubpenalty=10000
+    \@clubpenalty\clubpenalty
+    \widowpenalty=10000
+    \emergencystretch=2em
+  }
+  {}
+  {}
 %    \end{macrocode}
 % \section{Document-level elements}
 % \subsection{The document title}
@@ -1225,15 +1223,24 @@ http://www.latex-project.org/lppl.txt
                   \ \tl_use:N \l_phimisci_number_tl
                   \ \textperiodcentered\
                   \int_use:N \l_phimisci_publication_year_int\par
-                  \tl_if_blank:VF \l_phimisci_issue_name_tl
+                  \tl_if_blank:VF \l_phimisci_issue_title_tl
                     {
-                      Special~Issue:~\tl_use:N \l_phimisci_issue_name_tl \par
+                      Special~Issue:~
+                      \textit{\tl_use:N \l_phimisci_issue_title_tl}
+                      \seq_if_empty:NF \l_phimisci_issue_editor_seq
+                        {
+                          ,~ed.~by~\seq_use:Nnnn 
+                                   \l_phimisci_issue_editor_seq
+                                   {~\&~}
+                                   {,~}
+                                   {~\&}
+                        }
+                      \par
                     }
                   \textsc{doi}:~
                   \href{https://doi.org/\tl_use:N \l_phimisci_doi_tl}
                        {\oldstylenums{\tl_use:N \l_phimisci_doi_tl}}\par
-                  \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
-                  \tl_use:N \l__phimisci_copyright_tl}
+                   }
           }
           {
             \tl_use:N \l__phimisci_submission_footer_tl
@@ -1256,6 +1263,40 @@ http://www.latex-project.org/lppl.txt
         \textsc{paragraphs~\oldstylenums{12--34}}
       }
   }
+%    \end{macrocode}
+% \subsection{Colours and coloured boxes}
+% \begin{function}{PhiMiSciRed, PhiMiSciBlue}
+% The journal's identity has a blue: 
+% \fcolorbox{black}{PhiMiSciBlue}{\strut ~~~~} 
+% and a red: \fcolorbox{black}{PhiMiSciRed}{\strut ~~~~}
+%    \begin{macrocode}
+\definecolor{PhiMiSciRed}{cmyk}{0, 1, 0.91, 0.01}
+\definecolor{PhiMiSciBlue}{cmyk}{0.90, 0.73, 0, 0.62}
+%    \end{macrocode}
+% \end{function}
+%
+% \begin{function}{\PhiMiSci@ColouredBox}
+% \begin{syntax} \cs{PhiMiSci@ColouredBox}\marg{string}
+% \end{syntax}
+% A general-purpose function to put single line content into a blue box. This
+% function is called by our \texttt{type} settings and can be used to output
+% the paragraph number, possibly in combination with automatic paragraph
+% counting. 
+%
+% \begin{center}
+% \hbox{} \cs{PhiMiSci@ColouredBox}\texttt{\{string\}} \hskip 1em $\rightarrow$
+% \hskip 1em \bgroup \fboxrule=0pt \colorbox {PhiMiSciBlue}
+% { \strut\sffamily\bfseries\color{white} string } \egroup
+% \end{center}
+% \end{function}
+%    \begin{macrocode}
+\NewDocumentCommand{\PhiMiSci@ColouredBox}{m}
+  {%
+    \bgroup
+    \fboxrule=0pt
+    \colorbox {PhiMiSciBlue} { \strut\sffamily\bfseries\color{white} #1 }%
+    \egroup
+  }  
 %    \end{macrocode}
 % \subsection{Automatic paragraph numbering}\label{sec:parnumbering}
 % Passages in journal articles have traditionaly been identified by their page
