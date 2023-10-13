@@ -1,3 +1,5 @@
+### `phimisci`
+
 LaTeX document class for the journal [*Philosophy and the Mind Sciences*](https://philosophymindscience.org/).
 
 ### Acknowledgements
