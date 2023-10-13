@@ -1152,20 +1152,22 @@ http://www.latex-project.org/lppl.txt
   { \frenchspacing }
 \ExplSyntaxOff
 %    \end{macrocode}
-% \subsection{Line and page breaks in the bibliography}
+% \subsection{Bibliograpy layout}
 % We allow (almost) no breaking within entries in the list of references, and
 % we are especially tolerant regarding interword spacing to avoid overful 
-% lines. Our code follows a post by Enrico Gregorio on TeX.SE.
+% lines. Our code follows the standard \texttt{bibintoc} heading from 
+% \texttt{biblatex} as well as a post by Enrico Gregorio on TeX.SE.
 %    \begin{macrocode}
-\apptocmd {\thebibliography} 
+\defbibheading {phimisci} 
   {
+    \section*{\refname}
+    \addcontentsline{toc}{section}{\refname}
+    \@mkboth{\abx@MakeMarkcase{\refname}}{\abx@MakeMarkcase{\refname}}
     \clubpenalty=10000
     \@clubpenalty\clubpenalty
     \widowpenalty=10000
     \emergencystretch=2em
   }
-  {}
-  {}
 %    \end{macrocode}
 % \section{Document-level elements}
 % \subsection{The document title}
@@ -1196,11 +1198,11 @@ http://www.latex-project.org/lppl.txt
 %    \end{macrocode}
 % \subsection{Epigraphs}
 % Epigraphs can be inserted at any point of the document text using \cs{dictum}
-% \oarg{source}\marg{text}. The command is inherited from \meta{scrartcl}
+% \oarg{source}\marg{text}. The command is inherited from \texttt{scrartcl}
 % \cite[\S3.17]{scrguide}.
 %
-% \oarg{source} can contain a citation command. The following settings are 
-% adjustments to fit the needs of the journal:
+% The optional \oarg{source} can contain a citation command. 
+% The following settings are adjustments to fit the needs of the journal:
 %
 %    \begin{macrocode}
 \ExplSyntaxOn
@@ -1494,7 +1496,6 @@ http://www.latex-project.org/lppl.txt
     \PhiMiSci@ParNumSwitchDisable{env/verbatim}
     \PhiMiSci@ParNumSwitchDisable{env/tabbing}
   }
-
 \ExplSyntaxOff
 %    \end{macrocode}
 %    \begin{macrocode}
