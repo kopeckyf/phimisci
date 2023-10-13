@@ -67,6 +67,13 @@ http://www.latex-project.org/lppl.txt
     url = {https://www.latex-project.org/help/documentation/ltpara-doc.pdf},
     note = {Version 2022-05-13}
 }
+@misc{scrguide,
+    author = {Markus Kohm},
+    title = {{KOMA-Script}: {The} guide},
+    year = {2023},
+    note = {Version 2023-06-16},
+    url = {https://texdoc.org/serve/scrartcl/0}
+}
 \end{filecontents}
 \addbibresource{\jobname.bib}
 \begin{document}
@@ -197,6 +204,8 @@ http://www.latex-project.org/lppl.txt
 \setkomafont{author}{\raggedright\normalfont\normalsize\large\bfseries}
 \setkomafont{subject}{\normalfont\normalsize}
 \setkomafont{pageheadfoot}{\normalfont}
+\setkomafont{dictum}{\normalfont\normalsize\itshape}
+\setkomafont{dictumauthor}{\normalfont\normalsize}
 \addtokomafont{section}{\rmfamily}
 \addtokomafont{subsection}{\rmfamily}
 \addtokomafont{subsubsection}{\rmfamily}
@@ -461,7 +470,7 @@ http://www.latex-project.org/lppl.txt
 % \end{syntax}
 % \end{variable}
 %    \begin{macrocode}
-\keys_define:nn { phimisci / settings}
+\keys_define:nn { phimisci / settings }
   {
     author-output-separator .tl_set:N = \l__phimisci_authors_osep_tl,
     author-output-separator .initial:n = {,~},
@@ -498,6 +507,8 @@ http://www.latex-project.org/lppl.txt
     extra-sentence-spacing .bool_set:N = 
       \l__phimisci_settings_extra_sentence_spacing_bool,
     extra-sentence-spacing .initial:n = {false},
+    dictum-width .code:n = { \renewcommand* { \dictumwidth } { #1 } },
+    dictum-width .initial:n = { 0.62\textwidth },
     footnote-break-penalty .int_set:N = 
       \l__phimisci_settings_footnote_penalty_int,
     footnote-break-penalty .initial:n = { 1000 },
@@ -1183,9 +1194,21 @@ http://www.latex-project.org/lppl.txt
     \@afterindentfalse\@afterheading
   }
 %    \end{macrocode}
-% \subsection{Headers \& footers}
+% \subsection{Epigraphs}
+% Epigraphs can be inserted at any point of the document text using \cs{dictum}
+% \oarg{source}\marg{text}. The command is inherited from \meta{scrartcl}
+% \cite[\S3.17]{scrguide}.
+%
+% \oarg{source} can contain a citation command. The following settings are 
+% adjustments to fit the needs of the journal:
+%
 %    \begin{macrocode}
 \ExplSyntaxOn
+\RenewDocumentCommand { \dictumrule } {} { \smallskip }
+%    \end{macrocode}
+%
+% \subsection{Headers \& footers}
+%    \begin{macrocode}
 \AddToLayerPageStyleOptions{plain.scrheadings}
     {onselect={\setlength{\footheight}{3\baselineskip}}}
 \cfoot[\PhiMiSci@Footer*{}]{\PhiMiSci@Footer{}}
