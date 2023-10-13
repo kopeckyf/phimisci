@@ -1169,6 +1169,11 @@ http://www.latex-project.org/lppl.txt
     \emergencystretch=2em
   }
 %    \end{macrocode}
+% In citations, we prefer to have a non-breakable thin space between “p.” and 
+% the cited page number.
+%    \begin{macrocode}
+\RenewDocumentCommand {\ppspace} {} {\addnbthinspace}
+%    \end{macrocode}
 % \section{Document-level elements}
 % \subsection{The document title}
 % Document the |\and\relax| and |-1\baselineskip|
@@ -1498,6 +1503,7 @@ http://www.latex-project.org/lppl.txt
   }
 \ExplSyntaxOff
 %    \end{macrocode}
+%
 %    \begin{macrocode}
 %</class>
 %    \end{macrocode}
