@@ -140,6 +140,11 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \KOMAoption{onpsinit}{\protect\PhiMiSci@DetectKomaHeader{}}
 %    \end{macrocode}
+% Additionally, with \texttt{onpsfloatpage}, we can detect whether the current
+% page is used only to print floats with the \verb+[p]+ configuration.
+%    \begin{macrocode}
+\KOMAoption{onpsfloatpage}{\protect\PhiMiSci@DetectFloatPage{}}
+%    \end{macrocode}
 % \subsection{Basic packages}
 % We load well-known packages that are used regularly in the preparation of 
 % scientific texts.
@@ -169,6 +174,7 @@ http://www.latex-project.org/lppl.txt
 \bool_new:N \l__phimisci_output_publication_header_footer_bool
 \bool_new:N \l__phimisci_output_related_bool
 \bool_new:N \l__phimisci_koma_head_mode_bool
+\bool_new:N \l__phimisci_koma_float_page_bool
 \cs_new:Nn \__phimisci_affiliation_line_separator: { \smallskip\\ }
 \cs_generate_variant:Nn \seq_set_split:Nnn { NVn }
 \cs_generate_variant:Nn \seq_set_split:Nnn { NVx }
@@ -1488,6 +1494,16 @@ http://www.latex-project.org/lppl.txt
 \NewDocumentCommand{\PhiMiSci@DetectKomaHeader} {}
   {
     \bool_set_true:N \l__phimisci_koma_head_mode_bool
+  }
+%    \end{macrocode}
+% \begin{function}{\PhiMiSci@DetectFloatPage}
+% A helper macro that sets a switch if the current page is only used for
+% printing floats.
+% \end{function}
+%    \begin{macrocode}
+\NewDocumentCommand{\PhiMiSci@DetectFloatPage} {}
+  {
+    \bool_set_true:N \l__phimisci_koma_float_page_bool
   }
 %    \end{macrocode}
 % \begin{function}{PhiMiSciNumberedParagraphs}
