@@ -128,6 +128,10 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \LoadClass [12pt, oneside] {scrartcl}
 \RequirePackage[autoenlargeheadfoot=off]{scrlayer-scrpage}
+\AddToLayerPageStyleOptions{plain.scrheadings}
+  {
+    onselect={\setlength{\footskip}{5\baselineskip}}
+  }
 %    \end{macrocode}
 % The option \texttt{onpsinit} from \texttt{scrartcl} allows us to detect 
 % paragraphs in the header and footer of the document. We use this anchor to 
@@ -145,7 +149,8 @@ http://www.latex-project.org/lppl.txt
 % We also load helper packages that are necessary to program features of this
 % class.
 %    \begin{macrocode}
-\RequirePackage{calc, etoolbox, expl3, l3keys2e, microtype, xcolor}
+\RequirePackage{calc, etoolbox, expl3, iftex, l3keys2e, microtype, tikz, 
+                xcolor}
 %    \end{macrocode}
 % \subsection{Data storage, Boolean switches and command variants}
 % These Booleans, control sequences, integer variables, mappings, sequences and
@@ -159,8 +164,9 @@ http://www.latex-project.org/lppl.txt
 \bool_new:N \l__phimisci_output_abstract_bool
 \bool_new:N \l__phimisci_output_contact_bool
 \bool_new:N \l__phimisci_output_rights_bool
+\bool_new:N \l__phimisci_output_doi_bool
 \bool_new:N \l__phimisci_output_authors_bool
-\bool_new:N \l__phimisci_output_publication_footer_bool
+\bool_new:N \l__phimisci_output_publication_header_footer_bool
 \bool_new:N \l__phimisci_output_related_bool
 \bool_new:N \l__phimisci_koma_head_mode_bool
 \cs_new:Nn \__phimisci_affiliation_line_separator: { \smallskip\\ }
@@ -202,8 +208,8 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \setkomafont{title}{\raggedright\normalfont\normalsize\huge\bfseries}
 \setkomafont{author}{\raggedright\normalfont\normalsize\large\bfseries}
-\setkomafont{subject}{\normalfont\normalsize}
-\setkomafont{pageheadfoot}{\normalfont}
+\setkomafont{subject}{\normalfont\normalsize\large\scshape\color{PhiMiSciBlue}}
+\setkomafont{pageheadfoot}{\normalfont\small}
 \setkomafont{dictum}{\normalfont\normalsize\itshape}
 \setkomafont{dictumauthor}{\normalfont\normalsize}
 \addtokomafont{section}{\rmfamily}
@@ -299,8 +305,9 @@ http://www.latex-project.org/lppl.txt
     \KOMAoptions{overfullrule=false}
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
-    \bool_set_false:N \l__phimisci_output_publication_footer_bool
+    \bool_set_false:N \l__phimisci_output_publication_header_footer_bool
     \bool_set_true:N \l__phimisci_output_rights_bool
+    \bool_set_false:N \l__phimisci_output_doi_bool
   }
 %    \end{macrocode}
 %
@@ -313,8 +320,9 @@ http://www.latex-project.org/lppl.txt
     \KOMAoptions{overfullrule=false}
     \bool_set_false:N \l__phimisci_output_authors_bool
     \bool_set_false:N \l__phimisci_output_contact_bool
-    \bool_set_false:N \l__phimisci_output_publication_footer_bool
+    \bool_set_false:N \l__phimisci_output_publication_header_footer_bool
     \bool_set_false:N \l__phimisci_output_rights_bool
+    \bool_set_false:N \l__phimisci_output_doi_bool
   }
 %    \end{macrocode}
 % \begin{function}{\__phimisci_stage_draft:}
@@ -326,8 +334,9 @@ http://www.latex-project.org/lppl.txt
     \KOMAoptions{overfullrule=true}
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
-    \bool_set_true:N \l__phimisci_output_publication_footer_bool
+    \bool_set_true:N \l__phimisci_output_publication_header_footer_bool
     \bool_set_true:N \l__phimisci_output_rights_bool
+    \bool_set_true:N \l__phimisci_output_doi_bool
   }
 %    \end{macrocode}
 % \begin{function}{\__phimisci_stage_final:}
@@ -339,8 +348,9 @@ http://www.latex-project.org/lppl.txt
     \KOMAoptions{overfullrule=false}
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
-    \bool_set_true:N \l__phimisci_output_publication_footer_bool
+    \bool_set_true:N \l__phimisci_output_publication_header_footer_bool
     \bool_set_true:N \l__phimisci_output_rights_bool
+    \bool_set_true:N \l__phimisci_output_doi_bool
   }
 %    \end{macrocode}
 % \subsection{Publication type}
@@ -512,6 +522,8 @@ http://www.latex-project.org/lppl.txt
     footnote-break-penalty .int_set:N = 
       \l__phimisci_settings_footnote_penalty_int,
     footnote-break-penalty .initial:n = { 1000 },
+    logo-url .tl_set:N = \l__phimisci_branding_logo_tl,
+    logo-url .initial:n = {branding/phimisci-logo-mini.pdf},
     submission-footer-text .tl_set:N = \l__phimisci_submission_footer_tl,
     submission-footer-text .initial:n = 
       {
@@ -558,6 +570,8 @@ http://www.latex-project.org/lppl.txt
     reviewed-book .initial:n = {Reviewed~book:},
     rights .tl_set:N = \l__phimisci_locale_rights_tl,
     rights .initial:n = {Rights~\&~permissions:},
+    doi .tl_set:N = \l__phimisci_locale_doi_tl,
+    doi .initial:n = {DOI:},
     corrected-article .tl_set:N = \l__phimisci_locale_corrected_article_tl,
     corrected-article .initial:n = {Corrected~article:},
     original-research .tl_set:N = \l__phimisci_locale_original_research_tl,
@@ -1067,6 +1081,13 @@ http://www.latex-project.org/lppl.txt
                    \tl_use:N \l__phimisci_locale_keywords_tl] 
                    \tl_use:N \l__phimisci_keywords_tl
           }
+        \bool_if:NT \l__phimisci_output_doi_bool
+          {
+            \item [\usekomafont{PhiMiSciMetadataItem} 
+                   \tl_use:N \l__phimisci_locale_doi_tl] 
+                   \href{https://doi.org/\tl_use:N \l_phimisci_doi_tl}
+                        {\tl_use:N \l_phimisci_doi_tl}
+          }
         \bool_if:NT \l__phimisci_output_rights_bool
           {
             \item [\usekomafont{PhiMiSciMetadataItem}
@@ -1183,13 +1204,12 @@ http://www.latex-project.org/lppl.txt
 \RenewDocumentCommand {\@maketitle} {} 
   {%
     \let\and\relax
-    \enlargethispage{-1\baselineskip}
     \global\@topnum=\z@
     \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
     \null
     \vskip 1em%
       \ifx\@subject\@empty \else
-        {\usekomafont{subject}{\PhiMiSci@ColouredBox{~~\@subject~~} \par}}%
+        {\usekomafont{subject}{\MakeLowercase{\@subject} \par}}%
         \vskip 1em
       \fi
     {\usekomafont{title}{\@title \par}}%
@@ -1219,12 +1239,7 @@ http://www.latex-project.org/lppl.txt
 \AddToLayerPageStyleOptions{plain.scrheadings}
     {onselect={\setlength{\footheight}{3\baselineskip}}}
 \cfoot[\PhiMiSci@Footer*{}]{\PhiMiSci@Footer{}}
-\chead
-  {
-    \tl_use:N \l_phimisci_header_authors_tl
-    \hfill 
-    \tl_use:N \l_phimisci_short_document_title_tl
-  }
+\chead[\PhiMiSci@Header*{}]{\PhiMiSci@Header{}}
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@Footer, \PhiMiSci@Footer*}
 % Two macros for the content of the footer.  The starred variant produces the 
@@ -1236,53 +1251,17 @@ http://www.latex-project.org/lppl.txt
   {%
     \IfBooleanTF {#1}
       {%
-        \bool_if:NTF \l__phimisci_output_publication_footer_bool
-          {
-            \begin{minipage}[c]{1.5cm}
-            \includegraphics[width=\linewidth]{branding/phimisci-logo-mini.pdf}
-            \end{minipage}
-              \hfill\parbox[c]{\linewidth-2cm}{\raggedright%
-                \normalfont\small%
-                \textcolor{PhiMiSciBlue}{%
-                  \textbf{Philosophy~and~the~Mind~Sciences}}
-                  \ \textperiodcentered\ 
-                  \tl_use:N \l__phimisci_locale_volume_tl 
-                  \ \tl_use:N \l_phimisci_volume_tl
-                  \ \textperiodcentered\
-                  \tl_use:N \l__phimisci_locale_number_tl
-                  \ \tl_use:N \l_phimisci_number_tl
-                  \ \textperiodcentered\
-                  \int_use:N \l_phimisci_publication_year_int\par
-                  \tl_if_blank:VF \l_phimisci_issue_title_tl
-                    {
-                      Special~Issue:~
-                      \textit{\tl_use:N \l_phimisci_issue_title_tl}
-                      \seq_if_empty:NF \l_phimisci_issue_editor_seq
-                        {
-                          ,~ed.~by~\seq_use:Nnnn 
-                                   \l_phimisci_issue_editor_seq
-                                   {~\&~}
-                                   {,~}
-                                   {~\&}
-                        }
-                      \par
-                    }
-                  \textsc{doi}:~
-                  \href{https://doi.org/\tl_use:N \l_phimisci_doi_tl}
-                       {\oldstylenums{\tl_use:N \l_phimisci_doi_tl}}\par
-                   }
-          }
+        \bool_if:NF \l__phimisci_output_publication_header_footer_bool
           {
             \tl_use:N \l__phimisci_submission_footer_tl
           }
       }
       {%
-        \small
-        \bool_if:NTF \l__phimisci_output_publication_footer_bool
+        \bool_if:NTF \l__phimisci_output_publication_header_footer_bool
           {
             \textcolor{PhiMiSciBlue}{%
                   \textbf{Philosophy~and~the~Mind~Sciences}}
-                  \ \tl_use:N \l_phimisci_volume_tl.\l_phimisci_number_tl
+                  \ \tl_use:N \l_phimisci_volume_tl 
                   \ (\int_use:N \l_phimisci_publication_year_int)
           }
           {
@@ -1293,6 +1272,58 @@ http://www.latex-project.org/lppl.txt
         \textsc{paragraphs~\oldstylenums{12--34}}
       }
   }
+%    \end{macrocode}
+% \begin{function}{\PhiMiSci@Header, \PhiMiSci@Header*}
+% 
+% \end{function}
+%    \begin{macrocode}
+\NewDocumentCommand {\PhiMiSci@Header} {s} 
+  {%
+    \IfBooleanTF {#1}
+       {
+         \bool_if:NT \l__phimisci_output_publication_header_footer_bool
+           {
+             \parbox[c]{\linewidth-2cm}
+               {\raggedright\normalfont\small\textcolor{PhiMiSciBlue}
+                 {%
+                   \textbf{PhiMiSci\\Philosophy~and~the~Mind~Sciences}},\
+                   \tl_use:N \l__phimisci_locale_volume_tl 
+                   \ \tl_use:N \l_phimisci_volume_tl\  
+                   (\int_use:N \l_phimisci_publication_year_int)\par
+                   \tl_if_blank:VF \l_phimisci_issue_title_tl
+                     {
+                       Special~Issue:~
+                       \textit{\tl_use:N \l_phimisci_issue_title_tl}
+                       \seq_if_empty:NF \l_phimisci_issue_editor_seq
+                         {
+                           ,~ed.~by~\seq_use:Nnnn 
+                             \l_phimisci_issue_editor_seq
+                               {~\&~}
+                               {,~}
+                               {~\&}
+                         }
+                        \par
+                     }
+                 }
+               \hfill\hbox{}%
+               \tl_if_blank:VF \l__phimisci_branding_logo_tl
+                 {
+                   \begin{tikzpicture}[remember~picture, overlay]
+                   \node [anchor=west, xshift=-5.33cm, yshift=-3cm, 
+                          inner~sep=0pt] at (current~page.north~east)
+                         {\includegraphics[width=3cm]
+                           { \tl_use:N \l__phimisci_branding_logo_tl }
+                         };
+                   \end{tikzpicture}
+                 }
+         }
+       }
+       {
+          \tl_use:N \l_phimisci_header_authors_tl
+          \hfill 
+          \tl_use:N \l_phimisci_short_document_title_tl
+       }
+  }  
 %    \end{macrocode}
 % \subsection{Colours and coloured boxes}
 % \begin{function}{PhiMiSciRed, PhiMiSciBlue}
@@ -1384,8 +1415,8 @@ http://www.latex-project.org/lppl.txt
 \NewDocumentCommand {\PhiMiSci@PrintParNum} {}
   {
     \makebox[0pt][r]{ 
-                      \bfseries\sffamily\color{PhiMiSciBlue}               
-                      \thesection.\thePhiMiSci@Paragraph\hspace*{1em} 
+                      \color{gray}               
+                      \oldstylenums{\thePhiMiSci@Paragraph\hspace*{1.5em}} 
                     }
   }
 %    \end{macrocode}
@@ -1501,6 +1532,14 @@ http://www.latex-project.org/lppl.txt
     \PhiMiSci@ParNumSwitchDisable{env/verbatim}
     \PhiMiSci@ParNumSwitchDisable{env/tabbing}
   }
+%    \end{macrocode}
+%\subsection{Tracking the paragraphs of the current page}
+% We print the numbers of the paragraphs printed on the current page in the 
+% footer of the current page.
+% Whether we count paragraphs automatically or with a manual \texttt{pandoc}
+% filter, we need to track the numbers of printed paragraphs.
+%    \begin{macrocode}
+
 \ExplSyntaxOff
 %    \end{macrocode}
 %
