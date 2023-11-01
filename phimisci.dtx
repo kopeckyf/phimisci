@@ -1573,11 +1573,11 @@ http://www.latex-project.org/lppl.txt
 %    \end{macrocode}
 % \subsection{Material to be printed at the end of an article}
 %    \begin{macrocode}
-\NewDocumentCommand { \PhiMiSci@OutputAppendix } {}
+\NewDocumentCommand { \PhiMiSci@OutputEndofDocument } {}
   {
     \bool_if:NT \l__phimisci_output_acknowledgments_bool
       {
-        \section*{\tl_use:N \l__phimisci_locale_acknowledgments_tl}
+        \addsec{\tl_use:N \l__phimisci_locale_acknowledgments_tl}
         \tl_use:N \l__phimisci_acknowledgments_tl
       }
     \bool_if:NT \l__phimisci_output_bibliography_bool
@@ -1585,7 +1585,7 @@ http://www.latex-project.org/lppl.txt
         \printbibliography[heading=phimisci]
       }
   }
-\AtEndDocument{ \PhiMiSci@OutputAppendix{} }
+\AtEndDocument{ \PhiMiSci@OutputEndofDocument{} }
 %    \end{macrocode}
 %    \begin{macrocode}
 \ExplSyntaxOff
