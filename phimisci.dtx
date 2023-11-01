@@ -445,7 +445,12 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \section{Messages, errors and warnings}
-% 
+%    \begin{macrocode}
+\msg_new:nnnn { phimisci } { missing-logo-url } 
+              { I~didn't~find~a~logo~file~to~print~in~the~article's~header. }
+              {Please~supply~the~file~location~with~the~document~class~option~
+                'settings/logo-url~=~path/to/file.pdf'.}
+%    \end{macrocode}
 % \section{Key-value interface for user-configurable options}
 % \label{sec:options}
 % \subsection{Configure document data}
@@ -1127,7 +1132,7 @@ http://www.latex-project.org/lppl.txt
 % \subsection{Page geometry}
 % We configure the paper size and the type area through the margins.
 %    \begin{macrocode}
-\RequirePackage[a4paper, margin=4cm]{geometry}
+\RequirePackage[a4paper, margin=4cm, headheight=52pt]{geometry}
 %    \end{macrocode}
 % 
 % \subsection{Footnotes}
@@ -1304,13 +1309,16 @@ http://www.latex-project.org/lppl.txt
                              \l_phimisci_issue_editor_seq
                                {~\&~}
                                {,~}
-                               {~\&}
+                               {~\&~}
                          }
                         \par
                      }
                  }
                \hfill\hbox{}%
-               \tl_if_blank:VF \l__phimisci_branding_logo_tl
+               \tl_if_blank:VTF \l__phimisci_branding_logo_tl
+                 {
+                   \msg_warning:nn { phimisci } { missing-logo-url }
+                 }
                  {
                    \begin{tikzpicture}[remember~picture, overlay]
                    \node [anchor=west, xshift=-5.33cm, yshift=-3cm, 
