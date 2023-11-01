@@ -148,10 +148,12 @@ http://www.latex-project.org/lppl.txt
 \RequirePackage{amsmath, amsthm, amssymb, array, booktabs, enumitem, graphicx}
 %    \end{macrocode}
 % We also load helper packages that are necessary to program features of this
-% class.
+% class. \texttt{hyperref} is special in this regard, because certain options
+% have to be loaded early and can't be passed to \cs{hypersetup}.
 %    \begin{macrocode}
+\RequirePackage[final, hyperfootnotes=false]{hyperref}
 \RequirePackage{calc, etoolbox, expl3, iftex, l3keys2e, marginnote, microtype, 
-                tikz, xcolor}
+                orcidlink, tikz, xcolor}
 %    \end{macrocode}
 % \subsection{Data storage, Boolean switches and command variants}
 % These Booleans, control sequences, integer variables, mappings, sequences and
@@ -198,6 +200,7 @@ http://www.latex-project.org/lppl.txt
 \tl_new:N \l__phimisci_reviewed_book_tl
 \tl_new:N \l__phimisci_copyright_holder_tl
 \tl_new:N \l__phimisci_locale_related_tl
+\tl_new:N \l__phimisci_tmp_orcid_link_tl
 \ExplSyntaxOff
 %    \end{macrocode}
 
@@ -232,16 +235,14 @@ http://www.latex-project.org/lppl.txt
 \RequirePackage[style=apa, natbib=true]{biblatex}
 %    \end{macrocode}
 % \subsection{PDF meta data and links through \texttt{hyperref}}
-% We load hyperref and set all links to our blue color. 
+% After loading hyperref earlier, we set all links to our blue color. 
 %    \begin{macrocode}
-\RequirePackage[final,
-                breaklinks=true,
-                pdfusetitle=true,
-                colorlinks=true,
-                linkcolor=PhiMiSciBlue,
-                citecolor=PhiMiSciBlue,
-                urlcolor=PhiMiSciBlue,
-                hyperfootnotes=false]{hyperref}
+\hypersetup{breaklinks=true,
+            pdfusetitle=true,
+            colorlinks=true,
+            linkcolor=PhiMiSciBlue,
+            citecolor=PhiMiSciBlue,
+            urlcolor=PhiMiSciBlue}
 %    \end{macrocode}
 % We delay setting the PDF meta data (author, title) to the end of the preamble 
 % to allow for meta data processing first. The meta data is output only in 
@@ -549,6 +550,8 @@ http://www.latex-project.org/lppl.txt
     number-authors-header .int_set:N =
       \l__phimisci_authors_in_header_int,
     number-authors-header .initial:n = { 1 },
+    orcid-color .tl_set:N = \l__phimisci_orcid_color_tl,
+    orcid-color .initial:n = { 000000 }, 
     orphan-penalty .int_set:N = \l__phimisci_settings_orphan_penalty_int,
     orphan-penalty .initial:n = { 300 },
     output-orcids .bool_set:N = \l__phimisci_output_orcids_bool,
@@ -884,6 +887,7 @@ http://www.latex-project.org/lppl.txt
                 
         \seq_put_right:Nx \l__phimisci_output_authors_seq
           {
+            \exp_not:N \phimisci_print_orcid:n { ##1 }
             \tl_rescan:nn {} {##1}
             \int_compare:nNnT { #4 } > { 1 }
               {
@@ -951,6 +955,30 @@ http://www.latex-project.org/lppl.txt
         \group_end:
       }
   }
+%    \end{macrocode}
+% \begin{function}{\phimisci_print_orcid:n}
+% If \meta{author} exists in the property map assigning all authors to an ID,
+% output that ID with a hyperlink.
+% \begin{arguments}
+% \item A property map assigning some authors to ORCiDs
+% \item The author to be outpur
+% \end{arguments}
+% \end{function}
+%    \begin{macrocode}
+\cs_new:Npn \phimisci_print_orcid:n #1
+  {
+    \prop_get:NnNT 
+      \l__phimisci_authors_to_orcids_prop 
+      { #1 } 
+      \l__phimisci_tmp_orcid_link_tl
+      {
+        \tl_if_empty:NF \l__phimisci_tmp_orcid_link_tl
+          {
+            \orcidlink{ \tl_use:N \l__phimisci_tmp_orcid_link_tl }
+            \,
+          }
+      }
+}
 %    \end{macrocode}
 % \subsection{Managing the title and a short title (\texttt{\textbackslash title})}
 % \begin{function}{\title}
@@ -1359,6 +1387,13 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \definecolor{PhiMiSciRed}{cmyk}{0, 1, 0.91, 0.01}
 \definecolor{PhiMiSciBlue}{cmyk}{0.90, 0.73, 0, 0.62}
+%    \end{macrocode}
+% \end{function}
+% \begin{function}{orcidlogocol}
+% The color used to print the ORCiD logo. ORCiD's policy prescribes this can
+% be either black or the ORCiD green, HTML code \texttt{A6CE39}.
+%    \begin{macrocode}
+\definecolor{orcidlogocol}{HTML}{\tl_use:N \l__phimisci_orcid_color_tl}
 %    \end{macrocode}
 % \end{function}
 %
