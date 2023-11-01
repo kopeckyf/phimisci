@@ -173,6 +173,8 @@ http://www.latex-project.org/lppl.txt
 \bool_new:N \l__phimisci_output_authors_bool
 \bool_new:N \l__phimisci_output_publication_header_footer_bool
 \bool_new:N \l__phimisci_output_related_bool
+\bool_new:N \l__phimisci_output_acknowledgments_bool
+\bool_new:N \l__phimisci_output_bibliography_bool
 \bool_new:N \l__phimisci_koma_head_mode_bool
 \cs_new:Nn \__phimisci_affiliation_line_separator: { \smallskip\\ }
 \cs_generate_variant:Nn \seq_set_split:Nnn { NVn }
@@ -196,6 +198,7 @@ http://www.latex-project.org/lppl.txt
 \tl_new:N \l_phimisci_header_authors_tl
 \tl_new:N \l_phimisci_authors_tl
 \tl_new:N \l__phimisci_keywords_tl
+\tl_new:N \l__phimisci_acknowledgments_tl
 \tl_new:N \l__phimisci_reviewed_book_tl
 \tl_new:N \l__phimisci_copyright_holder_tl
 \tl_new:N \l__phimisci_locale_related_tl
@@ -554,6 +557,8 @@ http://www.latex-project.org/lppl.txt
     orphan-penalty .initial:n = { 300 },
     output-orcids .bool_set:N = \l__phimisci_output_orcids_bool,
     output-orcids .initial:n = {true},
+    output-bibliography .bool_set:N = \l__phimisci_output_bibliography_bool,
+    output-bibliography .initial:n = {true},
     paragraph-numbering-excluded-objects .tl_set:N = 
       \l__phimisci_parnum_excluded_objects_tl,
     paragraph-numbering-excluded-objects .initial:n = {},
@@ -569,6 +574,8 @@ http://www.latex-project.org/lppl.txt
   {
     abstract .tl_set:N = \l__phimisci_locale_abstract_tl,
     abstract .initial:n = {Abstract:},
+    acknowledgments .tl_set:N = \l__phimisci_locale_acknowledgments_tl,
+    acknowledgments .initial:n = {Acknowledgments},
     contact .tl_set:N = \l__phimisci_locale_contact_tl,
     contact .initial:n = {Contact:},
     keywords .tl_set:N = \l__phimisci_locale_keywords_tl,
@@ -1008,7 +1015,8 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \begin{function}{\keywords}
-% Store a list of keywords, separated by
+% Store a list of keywords, separated by a user-configurable input separator.
+% (\cs{l__phimisci_keywords_isep_tl}).
 % \end{function}
 %    \begin{macrocode}
 \DeclareDocumentCommand {\keywords} {m} 
@@ -1030,6 +1038,16 @@ http://www.latex-project.org/lppl.txt
 \DeclareDocumentCommand {\related} {m} 
   {%
     \tl_set:Nn \l__phimisci_related_tl { #1 }
+  }
+%    \end{macrocode}
+% \begin{function}{\acknowledgments}
+% A user-interface for the authors to provide acknowledments for their article.
+% \end{function}
+%    \begin{macrocode}
+\DeclareDocumentCommand {\acknowledgments} { +m }
+  {
+    \bool_set_true:N \l__phimisci_output_acknowledgments_bool
+    \tl_set:Nn \l__phimisci_acknowledgments_tl { #1 }
   }
 %    \end{macrocode}
 % 
@@ -1552,6 +1570,22 @@ http://www.latex-project.org/lppl.txt
     \PhiMiSci@ParNumSwitchDisable{env/verbatim}
     \PhiMiSci@ParNumSwitchDisable{env/tabbing}
   }
+%    \end{macrocode}
+% \subsection{Material to be printed at the end of an article}
+%    \begin{macrocode}
+\NewDocumentCommand { \PhiMiSci@OutputAppendix } {}
+  {
+    \bool_if:NT \l__phimisci_output_acknowledgments_bool
+      {
+        \section*{\tl_use:N \l__phimisci_locale_acknowledgments_tl}
+        \tl_use:N \l__phimisci_acknowledgments_tl
+      }
+    \bool_if:NT \l__phimisci_output_bibliography_bool
+      {
+        \printbibliography[heading=phimisci]
+      }
+  }
+\AtEndDocument{ \PhiMiSci@OutputAppendix{} }
 %    \end{macrocode}
 %    \begin{macrocode}
 \ExplSyntaxOff
