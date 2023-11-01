@@ -128,10 +128,6 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \LoadClass [12pt, oneside] {scrartcl}
 \RequirePackage[autoenlargeheadfoot=off]{scrlayer-scrpage}
-\AddToLayerPageStyleOptions{plain.scrheadings}
-  {
-    onselect={\setlength{\footskip}{5\baselineskip}}
-  }
 %    \end{macrocode}
 % The option \texttt{onpsinit} from \texttt{scrartcl} allows us to detect 
 % paragraphs in the header and footer of the document. We use this anchor to 
@@ -1150,7 +1146,7 @@ http://www.latex-project.org/lppl.txt
 % \subsection{Page geometry}
 % We configure the paper size and the type area through the margins.
 %    \begin{macrocode}
-\RequirePackage[a4paper, margin=4cm, headheight=52pt]{geometry}
+\RequirePackage[a4paper, margin=4cm]{geometry}
 %    \end{macrocode}
 % 
 % \subsection{Footnotes}
@@ -1266,7 +1262,7 @@ http://www.latex-project.org/lppl.txt
 % \subsection{Headers \& footers}
 %    \begin{macrocode}
 \AddToLayerPageStyleOptions{plain.scrheadings}
-    {onselect={\setlength{\footheight}{3\baselineskip}}}
+    {onselect={\setlength{\headheight}{52pt}}}
 \cfoot[\PhiMiSci@Footer*{}]{\PhiMiSci@Footer{}}
 \chead[\PhiMiSci@Header*{}]{\PhiMiSci@Header{}}
 %    \end{macrocode}
@@ -1310,7 +1306,7 @@ http://www.latex-project.org/lppl.txt
        {
          \bool_if:NT \l__phimisci_output_publication_header_footer_bool
            {
-             \parbox[c]{\linewidth-2cm}
+             \parbox[b]{\linewidth-3cm}
                {\raggedright\normalfont\small\textcolor{PhiMiSciBlue}
                  {%
                    \textbf{PhiMiSci\\Philosophy~and~the~Mind~Sciences}},\
