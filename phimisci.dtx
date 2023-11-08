@@ -1284,6 +1284,7 @@ http://www.latex-project.org/lppl.txt
 %
 % \subsection{Headers \& footers}
 %    \begin{macrocode}
+\KOMAoption{headsepline}{true}
 \AddToLayerPageStyleOptions{plain.scrheadings}
     {onselect={\setlength{\headheight}{52pt}}}
 \cfoot[\PhiMiSci@Footer*{}]{\PhiMiSci@Footer{}}
@@ -1315,7 +1316,6 @@ http://www.latex-project.org/lppl.txt
           {
             \tl_use:N \l__phimisci_submission_footer_tl
           }
-        \hfill \textsc{page~\oldstylenums{\thepage}}
       }
   }
 %    \end{macrocode}
@@ -1368,9 +1368,15 @@ http://www.latex-project.org/lppl.txt
          }
        }
        {
-          \tl_use:N \l_phimisci_header_authors_tl
-          \hfill 
-          \tl_use:N \l_phimisci_short_document_title_tl
+          \Ifthispageodd
+            {
+              \tl_use:N \l_phimisci_short_document_title_tl
+            }
+            {
+              \tl_use:N \l_phimisci_header_authors_tl
+            }
+         \hfill
+         \thepage
        }
   }  
 %    \end{macrocode}
