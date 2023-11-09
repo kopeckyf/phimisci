@@ -221,6 +221,7 @@ http://www.latex-project.org/lppl.txt
 \newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries\color{PhiMiSciBlue}}
 \newkomafont{PhiMiSciAffiliationLine}{\normalfont\normalsize}
 %    \end{macrocode}
+%
 % \subsection{Bibliography management through \texttt{biblatex}}
 % The entire bibliography management is delegated to \texttt{biblatex}. We enable 
 % \texttt{natbib} as well so that authors can use traditional commands, most notably
@@ -1221,7 +1222,25 @@ http://www.latex-project.org/lppl.txt
   { \frenchspacing }
 \ExplSyntaxOff
 %    \end{macrocode}
-% \subsection{Bibliograpy layout}
+%
+% \subsection{Indentation after lists and quotations}
+% We add a hook to the end of \env{quote}, \env{quotation}, \env{itemize}, 
+% \env{description} and \env{enumerate} to suppress indentation in the 
+% following paragraphs.
+%    \begin{macrocode}
+\AfterEndEnvironment{quote}
+                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterheading}
+\AfterEndEnvironment{quotation}
+                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterheading}
+\AfterEndEnvironment{itemize}
+                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterheading}
+\AfterEndEnvironment{description}
+                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterheading}
+\AfterEndEnvironment{enumerate}
+                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterh
+%    \end{macrocode}
+%
+% \subsection{Bibliography layout}
 % We allow (almost) no breaking within entries in the list of references, and
 % we are especially tolerant regarding interword spacing to avoid overful 
 % lines. Our code follows the standard \texttt{bibintoc} heading from 
