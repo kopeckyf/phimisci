@@ -197,7 +197,6 @@ http://www.latex-project.org/lppl.txt
 \tl_new:N \l__phimisci_copyright_holder_tl
 \tl_new:N \l__phimisci_locale_related_tl
 \tl_new:N \l__phimisci_tmp_orcid_link_tl
-\tl_new:N \l__phimisci_language_main_tl
 \ExplSyntaxOff
 %    \end{macrocode}
 
@@ -1169,6 +1168,10 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \subsection{Configure the document language}
+% The list passed as \cs{documentclass}\texttt{[language=\meta{list of 
+% languages}]}\texttt{\{phimisci\}} is processed here. By \texttt{babel}'s 
+% convention, if there is more than one language in the list, the last is 
+% considered to be the main document language.
 %    \begin{macrocode}
 \RequirePackage [ \clist_use:Nn \l__phimisci_languages_clist {,} ] {babel}
 \ExplSyntaxOff
