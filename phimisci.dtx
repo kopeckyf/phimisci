@@ -140,13 +140,14 @@ http://www.latex-project.org/lppl.txt
 % We load well-known packages that are used regularly in the preparation of 
 % scientific texts.
 %    \begin{macrocode}
-\RequirePackage{amsmath, amsthm, amssymb, array, booktabs, enumitem, graphicx}
+\RequirePackage{amsmath, amsthm, amssymb, array, booktabs, csquotes, enumitem, 
+                graphicx}
 %    \end{macrocode}
 % We also load helper packages that are necessary to program features of this
 % class. \texttt{hyperref} is special in this regard, because certain options
 % have to be loaded early and can't be passed to \cs{hypersetup}.
 %    \begin{macrocode}
-\RequirePackage[final, hyperfootnotes=false]{hyperref}
+\RequirePackage[final, hyperfootnotes=false, pdfusetitle=true]{hyperref}
 \RequirePackage{calc, etoolbox, expl3, iftex, l3keys2e, marginnote, microtype, 
                 orcidlink, tikz, xcolor}
 %    \end{macrocode}
@@ -196,6 +197,7 @@ http://www.latex-project.org/lppl.txt
 \tl_new:N \l__phimisci_copyright_holder_tl
 \tl_new:N \l__phimisci_locale_related_tl
 \tl_new:N \l__phimisci_tmp_orcid_link_tl
+\tl_new:N \l__phimisci_language_main_tl
 \ExplSyntaxOff
 %    \end{macrocode}
 
@@ -234,7 +236,6 @@ http://www.latex-project.org/lppl.txt
 % After loading hyperref earlier, we set all links to our blue color. 
 %    \begin{macrocode}
 \hypersetup{breaklinks=true,
-            pdfusetitle=true,
             colorlinks=true,
             linkcolor=PhiMiSciBlue,
             citecolor=PhiMiSciBlue,
@@ -478,6 +479,8 @@ http://www.latex-project.org/lppl.txt
     issue .initial:n = {},
     editor .code:n = 
       { \seq_set_split:Nnn \l_phimisci_issue_editor_seq { ; } { #1 } },
+    language .clist_set:N = \l__phimisci_languages_clist,
+    language .initial:n = {english}
   }
 %    \end{macrocode}
 % \subsection{Settings}
@@ -1164,6 +1167,10 @@ http://www.latex-project.org/lppl.txt
           }
       }
   }
+%    \end{macrocode}
+% \subsection{Configure the document language}
+%    \begin{macrocode}
+\RequirePackage [ \clist_use:Nn \l__phimisci_languages_clist {,} ] {babel}
 \ExplSyntaxOff
 %    \end{macrocode}
 % \section{Layout and design}
@@ -1237,7 +1244,7 @@ http://www.latex-project.org/lppl.txt
 \AfterEndEnvironment{description}
                     {\par\aftergroup\@afterindentfalse\aftergroup\@afterheading}
 \AfterEndEnvironment{enumerate}
-                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterh
+                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterheading}
 %    \end{macrocode}
 %
 % \subsection{Bibliography layout}
