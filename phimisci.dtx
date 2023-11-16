@@ -128,6 +128,7 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \LoadClass [12pt, oneside] {scrartcl}
 \RequirePackage[autoenlargeheadfoot=off]{scrlayer-scrpage}
+\RequirePackage{scrlayer-notecolumn}
 %    \end{macrocode}
 % The option \texttt{onpsinit} from \texttt{scrartcl} allows us to detect 
 % paragraphs in the header and footer of the document. We use this anchor to 
@@ -148,8 +149,8 @@ http://www.latex-project.org/lppl.txt
 % have to be loaded early and can't be passed to \cs{hypersetup}.
 %    \begin{macrocode}
 \RequirePackage[final, hyperfootnotes=false, pdfusetitle=true]{hyperref}
-\RequirePackage{calc, etoolbox, expl3, iftex, l3keys2e, marginnote, microtype, 
-                orcidlink, tikz, xcolor}
+\RequirePackage{calc, etoolbox, expl3, iftex, l3keys2e, microtype, orcidlink, 
+                tikz, xcolor}
 %    \end{macrocode}
 % \subsection{Data storage, Boolean switches and command variants}
 % These Booleans, control sequences, integer variables, mappings, sequences and
@@ -217,6 +218,7 @@ http://www.latex-project.org/lppl.txt
 \setkomafont{dictum}{\normalfont\normalsize\itshape}
 \setkomafont{dictumauthor}{\normalfont\normalsize}
 \setkomafont{descriptionlabel}{\normalfont\bfseries}
+\setkomafont{notecolumn.marginpar}{\normalfont\color{black!50}}
 \addtokomafont{section}{\rmfamily}
 \addtokomafont{subsection}{\rmfamily}
 \addtokomafont{subsubsection}{\rmfamily}
@@ -1477,7 +1479,7 @@ http://www.latex-project.org/lppl.txt
 % \begin{function}{\PhiMiSciParagraphNumber}
 \NewDocumentCommand{\PhiMiSciParagraphNumber}{m}
   {
-    \marginnote{ \color{black!50}\oldstylenums{#1} }
+    \makenote{ #1 }
   }
 % \end{function}
 %
