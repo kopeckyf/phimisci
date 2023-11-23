@@ -6,17 +6,16 @@
 \input{l3docstrip.tex}
 \keepsilent
 \preamble
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 Template for the journal Philosophy and the Mind Sciences
 
 Copyright (c) 2023 by Philosophy and the Mind Sciences
 
 This file may be distributed and/or modified under the conditions of the LaTeX 
 Project Public License, either version 1.3c of this license or (at your option) 
-any later version. The latest version of this license is in:
-
+any later version. The latest version of this license is available at:
 http://www.latex-project.org/lppl.txt
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 \endpreamble
 \generate{\file{\jobname.cls}{\from{\jobname.dtx}{class}}}
 %</install>
@@ -27,6 +26,7 @@ http://www.latex-project.org/lppl.txt
 %</internal>
 %<*driver>
 \documentclass{l3doc}
+\usepackage{metalogo}
 \usepackage{tgheros}
 \usepackage[zerostyle=d]{newtxtt}
 \let\familydefault\sfdefault
@@ -34,6 +34,7 @@ http://www.latex-project.org/lppl.txt
 \usepackage[british]{babel}
 \usepackage{biblatex}
 \usepackage{booktabs}
+\usepackage{multicol}
 \usepackage{xcolor}
 \usepackage{pifont}
 \definecolor{PhiMiSciRed}{cmyk}{0, 1, 0.91, 0.01}
@@ -100,12 +101,44 @@ http://www.latex-project.org/lppl.txt
 % \url{https://github.com/kopeckyf/phimisci}.
 % \tableofcontents
 % \section{Basic set-up}
-%    \begin{macrocode}
-%<*class>
-%    \end{macrocode}
+% \subsection{Prerequisites}
+% A \LaTeX{} installation from 2022 or newer is required. Additionally, the 
+% following packages need to be installed:
+%
+% \begin{multicols}{4}
+% \begin{itemize}
+% \item \pkg{amsmath}
+% \item \pkg{amsthm}
+% \item \pkg{amssymb}
+% \item \pkg{array}
+% \item \pkg{babel}
+% \item \pkg{biblatex}
+% \item \pkg{booktabs}
+% \item \pkg{calc}
+% \item \pkg{csquotes}
+% \item \pkg{enumitem}
+% \item \pkg{etoolbox}
+% \item \pkg{expl3}
+% \item \pkg{graphicx}
+% \item \pkg{hyperref}
+% \item \pkg{iftex}
+% \item \pkg{koma-script}
+% \item \pkg{l3keys2e}
+% \item \pkg{libertinus}
+% \item \pkg{microtype}
+% \item \pkg{orcidlink}
+% \item \pkg{xcolor}
+% \item \pkg{xparse}
+% \item []
+% \end{itemize}
+% \end{multicols}
+%
+% \noindent Documents in the \texttt{phimisci} class can be compiled with \XeLaTeX{} and 
+% PDF\LaTeX{}.
 % \subsection{Class identification and version check}
 % Start by identifying the document class.
 %    \begin{macrocode}
+%<*class>
 \NeedsTeXFormat {LaTeX2e} 
 \ProvidesExplClass {phimisci} {2023-08-01} {1.0}  
                    {Philosophy and the Mind Sciences Journal Template}
@@ -150,7 +183,7 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \RequirePackage[final, hyperfootnotes=false, pdfusetitle=true]{hyperref}
 \RequirePackage{calc, etoolbox, expl3, iftex, l3keys2e, microtype, orcidlink, 
-                tikz, xcolor}
+                xcolor}
 %    \end{macrocode}
 % \subsection{Data storage, Boolean switches and command variants}
 % These Booleans, control sequences, integer variables, mappings, sequences and
@@ -450,9 +483,55 @@ http://www.latex-project.org/lppl.txt
               {Please~supply~the~file~location~with~the~document~class~option~
                 'settings/logo-url~=~path/to/file.pdf'.}
 %    \end{macrocode}
-% \section{Key-value interface for user-configurable options}
+% \section{User-configurable options}
 % \label{sec:options}
-% \subsection{Configure document data}
+% Users can configure the output of \texttt{phimisci} documents using a 
+% key-value interface. Options can be loaded \emph{early} or \emph{late}. Early
+% settings are those passed to \cs{documentclass}:
+%
+% \begin{center}
+% \cs{documentclass}\oarg{\meta{key\textsubscript{1}}=
+%                           \meta{value\textsubscript{1}},
+%                         \meta{key\textsubscript{2}}=
+%                           \meta{value\textsubscript{2}},
+%                         ...}\verb+{phimisci}+
+% \end{center}
+% \noindent Late configurations appear after \cs{documentclass} but ideally 
+% before \verb+\begin{document}+. They are passed to \cs{PhiMiSciSettings}:
+%
+% \begin{center}
+% \cs{PhiMiSciSettings}\marg{\meta{key\textsubscript{1}}=
+%                           \meta{value\textsubscript{1}},
+%                         \meta{key\textsubscript{2}}=
+%                           \meta{value\textsubscript{2}},
+%                         ...}
+% \end{center}
+%
+% \begin{description}
+% \item[Hint:] Later settings always override previous ones.
+% \item[Warning:] Many of the options will take either no effect or cause 
+% unexpected output if they are changed in the document body. It is recommended
+% to change all settings in the preamble, that is, before 
+% \verb+\begin{document}+.
+% \end{description}
+% A \meta{key} can be any of the settings described below. Possible settings 
+% for the \meta{value} depend on the respective \meta{key}.
+%
+% There are three types of \meta{keys}. Document meta data can be configured 
+% with the first group. These are described in Section~\ref{sec:document-data}.
+%
+% Settings for the layout and document element behaviour are stored in the 
+% \meta{settings/} sub-group of keys (Section~\ref{sec:settings-layout}). 
+% Locale options are stored in the \meta{locale/} sub-group 
+% (Section~\ref{sec:settings-locale}).
+% \subsection{Configure document data}\label{sec:document-data}
+% Meta data that are not input through dedicated commands (such as \cs{author}
+% or \cs{title}) can be configured here. The code below prepares a draft for an
+% article to be printed in volume 100 of the journal in the year 2100:
+%
+% \begin{quote}
+% \verb+\PhiMiSettings{stage=draft, volume=100, year=2100}+
+% \end{quote}
 %    \begin{macrocode}
 \keys_define:nn { phimisci }
   {
@@ -485,7 +564,8 @@ http://www.latex-project.org/lppl.txt
     language .initial:n = {english}
   }
 %    \end{macrocode}
-% \subsection{Settings}
+% \subsection{Settings to document elements and layout}
+% \label{sec:settings-layout}
 % \begin{variable}{phimisci/settings}
 % \begin{syntax}
 % \cs{PhiMiSciSettings} \{ settings / \meta{key} = value \}
@@ -536,6 +616,8 @@ http://www.latex-project.org/lppl.txt
     footnote-break-penalty .initial:n = { 1000 },
     logo-url .tl_set:N = \l__phimisci_branding_logo_tl,
     logo-url .initial:n = {branding/phimisci-logo-mini.pdf},
+    logo-width .dim_set:N = \l__phimisci_logo_width_dim,
+    logo-width .initial:n = { 2.5cm },
     submission-footer-text .tl_set:N = \l__phimisci_submission_footer_tl,
     submission-footer-text .initial:n = 
       {
@@ -568,7 +650,7 @@ http://www.latex-project.org/lppl.txt
     widow-penalty .initial:n = { 500 },
   }
 %    \end{macrocode}
-% \subsection{Locale settings}
+% \subsection{Locale settings}\label{sec:settings-locale}
 %    \begin{macrocode}
 \keys_define:nn { phimisci / locale }
   {
@@ -1383,7 +1465,8 @@ http://www.latex-project.org/lppl.txt
        {
          \bool_if:NT \l__phimisci_output_publication_header_footer_bool
            {
-             \parbox[b]{\linewidth-3cm}
+             \parbox[c]
+               {\dim_eval:n { \linewidth - 1cm - \l__phimisci_logo_width_dim }}
                {\raggedright\normalfont\small\textcolor{PhiMiSciBlue}
                  {%
                    \textbf{PhiMiSci\\Philosophy~and~the~Mind~Sciences}},\
@@ -1405,21 +1488,20 @@ http://www.latex-project.org/lppl.txt
                         \par
                      }
                  }
-               \hfill\hbox{}%
-               \tl_if_blank:VTF \l__phimisci_branding_logo_tl
+               \hfill
+               \parbox[c]{\dim_use:N \l__phimisci_logo_width_dim}
                  {
-                   \msg_warning:nn { phimisci } { missing-logo-url }
-                 }
-                 {
-                   \begin{tikzpicture}[remember~picture, overlay]
-                   \node [anchor=west, xshift=-5.33cm, yshift=-3cm, 
-                          inner~sep=0pt] at (current~page.north~east)
-                         {\includegraphics[width=3cm]
-                           { \tl_use:N \l__phimisci_branding_logo_tl }
-                         };
-                   \end{tikzpicture}
-                 }
-         }
+                   \tl_if_blank:VTF \l__phimisci_branding_logo_tl
+                     {
+                       \msg_warning:nn { phimisci } { missing-logo-url }
+                     }
+                     {
+                       \includegraphics
+                         [ width=\dim_use:N \l__phimisci_logo_width_dim ]
+                         { \tl_use:N \l__phimisci_branding_logo_tl }
+                     }
+                }
+            }
        }
        {
           \Ifthispageodd
