@@ -177,11 +177,12 @@ http://www.latex-project.org/lppl.txt
                 graphicx}
 %    \end{macrocode}
 % We also load helper packages that are necessary to program features of this
-% class. \texttt{hyperref} is special in this regard, because certain options
-% have to be loaded early and can't be passed to \cs{hypersetup}.
+% class. \texttt{hyperref} and \texttt{xcolor} are special in this regard, 
+% because some of their options have to be loaded at initial package loading.
 %    \begin{macrocode}
 \RequirePackage[final, hyperfootnotes=false, pdfusetitle=true]{hyperref}
-\RequirePackage{etoolbox, expl3, iftex, l3keys2e, microtype, orcidlink, xcolor}
+\RequirePackage[dvipsnames]{xcolor}
+\RequirePackage{etoolbox, expl3, iftex, l3keys2e, microtype, orcidlink}
 %    \end{macrocode}
 % \subsection{Data storage, Boolean switches and command variants}
 % These Booleans, control sequences, integer variables, mappings, sequences and
@@ -253,7 +254,7 @@ http://www.latex-project.org/lppl.txt
 \addtokomafont{section}{\rmfamily}
 \addtokomafont{subsection}{\rmfamily}
 \addtokomafont{subsubsection}{\rmfamily}
-\newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries\color{PhiMiSciBlue}}
+\newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries}
 \newkomafont{PhiMiSciAffiliationLine}{\normalfont\normalsize}
 %    \end{macrocode}
 %
@@ -270,9 +271,9 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \hypersetup{breaklinks=true,
             colorlinks=true,
-            linkcolor=PhiMiSciBlue,
-            citecolor=PhiMiSciBlue,
-            urlcolor=PhiMiSciBlue}
+            linkcolor=Blue,
+            citecolor=Blue,
+            urlcolor=Blue}
 %    \end{macrocode}
 % We delay setting the PDF meta data (author, title) to the end of the preamble 
 % to allow for meta data processing first. The meta data is output only in 
@@ -1442,8 +1443,7 @@ http://www.latex-project.org/lppl.txt
       {%
         \bool_if:NTF \l__phimisci_output_publication_header_footer_bool
           {
-            \textcolor{PhiMiSciBlue}{%
-                  \textbf{Philosophy~and~the~Mind~Sciences}}
+            \textbf{Philosophy~and~the~Mind~Sciences}
                   \ \tl_use:N \l_phimisci_volume_tl 
                   \ (\int_use:N \l_phimisci_publication_year_int)
             \hfill\hbox{}
