@@ -20,6 +20,7 @@
 % Fonts
 \usepackage{tgheros}
 \usepackage[zerostyle=d]{newtxtt}
+\usepackage{pifont}
 \let\familydefault\sfdefault
 
 % Computer code
@@ -37,6 +38,8 @@
         
 % Better description environments
 \usepackage{enumitem}
+
+\usepackage{booktabs}
 
 \begin{document}
 \maketitle
@@ -68,14 +71,14 @@
           \OArg{\Meta{Short name}}
           \MArg{\Meta{Author data}}
          ]
-    In the mandatory argument \MArg{\Meta{Author data}}, author blocks are separated by \Command{and}:
+    In \MArg{\Meta{Author data}}, separate individuals by \Command{and}:
 \begin{lstlisting}
 \author{A. U. Thor \and E. di Tor}
 \end{lstlisting}
 
-Each author block can contain an \Command{affiliation}\MArg{\Meta{List of affiliations}} and\slash or an \Command{orcid}\MArg{\Meta{id}} command.
+Each author can contain an \Command{affiliation}\MArg{\Meta{List of affiliations}} and\slash or an \Command{orcid}\MArg{\Meta{id}} command.
 
-In the \Meta{List of affiliations}, each affiliation is separated by a semicolon:
+Affiliations are separated by semicolons:
 \begin{lstlisting}
 \author
   {
@@ -113,12 +116,12 @@ Accepts further meta data settings and their values. Possible settings are:
   \end{description}
 \end{description}
 \addsec{Elements configured in the preamble}
-\textit{Note:} The following commands must be placed in the preamble, before \Command{begin}\MArg{document}.
+\textit{Note:} The following commands must be placed in the preamble, before \Command{begin}\MArg{document}. These commands will respect paragraph breaks if their content contains them.
 \begin{description}[style=nextline]
     \item[\Command{abstract}\MArg{\Meta{text}}] Print \Meta{text} as the paper's abstract.
     \item[\Command{acknowledgments}\MArg{\Meta{thanks}}] Print \Meta{thanks} in a separate section, at the end of the paper (optional; not printed if not supplied or left empty).
 \end{description}
-These commands will respect paragraph breaks if their content contains them.
+
 
 \addsec{Elements configured in the document}
 \begin{description}[style=nextline]
@@ -126,13 +129,18 @@ These commands will respect paragraph breaks if their content contains them.
     \item[\Command{dictum}\OArg{\Meta{source}}\MArg{\Meta{epigraph}}] An epigraph. The \Meta{source} is printed below the \Meta{epigraph}. Can be used multiple times in one paper.
 \end{description}
 
-\vfill
-\begin{center}
-\textit{See back page}
-\end{center}
-\pagebreak
+\addsec{Production stages \& their output}
 
-\addsec{Production stages}
+ \begin{tabular}{lcccc}
+     \toprule
+   &            & \multicolumn{3}{c}{Output ... ?}\\\cmidrule(lr){3-5}
+     Stage & Overf. lin. & Authors & Contact & Footer\\\midrule
+     \ttfamily preparation & \ding{55} & \ding{51} & \ding{51} & \ding{55}\\
+     \ttfamily submission & \ding{55} & \ding{55} & \ding{55} & \ding{55}\\
+     \ttfamily draft & \ding{51} & \ding{51} & \ding{51} & \ding{51}\\
+     \ttfamily final & \ding{55} & \ding{51} & \ding{51} & \ding{51}\\
+     \bottomrule
+     \end{tabular}
 
 \addsec{Complete list of settings}
 These settings are accessible in the \texttt{settings} folder via {\Command{PhiMiSciSettings}\MArg{settings/\Meta{key\textsubscript{1}} = \Meta{value\textsubscript{1}}, ...}}. Values following equation signs are the initial values.
@@ -175,12 +183,17 @@ These settings are accessible in the \texttt{settings} folder via {\Command{PhiM
 These fonts can be set using \Command{setkomafont}\MArg{\Meta{font}}.
 
 \begin{description}[font=\ttfamily]
-    \item[title] Beschreibung
-    \item[author] Beschreibung
-    \item[subject] Beschreibung
-    \item[pageheadfoot] Beschreibung
-    \item[dictum] Beschreibung
-    \item[dictum] Beschreibung
+    \item[title] Title on the first page
+    \item[author] Author(s) on the title page.
+    \item[subject] Type of publication (paper, correction, etc.)
+    \item[PhiMiSciAffiliationLine] Affiliations below the author(s)
+    \item[PhiMiSciMetadataItem] The meta data elements in the list on the title page (e.g., abstract, rights \& permissions, etc.)
+    \item[pageheadfoot] Header and footer contents on all but the first page.
+    \item[dictum] Epigraphs (whereever the command \Command{dictum} is used).
+    \item[dictumauthor] The author below epigraphs (as input in \Command{dictum}\OArg{\Meta{author}}\Meta{epigraph})
+    \item[descriptionlabel] The label in \texttt{description} environments, i.e., the font for the \Meta{label} in \Command{item}\MArg{\Meta{label}}.
+    \item[notecolumn.marginpar] The paragraph numbers in the margin.
+    \item[section, subsection, subsubsection] The respective section heading
     
     
 \end{description}
