@@ -239,7 +239,7 @@ http://www.latex-project.org/lppl.txt
 % \textit{Philosophy and the Mind Sciences} uses Libertinus as its bread and
 % butter type, which we load through the \LaTeX\ package \texttt{libertinus}. 
 %    \begin{macrocode}
-\RequirePackage{libertinus}
+\RequirePackage[semibold]{libertinus}
 %    \end{macrocode}
 % We adjust the font settings inherited from \texttt{scrartcl} and create new
 % font commands for specific \textit{PhiMiSci} elements.
@@ -1448,6 +1448,7 @@ http://www.latex-project.org/lppl.txt
                   \textbf{Philosophy~and~the~Mind~Sciences}}
                   \ \tl_use:N \l_phimisci_volume_tl 
                   \ (\int_use:N \l_phimisci_publication_year_int)
+            \hfill\hbox{}
           }
           {
             \tl_use:N \l__phimisci_submission_footer_tl
