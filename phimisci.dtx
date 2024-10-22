@@ -9,7 +9,7 @@
 -------------------------------------------------------------------------------
 Template for the journal Philosophy and the Mind Sciences
 
-Copyright (c) 2023 by Philosophy and the Mind Sciences
+Copyright (c) 2024 by Philosophy and the Mind Sciences
 
 This file may be distributed and/or modified under the conditions of the LaTeX 
 Project Public License, either version 1.3c of this license or (at your option) 
@@ -145,7 +145,8 @@ http://www.latex-project.org/lppl.txt
 % Perform a check whether the used \LaTeX\ installation is recent enough.
 %    \begin{macrocode}
 \RequirePackage{xparse}
-\@ifpackagelater {xparse} {2022/01/01} {} 
+\@ifpackagelater {xparse} {2022/01/01} 
+  {} 
   {
     \ClassError {phimisci} { LaTeX~installation~too~old. }
       { 
@@ -212,6 +213,7 @@ http://www.latex-project.org/lppl.txt
 \int_new:N \l__phimisci_abstract_length_int
 \prop_new:N \l__phimisci_authors_to_affiliations_prop
 \prop_new:N \l__phimisci_authors_to_orcids_prop
+\prop_new:N \l__phimisci_authors_to_emails_prop
 \prop_new:N \l__phimisci_affiliation_id_resolver_prop
 \seq_new:N \l__phimisci_keywords_seq
 \seq_new:N \l__phimisci_authors_seq
@@ -633,7 +635,7 @@ http://www.latex-project.org/lppl.txt
       \l__phimisci_max_authors_in_header_int,
     number-authors-header .initial:n = { 2 },
     orcid-color .tl_set:N = \l__phimisci_orcid_color_tl,
-    orcid-color .initial:n = { 000000 }, 
+    orcid-color .initial:n = { A6CE39 }, 
     orphan-penalty .int_set:N = \l__phimisci_settings_orphan_penalty_int,
     orphan-penalty .initial:n = { 300 },
     output-orcids .bool_set:N = \l__phimisci_output_orcids_bool,
@@ -654,25 +656,25 @@ http://www.latex-project.org/lppl.txt
 \keys_define:nn { phimisci / locale }
   {
     abstract .tl_set:N = \l__phimisci_locale_abstract_tl,
-    abstract .initial:n = {Abstract:},
+    abstract .initial:n = {Abstract},
     acknowledgments .tl_set:N = \l__phimisci_locale_acknowledgments_tl,
     acknowledgments .initial:n = {Acknowledgments},
     contact .tl_set:N = \l__phimisci_locale_contact_tl,
-    contact .initial:n = {Contact:},
+    contact .initial:n = {Contact},
     keywords .tl_set:N = \l__phimisci_locale_keywords_tl,
-    keywords .initial:n = {Keywords:},
+    keywords .initial:n = {Keywords},
     volume .tl_set:N = \l__phimisci_locale_volume_tl,
     volume .initial:n = {Volume},
     number .tl_set:N = \l__phimisci_locale_number_tl,
     number .initial:n = {Number},
     reviewed-book .tl_set:N = \l__phimisci_locale_reviewed_book_tl,
-    reviewed-book .initial:n = {Reviewed~book:},
+    reviewed-book .initial:n = {Reviewed~book},
     rights .tl_set:N = \l__phimisci_locale_rights_tl,
-    rights .initial:n = {Rights~\&~permissions:},
+    rights .initial:n = {Rights~\&~permissions},
     doi .tl_set:N = \l__phimisci_locale_doi_tl,
-    doi .initial:n = {DOI:},
+    doi .initial:n = {DOI},
     corrected-article .tl_set:N = \l__phimisci_locale_corrected_article_tl,
-    corrected-article .initial:n = {Corrected~article:},
+    corrected-article .initial:n = {Corrected~article},
     original-research .tl_set:N = \l__phimisci_locale_original_research_tl,
     original-research .initial:n = {Original~research},
     book-review .tl_set:N = \l__phimisci_locale_book_review_tl,
@@ -742,13 +744,12 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \NewDocumentCommand { \PhiMiSci@ProcessAuthorData } { +m }
   {%
-    \exp_args:No \phimisci_process_author_data:nNNNNN
+    \exp_args:No \phimisci_process_author_data:nNNNN
                    { #1 }
-                   \l__phimisci_affiliation_id_resolver_prop
                    \l__phimisci_authors_to_affiliations_prop
                    \l__phimisci_authors_to_orcids_prop
+                   \l__phimisci_authors_to_emails_prop
                    \l__phimisci_number_of_authors_int
-                   \l__phimisci_number_of_affiliations_int
   }
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@OutputAuthorData}
@@ -758,45 +759,35 @@ http://www.latex-project.org/lppl.txt
   {
     \bool_if:NT \l__phimisci_output_authors_bool
       {
-        \group_begin:
-        \usekomafont{author}{\lineskip .5em%    
-        \phimisci_output_authors:NNNN
-                       \l__phimisci_authors_to_affiliations_prop
-                       \l__phimisci_affiliation_id_resolver_prop
-                       \l__phimisci_authors_to_orcids_prop
-                       \l__phimisci_number_of_authors_int
-        \phimisci_output_affiliations:NNN
-          \l__phimisci_affiliation_id_resolver_prop
-          \l__phimisci_number_of_affiliations_int
+        \phimisci_output_authors:NN
+          \l__phimisci_authors_to_affiliations_prop
           \l__phimisci_number_of_authors_int
-        \par}
-        \group_end:
+        \par
         \vskip 1em
       }
   }
 %    \end{macrocode}
-% \begin{function}{\phimisci_process_author_data:nNNNNN}
+% \begin{function}{\phimisci_process_author_data:nNNNN}
 % \begin{arguments}
-% \item The input author-affiliation-orcid text
-% \item A property map that lists assigns and ID to each affiliation.
+% \item The input author-affiliation-orcid text,
+% \item[] and the following outpus:
 % \item A property map that assigns a list of affiliations to each author.
 % \item A property map that stores the resulting author-to-ORCID mapping.
+% \item A property map that stores the email address of each author.
 % \item An integer variable that stores the number of authors
-% \item An integer variable that stores the number of affiliations
 % \end{arguments}
 % \end{function}
 %    \begin{macrocode}
-\cs_new:Npn \phimisci_process_author_data:nNNNNN #1#2#3#4#5#6
+\cs_new:Npn \phimisci_process_author_data:nNNNN #1#2#3#4#5
   {
     \seq_clear_new:N \l__phimisci_authors_header_tmp_seq
     \int_zero:N #5
-    \int_zero:N #6
 %    \end{macrocode}
 % We first split the input string by \cs{and}, the common separator between 
 % authors in the \LaTeX\ world. The result is stored in a sequence. 
 %    \begin{macrocode}    
     \seq_set_split:Nnn \l__phimisci_authors_seq
-                       {~\and~}
+                       { \and~ }
                        { #1 }
 %    \end{macrocode}
 % We now loop over the items stored in the sequence. The sequence is a list of all
@@ -831,10 +822,18 @@ http://www.latex-project.org/lppl.txt
         {\c{orcid} \cB. (\c[^BE].*) \cE.}
         { ##1 }
         \l__phimisci_tmp_author_orcid_seq
+        
+      \regex_extract_once:nnN 
+        {\c{email} \cB. (\c[^BE].*) \cE.}
+        { ##1 }
+        \l__phimisci_tmp_author_email_seq
 %    \end{macrocode}
 % Following extraction we remove the author's affiliation and ORCID from the input
 % so that only the name remains in the data for the current author.
 %    \begin{macrocode}
+      \regex_replace_all:nnN {\c{email} \cB. (\c[^BE].*) \cE.} 
+                             {}
+                             \l__phimisci_author_tmp_tl
       \regex_replace_all:nnN {\c{orcid} \cB. (\c[^BE].*) \cE.} 
                              {} 
                              \l__phimisci_author_tmp_tl
@@ -842,48 +841,29 @@ http://www.latex-project.org/lppl.txt
                              {}
                              \l__phimisci_author_tmp_tl
 %    \end{macrocode}
-% Next, we store the name of the author in a sequence. 
+% Next, we trim leading and trailing spaces and store the name of the author 
+% in a sequence. 
 %    \begin{macrocode}
+      \tl_trim_spaces:N \l__phimisci_author_tmp_tl
       \seq_put_right:NV \l__phimisci_authors_header_tmp_seq
                         \l__phimisci_author_tmp_tl
 %    \end{macrocode}
 % We now store all the data in three separate property lists. In the first we 
-% assign authors to (lists of) affiliation IDs. These IDs are resolved to 
-% affiliation names. And third, we map authors to their ORCIDs in a separate 
-% property list. The currently processed affiliation is given by |####1|.
-%    \begin{macrocode}
-      \seq_clear_new:N \l__phimisci_current_author_affils_seq
-      \seq_set_split:NVx \l__phimisci_current_author_affils_seq
-                         \l__phimisci_affiliations_isep_tl
-                         {
-                           \seq_item:Nn 
-                             \l__phimisci_tmp_author_affiliation_seq 
-                             {2} 
-                         }
-      \seq_map_inline:Nn \l__phimisci_current_author_affils_seq
-        {
-          \tl_if_empty:nF { ####1 }
-            {
-              \prop_get:NnNF { #2 }
-                             { ####1 }
-                             \l__phimisci_tmp_affiliation_id_tl
-                               {  
-                                 \prop_put:Nnx 
-                                   { #2 }
-                                   { ####1 }
-                                   { \prop_count:N { #2 } }
-                                 \tl_if_empty:nF { ####1 } { \int_incr:N #6}
-                               }
-            }
-          }
-        
-      \prop_put:Nxx { #3 }
+% assign authors to (lists of) affiliations. Seconly, we map authors to their 
+% ORCIDs in a separate property list. And third, we store the e-mail address
+% in another property map. The currently processed affiliation is given by |####1|.
+%    \begin{macrocode}        
+      \prop_put:Nxx { #2 }
                     { \tl_use:N \l__phimisci_author_tmp_tl }
                     { \seq_item:Nn \l__phimisci_tmp_author_affiliation_seq {2} }
                   
-      \prop_put:Nxx { #4 }
+      \prop_put:Nxx { #3 }
                     { \tl_use:N \l__phimisci_author_tmp_tl }
                     { \seq_item:Nn \l__phimisci_tmp_author_orcid_seq {2} }
+                    
+      \prop_put:Nxx { #4 }
+                    { \tl_use:N \l__phimisci_author_tmp_tl }
+                    { \seq_item:Nn \l__phimisci_tmp_author_email_seq {2} }
     }
 %    \end{macrocode}
 % When all authors are parsed, create a token list of authors to be placed 
@@ -944,127 +924,45 @@ http://www.latex-project.org/lppl.txt
 %    \end{macrocode}
 % We have now sorted our data in two mappings, a \{author: <affiliations>\} and 
 % an \{author: orcid\} mapping. These two are now output.
-% \begin{function}{\phimisci_output_authors:NNNN}
+% \begin{function}{\phimisci_output_authors:NN}
 % \begin{arguments}
 % \item A property mapping that assigns each author to a list of affiliations.
-% \item A mapping from affiliations to their IDs.
-% \item A mapping from authors to ORCIDs.
 % \item The number of authors
 % \end{arguments}
 % \end{function}
 %    \begin{macrocode}
-\cs_new:Npn \phimisci_output_authors:NNNN #1#2#3#4
+\cs_new:Npn \phimisci_output_authors:NN #1#2
   {
     \prop_map_inline:Nn { #1 }
       {
-        \seq_clear_new:N \l__phimisci_current_author_affils_id_input_seq
-        \seq_clear_new:N \l__phimisci_current_author_affils_id_output_seq
-        \tl_clear_new:N \l__phimisci_current_affiliation_key_tl
-        \seq_set_split:NVn \l__phimisci_current_author_affils_id_input_seq
-                           \l__phimisci_affiliations_isep_tl
-                           { ##2 }
-%    \end{macrocode}
-% We now assign each affiliation of the current author to its output index,
-% which is later printed next to the author in superscript. The current 
-% affiliation is known to the loop as |####1|.
-%    \begin{macrocode}
-        \seq_map_inline:Nn \l__phimisci_current_author_affils_id_input_seq
-          {
-            \prop_get:NnNT
-              #2 
-              {####1}
-              \l__phimisci_current_affiliation_key_tl
-              {
-                \seq_put_right:Nx \l__phimisci_current_author_affils_id_output_seq
-                  {
-                    \int_to_alph:n
-                      {  
-                        \int_eval:n 
-                          { 
-                            \l__phimisci_current_affiliation_key_tl + 1 
-                          }
-                      }
-                  }
-              }
-          }
-                
-        \seq_put_right:Nx \l__phimisci_output_authors_seq
-          {
-            \exp_not:N \phimisci_print_orcid:n { ##1 }
-            \tl_rescan:nn {} {##1}
-            \int_compare:nNnT { #4 } > { 1 }
-              {
-                \exp_not:N \textsuperscript
-                  {
-                    \seq_use:Nn \l__phimisci_current_author_affils_id_output_seq
-                                {\l__phimisci_affliation_multisep_tl}
-                  }
-              }
-          }
-      }
-    \seq_use:Nnnn \l__phimisci_output_authors_seq 
-                  { \l__phimisci_authors_osep_final_tl } 
-                  { \l__phimisci_authors_osep_tl } 
-                  { \l__phimisci_authors_osep_final_tl } 
-  }
-%    \end{macrocode}
-% \begin{function}{\phimisci_output_affiliations:NNN}
-% \begin{arguments}
-% \item A property map assigning each affiliation to an ID
-% \item The number of affiliations
-% \item The number of authors
-% \end{arguments}
-% \end{function}
-%    \begin{macrocode}
-\cs_new:Npn \phimisci_output_affiliations:NNN #1#2#3
-  {
-    \int_compare:nNnT { #2 } > { 0 }
-      {
-        \__phimisci_affiliation_line_separator:
-        \seq_clear_new:N \l__phimisci_affiliation_output_seq
+        \vskip 1em
+        \group_begin:
+        \usekomafont{author}
+        \tl_rescan:nn {} {##1}
+        \phimisci_print_orcid:n { ##1 }
+        \group_end:
         \group_begin:
         \usekomafont{PhiMiSciAffiliationLine}
-        \prop_map_inline:Nn { #1 }
-          {
-            \int_compare:nNnTF { #3 } > { 1 }
-              {
-                \seq_put_right:Nx \l__phimisci_affiliation_output_seq
-                  {
-                    \exp_not:N \textsuperscript 
-                      { 
-                        \int_to_alph:n { \int_eval:n { ##2 + 1 } } 
-                      }
-                    \tl_use:N \l__phimisci_affiliation_id_name_sep_tl
-                    \tl_rescan:nn {} { ##1 } 
-                  }
-              }
-              {
-                \seq_put_right:Nx \l__phimisci_affiliation_output_seq
-                  { \tl_rescan:nn {} { ##1 } }
-              }
-          }
+        \__phimisci_affiliation_line_separator:
+        \seq_clear_new:N \l__phimisci_affiliation_output_seq
+        \seq_set_split:NVn \l__phimisci_affiliation_output_seq
+                           \l__phimisci_affiliations_isep_tl 
+                           { ##2 } 
+        \seq_use:Nnnn \l__phimisci_affiliation_output_seq
+          { \l__phimisci_affiliation_line_ampersand_sep_tl }
+          { \l__phimisci_affiliation_line_single_sep_tl }
+          { \l__phimisci_affiliation_line_ampersand_sep_tl }
         
-        \int_compare:nNnTF { #3 } = { 1 }
-          {
-            \seq_use:Nnnn \l__phimisci_affiliation_output_seq
-              { \l__phimisci_affiliation_line_ampersand_sep_tl }
-              { \l__phimisci_affiliation_line_single_sep_tl }
-              { \l__phimisci_affiliation_line_ampersand_sep_tl }
-          }
-          {
-            \seq_use:Nn \l__phimisci_affiliation_output_seq
-              { \l__phimisci_affiliation_line_sep_tl }
-          }
+        \phimisci_print_email:n { ##1 }
         \group_end:
       }
   }
 %    \end{macrocode}
 % \begin{function}{\phimisci_print_orcid:n}
-% If \meta{author} exists in the property map assigning all authors to an ID,
-% output that ID with a hyperlink.
+% If \meta{author} exists in the property map assigning all authors to an 
+% ORCiD, output that ID with a hyperlink.
 % \begin{arguments}
 % \item A property map assigning some authors to ORCiDs
-% \item The author to be outpur
 % \end{arguments}
 % \end{function}
 %    \begin{macrocode}
@@ -1077,8 +975,31 @@ http://www.latex-project.org/lppl.txt
       {
         \tl_if_empty:NF \l__phimisci_tmp_orcid_link_tl
           {
-            \orcidlink{ \tl_use:N \l__phimisci_tmp_orcid_link_tl }
             \,
+            \orcidlink{ \tl_use:N \l__phimisci_tmp_orcid_link_tl }
+          }
+      }
+}
+%    \end{macrocode}
+% \begin{function}{\phimisci_print_email:n}
+% If \meta{author} exists in the property map assigning all authors to their 
+% emails, output that email.
+% \begin{arguments}
+% \item A property map assigning some authors to email addresses.
+% \end{arguments}
+% \end{function}
+%    \begin{macrocode}
+\cs_new:Npn \phimisci_print_email:n #1
+  {
+    \prop_get:NnNT 
+      \l__phimisci_authors_to_emails_prop 
+      { #1 } 
+      \l__phimisci_tmp_email_link_tl
+      {
+        \tl_if_empty:NF \l__phimisci_tmp_email_link_tl
+          {
+            \par
+            \tl_use:N \l__phimisci_tmp_email_link_tl
           }
       }
 }
@@ -1210,16 +1131,11 @@ http://www.latex-project.org/lppl.txt
     \bool_if:nT 
       { 
         \l__phimisci_output_keywords_bool || \l__phimisci_output_abstract_bool
-        || \l__phimisci_output_contact_bool || \l__phimisci_output_rights_bool
+        || \l__phimisci_output_rights_bool
       }
       {
-        \begin{description}
-        \bool_if:NT \l__phimisci_output_contact_bool
-          {
-            \item [\usekomafont{PhiMiSciMetadataItem} 
-                   \tl_use:N \l__phimisci_locale_contact_tl] 
-                   \tl_use:N \l__phimisci_contact_tl
-          }
+        \begin{description}[style=nextline,leftmargin=*]
+
         \bool_if:NT \l__phimisci_output_abstract_bool
           {
             \item [\usekomafont{PhiMiSciMetadataItem} 
@@ -1237,20 +1153,6 @@ http://www.latex-project.org/lppl.txt
             \item [\usekomafont{PhiMiSciMetadataItem} 
                    \tl_use:N \l__phimisci_locale_keywords_tl] 
                    \tl_use:N \l__phimisci_keywords_tl
-          }
-        \bool_if:NT \l__phimisci_output_doi_bool
-          {
-            \item [\usekomafont{PhiMiSciMetadataItem} 
-                   \tl_use:N \l__phimisci_locale_doi_tl] 
-                   \href{https://doi.org/\tl_use:N \l_phimisci_doi_tl}
-                        {\tl_use:N \l_phimisci_doi_tl}
-          }
-        \bool_if:NT \l__phimisci_output_rights_bool
-          {
-            \item [\usekomafont{PhiMiSciMetadataItem}
-                   \tl_use:N \l__phimisci_locale_rights_tl]
-                   \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
-                   \tl_use:N \l__phimisci_copyright_tl
           }
         \end{description}
         \vskip 1em
@@ -1390,15 +1292,10 @@ http://www.latex-project.org/lppl.txt
     \global\@topnum=\z@
     \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
     \null
-    \vskip 1em%
-      \ifx\@subject\@empty \else
-        {\usekomafont{subject}{\MakeLowercase{\@subject} \par}}%
-        \vskip 1em
-      \fi
+    \vskip .5em%
     {\usekomafont{title}{\@title \par}}%
     \vskip .5em%
     {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\fi}%
-    \vskip 1em%
     \PhiMiSci@OutputAuthorData{}
     \PhiMiSci@OutputMetadata{}
     \@afterindentfalse\@afterheading
@@ -1435,7 +1332,11 @@ http://www.latex-project.org/lppl.txt
   {%
     \IfBooleanTF {#1}
       {%
-        \bool_if:NF \l__phimisci_output_publication_header_footer_bool
+        \bool_if:NTF \l__phimisci_output_publication_header_footer_bool
+          {
+            \noindent\copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
+            \tl_use:N \l__phimisci_copyright_tl\hfill\hbox{}
+          }
           {
             \tl_use:N \l__phimisci_submission_footer_tl
           }
