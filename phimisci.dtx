@@ -1311,14 +1311,11 @@ http://www.latex-project.org/lppl.txt
 % \subsection{Bibliography layout}
 % We allow (almost) no breaking within entries in the list of references, and
 % we are especially tolerant regarding interword spacing to avoid overful 
-% lines. Our code follows the standard \texttt{bibintoc} heading from 
-% \texttt{biblatex} as well as a post by Enrico Gregorio on TeX.SE.
+% lines. These tolerances follow a post by Enrico Gregorio on TeX.SE.
 %    \begin{macrocode}
-\defbibheading {phimisci} 
+\defbibheading { bibliography } [ \refname ]
   {
-    \section*{\refname}
-    \addcontentsline{toc}{section}{\refname}
-    \@mkboth{\abx@MakeMarkcase{\refname}}{\abx@MakeMarkcase{\refname}}
+    \addsec{ #1 }
     \clubpenalty=10000
     \@clubpenalty\clubpenalty
     \widowpenalty=10000
@@ -1709,7 +1706,7 @@ http://www.latex-project.org/lppl.txt
       }
     \bool_if:NT \l__phimisci_output_bibliography_bool
       {
-        \printbibliography[heading=phimisci]
+        \printbibliography
       }
   }
 \AtEndDocument{ \PhiMiSci@OutputEndofDocument{} }
