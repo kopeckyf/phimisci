@@ -211,6 +211,7 @@ http://www.latex-project.org/lppl.txt
 \int_new:N \l__phimisci_number_of_affiliations_int
 \int_new:N \l__phimisci_current_affiliation_id_int
 \int_new:N \l__phimisci_abstract_length_int
+\iow_new:N \l__phimisci_citation_file_stream
 \prop_new:N \l__phimisci_authors_to_affiliations_prop
 \prop_new:N \l__phimisci_authors_to_orcids_prop
 \prop_new:N \l__phimisci_authors_to_emails_prop
@@ -226,6 +227,7 @@ http://www.latex-project.org/lppl.txt
   }
 \tl_new:N \l_phimisci_header_authors_tl
 \tl_new:N \l_phimisci_authors_tl
+\tl_new:N \l__phimisci_authors_citation_footer_tl
 \tl_new:N \l__phimisci_custom_header_authors_tl
 \tl_new:N \l__phimisci_keywords_tl
 \tl_new:N \l__phimisci_acknowledgments_tl
@@ -598,8 +600,9 @@ http://www.latex-project.org/lppl.txt
     affiliations-output-multiple-separator .tl_set:N = 
       \l__phimisci_affliation_multisep_tl,
     affiliations-output-multiple-separator .initial:n = {,},
-    copyright-text .tl_set:N = 
-      \l__phimisci_copyright_tl,
+    citation-file .tl_set:N = \l__phimisci_citation_file_name_tl,
+    citation-file .initial:n = { phimisci-current-article.bib },
+    copyright-text .tl_set:N = \l__phimisci_copyright_tl,
     copyright-text .initial:n = 
       {
         This~is~an~open~access~article~distributed~
@@ -612,6 +615,16 @@ http://www.latex-project.org/lppl.txt
     extra-sentence-spacing .initial:n = {false},
     dictum-width .code:n = { \renewcommand* { \dictumwidth } { #1 } },
     dictum-width .initial:n = { 0.62\textwidth },
+    footer-color .tl_set:N = \l__phimisci_footer_color_tl,
+    footer-color .initial:n = { black!70 },
+    footer-font-settings .cs_set:Np = \__phimisci_footer_font_settings: {},
+    footer-font-settings .initial:n = 
+      {
+        \raggedright
+        \footnotesize
+        \color{ \tl_use:N \l__phimisci_footer_color_tl }
+        \hypersetup{ urlcolor = \tl_use:N \l__phimisci_footer_color_tl }
+      },
     footnote-break-penalty .int_set:N = 
       \l__phimisci_settings_footnote_penalty_int,
     footnote-break-penalty .initial:n = { 1000 },
@@ -905,6 +918,11 @@ http://www.latex-project.org/lppl.txt
                           { \l__phimisci_authors_osep_tl } 
                           { \l__phimisci_authors_osep_final_tl } 
           }
+        \tl_set:Nx \l__phimisci_authors_citation_footer_tl
+          {
+            \seq_use:Nn \l__phimisci_authors_header_tmp_seq
+                          { ~and~ } 
+          }
         \int_compare:nNnTF
           { \seq_count:N \l__phimisci_authors_header_tmp_seq } = 1
           { 
@@ -1175,6 +1193,38 @@ http://www.latex-project.org/lppl.txt
       }
   }
 %    \end{macrocode}
+% \subsection{Generate an auxiliary bibliography file}
+%
+%    \begin{macrocode}
+\AtBeginDocument
+  {
+    \iow_open:Nn \l__phimisci_citation_file_stream 
+                 { \l__phimisci_citation_file_name_tl }
+    \iow_now:Nx \l__phimisci_citation_file_stream
+      {
+        @article{phimisci-current-article,\iow_newline:
+          author = { \tl_use:N \l__phimisci_authors_citation_footer_tl },
+          \iow_newline:
+          year   = { \int_use:N \l_phimisci_publication_year_int },
+          \iow_newline:
+          title  = { \tl_use:N \l_phimisci_document_title_tl },
+          \iow_newline:
+          journal = {Philosophy~and~the~Mind~Sciences},
+          \iow_newline:
+          volume = { \tl_use:N \l_phimisci_volume_tl },
+          \iow_newline:
+          doi = { \tl_use:N \l_phimisci_doi_tl },
+          \iow_newline:
+          options = { dataonly = true }
+        }
+      }
+    \iow_close:N \l__phimisci_citation_file_stream
+  }
+\AtEndPreamble
+  {
+    \addbibresource { \tl_use:N \l__phimisci_citation_file_name_tl }
+  }
+%    \end{macrocode}
 % \subsection{Configure the document language}
 % The list passed as \cs{documentclass}\texttt{[language=\meta{list of 
 % languages}]}\texttt{\{phimisci\}} is processed here. By \texttt{babel}'s 
@@ -1298,6 +1348,7 @@ http://www.latex-project.org/lppl.txt
     {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\fi}%
     \PhiMiSci@OutputAuthorData{}
     \PhiMiSci@OutputMetadata{}
+    \enlargethispage{-4\baselineskip}
     \@afterindentfalse\@afterheading
   }
 %    \end{macrocode}
@@ -1318,7 +1369,13 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \KOMAoption{headsepline}{true}
 \AddToLayerPageStyleOptions{plain.scrheadings}
-    {onselect={\setlength{\headheight}{52pt}}}
+    {
+      onselect = 
+        {
+          \setlength{\headheight}{52pt}
+          \setlength{\footheight}{72pt}
+        }
+    }
 \cfoot[\PhiMiSci@Footer*{}]{\PhiMiSci@Footer{}}
 \chead[\PhiMiSci@Header*{}]{\PhiMiSci@Header{}}
 %    \end{macrocode}
@@ -1334,8 +1391,10 @@ http://www.latex-project.org/lppl.txt
       {%
         \bool_if:NTF \l__phimisci_output_publication_header_footer_bool
           {
-            \noindent\copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
-            \tl_use:N \l__phimisci_copyright_tl\hfill\hbox{}
+            \__phimisci_footer_font_settings:
+            \fullcite{phimisci-current-article}\medskip\par
+            \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
+            \tl_use:N \l__phimisci_copyright_tl
           }
           {
             \tl_use:N \l__phimisci_submission_footer_tl
