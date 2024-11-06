@@ -175,7 +175,7 @@ http://www.latex-project.org/lppl.txt
 % scientific texts.
 %    \begin{macrocode}
 \RequirePackage{amsmath, amsthm, amssymb, array, booktabs, csquotes, enumitem, 
-                graphicx}
+                graphicx, hyphenat}
 %    \end{macrocode}
 % We also load helper packages that are necessary to program features of this
 % class. \texttt{hyperref} and \texttt{xcolor} are special in this regard, 
@@ -248,6 +248,7 @@ http://www.latex-project.org/lppl.txt
 % font commands for specific \textit{PhiMiSci} elements.
 %    \begin{macrocode}
 \setkomafont{title}{\raggedright\normalfont\normalsize\huge\bfseries}
+\setkomafont{subtitle}{\raggedright\normalfont\normalsize\huge\bfseries}
 \setkomafont{author}{\raggedright\normalfont\normalsize\large\bfseries}
 \setkomafont{subject}{\normalfont\normalsize\large\scshape\color{PhiMiSciBlue}}
 \setkomafont{pageheadfoot}{\normalfont\small}
@@ -605,8 +606,8 @@ http://www.latex-project.org/lppl.txt
     copyright-text .tl_set:N = \l__phimisci_copyright_tl,
     copyright-text .initial:n = 
       {
-        This~is~an~open~access~article~distributed~
-        under~the~terms~of~the~Creative~Commons~Attribution~4.0~license.
+        This~is~an~open~access~article~distributed~under~the~terms~of~the~
+        Creative~Commons~Attribution~(CC-BY)~4.0~license.
       },
     emergency-stretch .dim_set:N = \l__phimisci_settings_emergencystretch_dim,
     emergency-stretch .initial:n = { 0.5em },
@@ -1238,7 +1239,7 @@ http://www.latex-project.org/lppl.txt
 % \subsection{Page geometry}
 % We configure the paper size and the type area through the margins.
 %    \begin{macrocode}
-\RequirePackage[a4paper, margin=4cm]{geometry}
+\RequirePackage[a4paper, vmargin=4cm, hmargin=3cm]{geometry}
 %    \end{macrocode}
 % 
 % \subsection{Footnotes}
@@ -1319,7 +1320,7 @@ http://www.latex-project.org/lppl.txt
     \clubpenalty=10000
     \@clubpenalty\clubpenalty
     \widowpenalty=10000
-    \emergencystretch=2em
+    \emergencystretch=3em
   }
 %    \end{macrocode}
 % In citations, we prefer to have a non-breakable thin space between “p.” and 
@@ -1340,9 +1341,12 @@ http://www.latex-project.org/lppl.txt
     \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
     \null
     \vskip .5em%
-    {\usekomafont{title}{\@title \par}}%
-    \vskip .5em%
+    {%
+      \usekomafont{title}{\@title 
+      \ifx\@subtitle\@empty\else:\fi\par}%
+    }%
     {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\fi}%
+    \vskip .5em%
     \PhiMiSci@OutputAuthorData{}
     \PhiMiSci@OutputMetadata{}
     \enlargethispage{-4\baselineskip}
@@ -1369,7 +1373,7 @@ http://www.latex-project.org/lppl.txt
     {
       onselect = 
         {
-          \setlength{\headheight}{52pt}
+          \setlength{\headheight}{42pt}
           \setlength{\footheight}{72pt}
         }
     }
