@@ -1210,8 +1210,11 @@ http://www.latex-project.org/lppl.txt
           \iow_newline:
           title  = { {\tl_use:N \l_phimisci_document_title_tl} },
           \iow_newline:
-          subtitle = { {\@subtitle} },
-          \iow_newline:
+          \tl_if_blank:VF \@subtitle
+            {
+              subtitle = { {\@subtitle} },
+              \iow_newline:
+            }
           journal = {Philosophy~and~the~Mind~Sciences},
           \iow_newline:
           volume = { \tl_use:N \l_phimisci_volume_tl },
