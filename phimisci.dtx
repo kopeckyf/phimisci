@@ -159,7 +159,7 @@ http://www.latex-project.org/lppl.txt
 % This class is based on Markus Kohm's \texttt{scrartcl} class. We set load 
 % this class with apropriate settings and the package \texttt{scrlayer-scrpage}.
 %    \begin{macrocode}
-\LoadClass [12pt, oneside] {scrartcl}
+\LoadClass [fontsize=11pt, oneside] {scrartcl}
 \RequirePackage[autoenlargeheadfoot=off]{scrlayer-scrpage}
 \RequirePackage{scrlayer-notecolumn}
 %    \end{macrocode}
@@ -261,6 +261,7 @@ http://www.latex-project.org/lppl.txt
 \addtokomafont{subsubsection}{\rmfamily}
 \newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries}
 \newkomafont{PhiMiSciAffiliationLine}{\normalfont\normalsize}
+\newkomafont{PhiMiSciEmail}{\normalfont\slshape}
 %    \end{macrocode}
 %
 % \subsection{Bibliography management through \texttt{biblatex}}
@@ -1018,7 +1019,16 @@ http://www.latex-project.org/lppl.txt
         \tl_if_empty:NF \l__phimisci_tmp_email_link_tl
           {
             \par
-            \tl_use:N \l__phimisci_tmp_email_link_tl
+            \group_begin:
+            \usekomafont{PhiMiSciEmail}
+            \href
+              {
+                mailto:\tl_use:N \l__phimisci_tmp_email_link_tl
+              }
+              {
+                \tl_use:N \l__phimisci_tmp_email_link_tl
+              }
+            \group_end:
           }
       }
 }
@@ -1244,7 +1254,12 @@ http://www.latex-project.org/lppl.txt
 % \subsection{Page geometry}
 % We configure the paper size and the type area through the margins.
 %    \begin{macrocode}
-\RequirePackage[a4paper, vmargin=4cm, hmargin=3cm]{geometry}
+\RequirePackage[a4paper, 
+                top=3cm,
+                bottom=3cm,
+                hmargin=3.5cm
+                ]
+                {geometry}
 %    \end{macrocode}
 % 
 % \subsection{Footnotes}
@@ -1342,10 +1357,7 @@ http://www.latex-project.org/lppl.txt
 \RenewDocumentCommand {\@maketitle} {} 
   {%
     \let\and\relax
-    \global\@topnum=\z@
-    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
-    \null
-    \vskip .5em%
+    \vskip 1em%
     {%
       \usekomafont{title}{\@title 
       \ifx\@subtitle\@empty\else:\fi\par}%
@@ -1378,8 +1390,8 @@ http://www.latex-project.org/lppl.txt
     {
       onselect = 
         {
-          \setlength{\headheight}{42pt}
-          \setlength{\footheight}{72pt}
+          \setlength{\headheight}{86pt}
+          \setlength{\footheight}{10\baselineskip}
         }
     }
 \cfoot[\PhiMiSci@Footer*{}]{\PhiMiSci@Footer{}}
@@ -1397,10 +1409,12 @@ http://www.latex-project.org/lppl.txt
       {%
         \bool_if:NTF \l__phimisci_output_publication_header_footer_bool
           {
-            \__phimisci_footer_font_settings:
-            \fullcite{phimisci-current-article}\medskip\par
-            \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
-            \tl_use:N \l__phimisci_copyright_tl
+            \begin{minipage} [b] {\textwidth}
+                \__phimisci_footer_font_settings:
+                \fullcite{phimisci-current-article}\medskip\par
+                \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
+                \tl_use:N \l__phimisci_copyright_tl
+            \end{minipage}
           }
           {
             \tl_use:N \l__phimisci_submission_footer_tl
