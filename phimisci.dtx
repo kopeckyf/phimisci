@@ -122,6 +122,7 @@ http://www.latex-project.org/lppl.txt
 % \item \pkg{hyperref}
 % \item \pkg{iftex}
 % \item \pkg{koma-script}
+% \item \pkg{noto}
 % \item \pkg{l3keys2e}
 % \item \pkg{libertinus}
 % \item \pkg{microtype}
@@ -240,16 +241,18 @@ http://www.latex-project.org/lppl.txt
 
 % \subsection{Font loading}
 % \textit{Philosophy and the Mind Sciences} uses Libertinus as its bread and
-% butter type, which we load through the \LaTeX\ package \texttt{libertinus}. 
+% butter type, which we load through the \LaTeX\ package \texttt{libertinus}.
+% PhiMiSci uses Noto as its sans font, which we load as \texttt{noto-sans}.
 %    \begin{macrocode}
 \RequirePackage[semibold]{libertinus}
+\RequirePackage[medium, scale=0.9]{noto-sans}
 %    \end{macrocode}
 % We adjust the font settings inherited from \texttt{scrartcl} and create new
 % font commands for specific \textit{PhiMiSci} elements.
 %    \begin{macrocode}
-\setkomafont{title}{\raggedright\normalfont\normalsize\huge\bfseries}
-\setkomafont{subtitle}{\raggedright\normalfont\normalsize\huge\bfseries}
-\setkomafont{author}{\raggedright\normalfont\normalsize\large\bfseries}
+\setkomafont{title}{\raggedright\sffamily\normalsize\huge\bfseries}
+\setkomafont{subtitle}{\raggedright\sffamily\normalsize\huge\bfseries}
+\setkomafont{author}{\raggedright\sffamily\normalsize\large\bfseries}
 \setkomafont{subject}{\normalfont\normalsize\large\scshape\color{PhiMiSciBlue}}
 \setkomafont{pageheadfoot}{\normalfont\small}
 \addtokomafont{pagehead}{\color{Blue}}
@@ -257,9 +260,7 @@ http://www.latex-project.org/lppl.txt
 \setkomafont{dictumauthor}{\normalfont\normalsize}
 \setkomafont{descriptionlabel}{\normalfont\bfseries}
 \setkomafont{notecolumn.marginpar}{\normalfont\color{black!50}}
-\addtokomafont{section}{\rmfamily}
-\addtokomafont{subsection}{\rmfamily}
-\addtokomafont{subsubsection}{\rmfamily}
+\addtokomafont{disposition}{\sffamily}
 \newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries}
 \newkomafont{PhiMiSciAffiliationLine}{\normalfont\normalsize}
 \newkomafont{PhiMiSciEmail}{\normalfont\slshape}
@@ -1368,8 +1369,8 @@ http://www.latex-project.org/lppl.txt
     {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\fi}%
     \vskip .5em%
     \PhiMiSci@OutputAuthorData{}
+    \pagebreak
     \PhiMiSci@OutputMetadata{}
-    \enlargethispage{-4\baselineskip}
     \@afterindentfalse\@afterheading
   }
 %    \end{macrocode}
