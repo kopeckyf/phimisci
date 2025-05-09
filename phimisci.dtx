@@ -252,6 +252,7 @@ http://www.latex-project.org/lppl.txt
 \setkomafont{author}{\raggedright\normalfont\normalsize\large\bfseries}
 \setkomafont{subject}{\normalfont\normalsize\large\scshape\color{PhiMiSciBlue}}
 \setkomafont{pageheadfoot}{\normalfont\small}
+\addtokomafont{pagehead}{\color{Blue}}
 \setkomafont{dictum}{\normalfont\normalsize\itshape}
 \setkomafont{dictumauthor}{\normalfont\normalsize}
 \setkomafont{descriptionlabel}{\normalfont\bfseries}
@@ -1254,7 +1255,9 @@ http://www.latex-project.org/lppl.txt
 % \subsection{Page geometry}
 % We configure the paper size and the type area through the margins.
 %    \begin{macrocode}
-\RequirePackage[a4paper, 
+\RequirePackage[a4paper,
+                landscape,
+                twocolumn,
                 top=3cm,
                 bottom=3cm,
                 hmargin=3.5cm
