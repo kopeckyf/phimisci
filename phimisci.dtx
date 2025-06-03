@@ -37,6 +37,7 @@ http://www.latex-project.org/lppl.txt
 \usepackage{multicol}
 \usepackage{xcolor}
 \usepackage{pifont}
+\usepackage{parskip}
 \definecolor{PhiMiSciRed}{cmyk}{0, 1, 0.91, 0.01}
 \definecolor{PhiMiSciBlue}{cmyk}{0.90, 0.73, 0, 0.62}
 \begin{filecontents}[overwrite]{\jobname.bib}
@@ -205,17 +206,17 @@ http://www.latex-project.org/lppl.txt
 \bool_new:N \l__phimisci_output_acknowledgments_bool
 \bool_new:N \l__phimisci_output_bibliography_bool
 \bool_new:N \l__phimisci_koma_head_mode_bool
-\cs_new:Nn \__phimisci_affiliation_line_separator: { \smallskip\\ }
+\cs_new:Nn \__phimisci_affiliation_line_separator: { \quad }
 \cs_generate_variant:Nn \seq_set_split:Nnn { NVn }
 \cs_generate_variant:Nn \seq_set_split:Nnn { NVx }
-\int_new:N \l__phimisci_number_of_authors_int
-\int_new:N \l__phimisci_number_of_affiliations_int
-\int_new:N \l__phimisci_current_affiliation_id_int
+\cs_generate_variant:Nn \int_set:Nn { Nx }
+\cs_generate_variant:Nn \tl_rescan:nn { nx }
 \int_new:N \l__phimisci_abstract_length_int
+\int_new:N \l__phimisci_output_authors_int
 \iow_new:N \l__phimisci_citation_file_stream
-\prop_new:N \l__phimisci_authors_to_affiliations_prop
-\prop_new:N \l__phimisci_authors_to_orcids_prop
-\prop_new:N \l__phimisci_authors_to_emails_prop
+\prop_new:N \l__phimisci_authors_to_ids_prop
+\prop_new:N \l__phimisci_author_ids_to_affiliations_prop
+\prop_new:N \l__phimisci_author_ids_to_orcids_prop
 \prop_new:N \l__phimisci_affiliation_id_resolver_prop
 \seq_new:N \l__phimisci_keywords_seq
 \seq_new:N \l__phimisci_authors_seq
@@ -235,6 +236,8 @@ http://www.latex-project.org/lppl.txt
 \tl_new:N \l__phimisci_reviewed_book_tl
 \tl_new:N \l__phimisci_copyright_holder_tl
 \tl_new:N \l__phimisci_locale_related_tl
+\tl_new:N \l__phimisci_contact_tl
+\tl_new:N \l__phimisci_contact_author_tl
 \tl_new:N \l__phimisci_tmp_orcid_link_tl
 \ExplSyntaxOff
 %    \end{macrocode}
@@ -635,7 +638,7 @@ http://www.latex-project.org/lppl.txt
     logo-url .tl_set:N = \l__phimisci_branding_logo_tl,
     logo-url .initial:n = {branding/phimisci-logo-mini.pdf},
     logo-width .dim_set:N = \l__phimisci_logo_width_dim,
-    logo-width .initial:n = { 2.5cm },
+    logo-width .initial:n = { 1.5cm },
     submission-footer-text .tl_set:N = \l__phimisci_submission_footer_tl,
     submission-footer-text .initial:n = 
       {
@@ -677,13 +680,13 @@ http://www.latex-project.org/lppl.txt
     acknowledgments .tl_set:N = \l__phimisci_locale_acknowledgments_tl,
     acknowledgments .initial:n = {Acknowledgments},
     contact .tl_set:N = \l__phimisci_locale_contact_tl,
-    contact .initial:n = {Contact},
+    contact .initial:n = {Primary~contact:~},
     keywords .tl_set:N = \l__phimisci_locale_keywords_tl,
     keywords .initial:n = {Keywords},
     volume .tl_set:N = \l__phimisci_locale_volume_tl,
-    volume .initial:n = {Volume},
+    volume .initial:n = {Vol.},
     number .tl_set:N = \l__phimisci_locale_number_tl,
-    number .initial:n = {Number},
+    number .initial:n = {No.},
     reviewed-book .tl_set:N = \l__phimisci_locale_reviewed_book_tl,
     reviewed-book .initial:n = {Reviewed~book},
     rights .tl_set:N = \l__phimisci_locale_rights_tl,
@@ -722,15 +725,22 @@ http://www.latex-project.org/lppl.txt
 %
 % \subsection{Manage author data (\texttt{\textbackslash author}, 
 %    \texttt{\textbackslash affiliation}, \texttt{\textbackslash orcid})}
+% 
+% \begin{function}{\author}
+% \begin{arguments}
+% \item A shortened author string to be printed in the page header
+% \item Author-affiliation-ORCiD triples, separated by \cs{and}:
+%       \begin{quote}
+%       Author 1\cs{affiliation} \marg{Affiliation 1; Affiliation 2}
+%       \cs{orcid}\marg{...}\\ 
+%       \cs{and} Author 2\cs{affiliation}\marg{...}\cs{orcid}\marg{...}
+%       \end{quote}
 % It should be noted that \cs{affiliation} and \cs{orcid} are \emph{not} defined
 % commands here, but merely elements for the \LaTeX3 parsing of regex parsing to
 % hook to \cite[see][46]{Interface3}.
-% 
-% \begin{function}{\author}
+% \end{arguments}
 % \begin{syntax}
-% \cs{author} \oarg{Author in running head} \marg{Author 1\cs{affiliation}
-% \marg{Affiliation 1; Affiliation 2} \cs{and} Author 2\cs{affiliation}\marg{...} 
-% \cs{and} ...}
+% \cs{author} \oarg{\#1} \marg{\#2}
 % \end{syntax}
 % We redirect user input in \cs{author} to our dedicated processing mechanism
 % but set the variable \cs{@author} nevertheless. The processing is continued
@@ -743,15 +753,15 @@ http://www.latex-project.org/lppl.txt
 % \end{quote}
 % The position of \cs{affiliation} and \cs{orcid} is 
 % interchangeable. Within \marg{list of affiliations}, items are separated by
-% \texttt{;}. Multiple authors are separated by the marker \cs{and}. Line breaks
-% can be used in the argument passed to \cs{author} 
+% \texttt{;}. Multiple authors are separated by the marker \cs{and}. New 
+% lines are allowed in the argument to \cs{author}.
 % \end{function}
 %    \begin{macrocode}
 \RenewDocumentCommand {\author} { O{} +m }
  {
    \tl_set:Nx \l__phimisci_custom_header_authors_tl { #1 }
    \gdef \@author { #2 }
-   \PhiMiSci@ProcessAuthorData { #2 }
+   \AtEndPreamble { \PhiMiSci@ProcessAuthorData { #2 } }
  }
 %    \end{macrocode}
 %    \begin{macrocode}
@@ -761,44 +771,52 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \NewDocumentCommand { \PhiMiSci@ProcessAuthorData } { +m }
   {%
-    \exp_args:No \phimisci_process_author_data:nNNNN
+    \exp_args:No \phimisci_process_author_data:nNNN
                    { #1 }
-                   \l__phimisci_authors_to_affiliations_prop
-                   \l__phimisci_authors_to_orcids_prop
-                   \l__phimisci_authors_to_emails_prop
-                   \l__phimisci_number_of_authors_int
+                   \l__phimisci_authors_to_ids_prop
+                   \l__phimisci_author_ids_to_affiliations_prop
+                   \l__phimisci_author_ids_to_orcids_prop
   }
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@OutputAuthorData}
 % \end{function}
 %    \begin{macrocode}
-\NewDocumentCommand { \PhiMiSci@OutputAuthorData } { }
+\NewDocumentCommand { \PhiMiSci@OutputAuthorData } {}
   {
     \bool_if:NT \l__phimisci_output_authors_bool
       {
-        \phimisci_output_authors:NN
-          \l__phimisci_authors_to_affiliations_prop
-          \l__phimisci_number_of_authors_int
-        \par
-        \vskip 1em
+        \group_begin:
+        \usekomafont{author}
+            \phimisci_output_authors:NNN 
+               \l__phimisci_authors_to_ids_prop
+               \l__phimisci_author_ids_to_affiliations_prop
+               \l__phimisci_author_ids_to_orcids_prop
+        \group_end:
+        \smallskip\\
+        \group_begin:
+        \usekomafont{PhiMiSciAffiliationLine}
+        \phimisci_output_affiliations:N 
+            \l__phimisci_affiliation_id_resolver_prop
+        \par 
+        \tl_use:N \l__phimisci_locale_contact_tl 
+        \tl_use:N \l__phimisci_contact_tl  
+        \group_end:
       }
   }
 %    \end{macrocode}
-% \begin{function}{\phimisci_process_author_data:nNNNN}
+% \begin{function}{\phimisci_process_author_data:nNNN}
 % \begin{arguments}
 % \item The input author-affiliation-orcid text,
 % \item[] and the following outpus:
-% \item A property map that assigns a list of affiliations to each author.
-% \item A property map that stores the resulting author-to-ORCID mapping.
-% \item A property map that stores the email address of each author.
-% \item An integer variable that stores the number of authors
+% \item A property map that assigns each author to a unique ID.
+% \item A property map that assigns each ID to an affiliation.
+% \item A property map that assigns each ID to an ORCiD.
 % \end{arguments}
 % \end{function}
 %    \begin{macrocode}
-\cs_new:Npn \phimisci_process_author_data:nNNNN #1#2#3#4#5
+\cs_new:Npn \phimisci_process_author_data:nNNN #1#2#3#4
   {
     \seq_clear_new:N \l__phimisci_authors_header_tmp_seq
-    \int_zero:N #5
 %    \end{macrocode}
 % We first split the input string by \cs{and}, the common separator between 
 % authors in the \LaTeX\ world. The result is stored in a sequence. 
@@ -811,9 +829,9 @@ http://www.latex-project.org/lppl.txt
 % authors and each item stores all information of a single author. The currently 
 % processed author item is known to \LaTeX\ as \texttt{\#\#1}.
 %    \begin{macrocode}
+    \int_zero_new:N \l__phimisci_current_author_id_int
     \seq_map_inline:Nn \l__phimisci_authors_seq
       {
-        \int_incr:N #5
         \tl_clear_new:N \l__phimisci_author_tmp_tl
         \tl_set:Nn \l__phimisci_author_tmp_tl { ##1 }
 %    \end{macrocode}
@@ -839,18 +857,10 @@ http://www.latex-project.org/lppl.txt
         {\c{orcid} \cB. (\c[^BE].*) \cE.}
         { ##1 }
         \l__phimisci_tmp_author_orcid_seq
-        
-      \regex_extract_once:nnN 
-        {\c{email} \cB. (\c[^BE].*) \cE.}
-        { ##1 }
-        \l__phimisci_tmp_author_email_seq
 %    \end{macrocode}
 % Following extraction we remove the author's affiliation and ORCID from the input
 % so that only the name remains in the data for the current author.
 %    \begin{macrocode}
-      \regex_replace_all:nnN {\c{email} \cB. (\c[^BE].*) \cE.} 
-                             {}
-                             \l__phimisci_author_tmp_tl
       \regex_replace_all:nnN {\c{orcid} \cB. (\c[^BE].*) \cE.} 
                              {} 
                              \l__phimisci_author_tmp_tl
@@ -865,22 +875,76 @@ http://www.latex-project.org/lppl.txt
       \seq_put_right:NV \l__phimisci_authors_header_tmp_seq
                         \l__phimisci_author_tmp_tl
 %    \end{macrocode}
+% Loop over the affiliation(s) of the current author and assign each ID to 
+% an affiliation ID, if not already present. \#\#\#\#1 is the current 
+% affiliation. We first split the sequence of affiliations for each author.
+%    \begin{macrocode}
+      \seq_clear_new:N \l__phimisci_author_affiliation_seq
+      \seq_clear_new:N \l__phimisci_author_affiliation_ids_seq
+      \tl_clear_new:N \l__phimisci_afil_loop_tl
+      \seq_set_split:NVx \l__phimisci_author_affiliation_seq
+                         \l__phimisci_affiliations_isep_tl 
+                         { 
+                           \seq_item:Nn 
+                             \l__phimisci_tmp_author_affiliation_seq 
+                             {2} 
+                         } 
+%    \end{macrocode}
+% We now loop over all the affiliations of an author. We first check whether
+% the current affiliation, \#\#\#\#1, is already assigned to an affiliation 
+% ID. If not, we create a new global ID for this affiliation. We then add the
+% affiliation ID to the author's sequence of affiliation IDs.
+%    \begin{macrocode}
+      \seq_map_inline:Nn \l__phimisci_author_affiliation_seq
+        {
+          \prop_get:NnNTF \l__phimisci_affiliation_id_resolver_prop { ####1 }
+            \l__phimisci_afil_loop_tl
+            {
+              \seq_put_right:NV 
+                \l__phimisci_author_affiliation_ids_seq
+                \l__phimisci_afil_loop_tl
+            }
+            {
+              \prop_put:Nxx \l__phimisci_affiliation_id_resolver_prop
+                {
+                  \int_eval:n 
+                    { 
+                      \prop_count:N \l__phimisci_affiliation_id_resolver_prop 
+                      + 1 
+                    }
+                }
+                { ####1 }
+              \seq_put_right:Nx \l__phimisci_author_affiliation_ids_seq
+                {
+                  \prop_count:N \l__phimisci_affiliation_id_resolver_prop
+                }
+            }
+        }
+%    \end{macrocode}                    
 % We now store all the data in three separate property lists. In the first we 
 % assign authors to (lists of) affiliations. Seconly, we map authors to their 
 % ORCIDs in a separate property list. And third, we store the e-mail address
 % in another property map. The currently processed affiliation is given by |####1|.
-%    \begin{macrocode}        
+%    \begin{macrocode}
       \prop_put:Nxx { #2 }
-                    { \tl_use:N \l__phimisci_author_tmp_tl }
-                    { \seq_item:Nn \l__phimisci_tmp_author_affiliation_seq {2} }
-                  
+                    { \int_use:N \l__phimisci_current_author_id_int }
+                    { \tl_use:N \l__phimisci_author_tmp_tl }      
+      
       \prop_put:Nxx { #3 }
-                    { \tl_use:N \l__phimisci_author_tmp_tl }
-                    { \seq_item:Nn \l__phimisci_tmp_author_orcid_seq {2} }
-                    
+                    { \int_use:N \l__phimisci_current_author_id_int }
+                    { 
+                      \seq_use:Nn 
+                        \l__phimisci_author_affiliation_ids_seq 
+                        {,~} 
+                    }
+                  
       \prop_put:Nxx { #4 }
-                    { \tl_use:N \l__phimisci_author_tmp_tl }
-                    { \seq_item:Nn \l__phimisci_tmp_author_email_seq {2} }
+                    { \int_use:N \l__phimisci_current_author_id_int }
+                    { \seq_item:Nn \l__phimisci_tmp_author_orcid_seq {2} }
+%    \end{macrocode}
+% Increase the ID and continue the loop with the next author.
+%    \begin{macrocode}
+      \int_incr:N \l__phimisci_current_author_id_int
     }
 %    \end{macrocode}
 % When all authors are parsed, create a token list of authors to be placed 
@@ -946,37 +1010,71 @@ http://www.latex-project.org/lppl.txt
 %    \end{macrocode}
 % We have now sorted our data in two mappings, a \{author: <affiliations>\} and 
 % an \{author: orcid\} mapping. These two are now output.
-% \begin{function}{\phimisci_output_authors:NN}
+% \begin{function}{\phimisci_output_authors:NNN}
 % \begin{arguments}
-% \item A property mapping that assigns each author to a list of affiliations.
-% \item The number of authors
+% \item A property mapping that assigns each author to an ID.
+% \item A property map that assigns each ID to a list of affiliations.
+% \item A property map that assigns each ID to an ORCiD.
 % \end{arguments}
 % \end{function}
 %    \begin{macrocode}
-\cs_new:Npn \phimisci_output_authors:NN #1#2
+\cs_new:Npn \phimisci_output_authors:NNN #1#2#3
   {
-    \prop_map_inline:Nn { #1 }
+    \seq_clear_new:N \l__phimisci_output_authors_loop_seq
+    \int_set:Nx \l__phimisci_output_authors_int
+      { \prop_count:N \l__phimisci_author_ids_to_affiliations_prop }
+    \int_do_until:nNnn { \seq_count:N \l__phimisci_output_authors_loop_seq }
+                       =
+                       { 
+                         \l__phimisci_output_authors_int 
+                       }
+                       {
+                         \seq_put_right:Nx 
+                           \l__phimisci_output_authors_loop_seq
+                           {
+                             \seq_count:N 
+                               \l__phimisci_output_authors_loop_seq
+                           }
+                       }
+    \seq_map_inline:Nn \l__phimisci_output_authors_loop_seq
       {
-        \vskip 1em
-        \group_begin:
-        \usekomafont{author}
-        \tl_rescan:nn {} {##1}
+        \tl_clear_new:N \l__phimisci_affiliation_ids_of_author_tl
+        \tl_clear_new:N \l__phimisci_output_author_temp_tl
+        \prop_get:NnN #2 { ##1 } \l__phimisci_affiliation_ids_of_author_tl
+        \prop_get:NnN #1 { ##1 } \l__phimisci_output_author_temp_tl
+        \tl_rescan:nx {} { \l__phimisci_output_author_temp_tl }
+        \tl_if_empty:NF \l__phimisci_affiliation_ids_of_author_tl
+          {
+            \textsuperscript
+              { 
+                \tl_use:N \l__phimisci_affiliation_ids_of_author_tl
+                \str_if_eq:eeT \l__phimisci_output_author_temp_tl
+                               \l__phimisci_contact_author_tl
+                               { ,\,* }
+              }
+          }
         \phimisci_print_orcid:n { ##1 }
-        \group_end:
-        \group_begin:
-        \usekomafont{PhiMiSciAffiliationLine}
+        \int_compare:nNnT { ##1 } < { \l__phimisci_output_authors_int-1 }
+          {
+           \par
+          }
+      }
+  }   
+%    \end{macrocode}
+% \begin{function}{\phimisci_output_affiliations:N}
+% \begin{arguments}
+% \item A property map that assigns each affiliation ID to the name of the
+%       affiliation.
+% \end{arguments}
+% \end{function}
+%    \begin{macrocode}
+\cs_new:Npn \phimisci_output_affiliations:N #1
+  {
+    \prop_map_inline:Nn #1
+      {
+        \textsuperscript { ##1 }
+        \tl_rescan:nn {} { ##2 }
         \__phimisci_affiliation_line_separator:
-        \seq_clear_new:N \l__phimisci_affiliation_output_seq
-        \seq_set_split:NVn \l__phimisci_affiliation_output_seq
-                           \l__phimisci_affiliations_isep_tl 
-                           { ##2 } 
-        \seq_use:Nnnn \l__phimisci_affiliation_output_seq
-          { \l__phimisci_affiliation_line_ampersand_sep_tl }
-          { \l__phimisci_affiliation_line_single_sep_tl }
-          { \l__phimisci_affiliation_line_ampersand_sep_tl }
-        
-        \phimisci_print_email:n { ##1 }
-        \group_end:
       }
   }
 %    \end{macrocode}
@@ -991,7 +1089,7 @@ http://www.latex-project.org/lppl.txt
 \cs_new:Npn \phimisci_print_orcid:n #1
   {
     \prop_get:NnNT 
-      \l__phimisci_authors_to_orcids_prop 
+      \l__phimisci_author_ids_to_orcids_prop 
       { #1 } 
       \l__phimisci_tmp_orcid_link_tl
       {
@@ -1013,25 +1111,19 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \cs_new:Npn \phimisci_print_email:n #1
   {
-    \prop_get:NnNT 
-      \l__phimisci_authors_to_emails_prop 
-      { #1 } 
-      \l__phimisci_tmp_email_link_tl
+    \tl_if_empty:nF { #1 }
       {
-        \tl_if_empty:NF \l__phimisci_tmp_email_link_tl
+        \par
+        \group_begin:
+        \usekomafont{PhiMiSciEmail}
+        \href
           {
-            \par
-            \group_begin:
-            \usekomafont{PhiMiSciEmail}
-            \href
-              {
-                mailto:\tl_use:N \l__phimisci_tmp_email_link_tl
-              }
-              {
-                \tl_use:N \l__phimisci_tmp_email_link_tl
-              }
-            \group_end:
+            mailto:\tl_use:N \l__phimisci_tmp_email_link_tl
           }
+          {
+            \tl_use:N \l__phimisci_tmp_email_link_tl
+          }
+        \group_end:
       }
 }
 %    \end{macrocode}
@@ -1060,21 +1152,45 @@ http://www.latex-project.org/lppl.txt
 % about reviewed books}\label{sec:data:other}
 % \begin{function}{\contact}
 % \begin{syntax}
-% \cs{contact} \Arg{contact~details}
+% \cs{contact} \oarg{type} \Arg{contact~name} \marg{address}
 % \end{syntax}
-% Store the contact information in free form input.
+% Store the contact details given on the title page. The \marg{contact~name}
+% can be empty. When \marg{contact~name} matches one of the authors in 
+% \cs{author}, an asterisk is placed after the author to indicate them as
+% the primary author.
+% The \marg{address} can be of different types. When \oarg{type} is not given
+% or set to \texttt{email}, \marg{address} will be handled as an e-mail 
+% address and will be formatted appropriately as
+% \texttt{mailto:\meta{address}}. When \oarg{type} is set to \texttt{website},
+% the output will be formatted as the URL given in \marg{address}. When 
+% \oarg{type} is set to an other value, the \marg{address} will be output as
+% free-form output without a link.
 % \end{function}
 %    \begin{macrocode}
-\DeclareDocumentCommand {\contact} {m} 
+\DeclareDocumentCommand {\contact} { O{email} m m }
   {%
     \bool_if:NT \l__phimisci_output_contact_bool
       {
-        \tl_if_blank:nTF { #1 }
+        \tl_set:Nn \l__phimisci_contact_author_tl { #2 }
+        \str_case:nnF { #1 }
           {
-            \bool_set_false:N \l__phimisci_output_contact_bool
+              {email}
+              {
+                \tl_set:Nn \l__phimisci_contact_tl 
+                  { 
+                    \href{mailto:#3}{#3} 
+                  }
+              }
+              {website}
+              {
+                \tl_set:Nn \l__phimisci_contact_tl
+                  {
+                    \url{#3}
+                  }
+              }
           }
           {
-            \tl_set:Nn \l__phimisci_contact_tl { #1 }
+            \tl_set:Nn \l__phimisci_contact_tl { #3 }
           }
       }
   }
@@ -1261,7 +1377,8 @@ http://www.latex-project.org/lppl.txt
                 twocolumn,
                 top=3cm,
                 bottom=3cm,
-                hmargin=3.5cm
+                hmargin=1.5cm,
+                columnsep=1cm
                 ]
                 {geometry}
 %    \end{macrocode}
@@ -1358,8 +1475,48 @@ http://www.latex-project.org/lppl.txt
 % \begin{function}{\@maketitle}
 % \end{function}
 %    \begin{macrocode}
+\ExplSyntaxOn
 \RenewDocumentCommand {\@maketitle} {} 
   {%
+    \bool_if:NT \l__phimisci_output_publication_header_footer_bool
+       {
+         \parbox[c]
+           {\dim_eval:n { \linewidth - 1cm - \l__phimisci_logo_width_dim }}
+           {\raggedright\normalfont\small\textcolor{PhiMiSciBlue}
+             {%
+               \textbf{PhiMiSci\\Philosophy~and~the~Mind~Sciences}}\ | \
+               \tl_use:N \l__phimisci_locale_volume_tl 
+               \ \tl_use:N \l_phimisci_volume_tl\ | \
+               \int_use:N \l_phimisci_publication_year_int\par
+               \tl_if_blank:VF \l_phimisci_issue_title_tl
+                 {
+                   Special~Issue:~
+                   \textit{\tl_use:N \l_phimisci_issue_title_tl}
+                   \seq_if_empty:NF \l_phimisci_issue_editor_seq
+                     {
+                       ,~ed.~by~\seq_use:Nnnn 
+                         \l_phimisci_issue_editor_seq
+                           {~\&~}
+                           {,~}
+                           {~\&~}
+                     }
+                    \par
+                 }
+             }
+           \hfill
+           \parbox[c]{\dim_use:N \l__phimisci_logo_width_dim}
+             {
+               \tl_if_blank:VTF \l__phimisci_branding_logo_tl
+                 {
+                   \msg_warning:nn { phimisci } { missing-logo-url }
+                 }
+                 {
+                   \includegraphics
+                     [ width=\dim_use:N \l__phimisci_logo_width_dim ]
+                     { \tl_use:N \l__phimisci_branding_logo_tl }
+                 }
+            }
+        }
     \let\and\relax
     \vskip 1em%
     {%
@@ -1367,12 +1524,20 @@ http://www.latex-project.org/lppl.txt
       \ifx\@subtitle\@empty\else:\fi\par}%
     }%
     {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\fi}%
-    \vskip .5em%
+    \vskip .5em
     \PhiMiSci@OutputAuthorData{}
-    \pagebreak
-    \PhiMiSci@OutputMetadata{}
+    \vskip .5em
+    \begin{minipage} [b] {\linewidth}
+                \__phimisci_footer_font_settings:
+                \fullcite{phimisci-current-article}\medskip\par
+                \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
+                \tl_use:N \l__phimisci_copyright_tl
+            \end{minipage}
+    %\pagebreak
+    %\PhiMiSci@OutputMetadata{}
     \@afterindentfalse\@afterheading
   }
+\ExplSyntaxOff
 %    \end{macrocode}
 % \subsection{Epigraphs}
 % Epigraphs can be inserted at any point of the document text using \cs{dictum}
@@ -1394,11 +1559,10 @@ http://www.latex-project.org/lppl.txt
     {
       onselect = 
         {
-          \setlength{\headheight}{86pt}
-          \setlength{\footheight}{10\baselineskip}
+          %\setlength{\footheight}{10\baselineskip}
         }
     }
-\cfoot[\PhiMiSci@Footer*{}]{\PhiMiSci@Footer{}}
+\cfoot{\PhiMiSci@Footer{}}
 \chead[\PhiMiSci@Header*{}]{\PhiMiSci@Header{}}
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@Footer, \PhiMiSci@Footer*}
@@ -1407,34 +1571,11 @@ http://www.latex-project.org/lppl.txt
 % pages.
 % \end{function}
 %    \begin{macrocode}
-\NewDocumentCommand {\PhiMiSci@Footer} {s}
+\NewDocumentCommand {\PhiMiSci@Footer} { }
   {%
-    \IfBooleanTF {#1}
-      {%
-        \bool_if:NTF \l__phimisci_output_publication_header_footer_bool
-          {
-            \begin{minipage} [b] {\textwidth}
-                \__phimisci_footer_font_settings:
-                \fullcite{phimisci-current-article}\medskip\par
-                \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
-                \tl_use:N \l__phimisci_copyright_tl
-            \end{minipage}
-          }
-          {
-            \tl_use:N \l__phimisci_submission_footer_tl
-          }
-      }
-      {%
-        \bool_if:NTF \l__phimisci_output_publication_header_footer_bool
-          {
-            \textbf{Philosophy~and~the~Mind~Sciences}
-                  \ \tl_use:N \l_phimisci_volume_tl 
-                  \ (\int_use:N \l_phimisci_publication_year_int)
-            \hfill\hbox{}
-          }
-          {
-            \tl_use:N \l__phimisci_submission_footer_tl
-          }
+    \bool_if:NF \l__phimisci_output_publication_header_footer_bool
+      {
+        \tl_use:N \l__phimisci_submission_footer_tl
       }
   }
 %    \end{macrocode}
@@ -1446,45 +1587,7 @@ http://www.latex-project.org/lppl.txt
   {%
     \IfBooleanTF {#1}
        {
-         \bool_if:NT \l__phimisci_output_publication_header_footer_bool
-           {
-             \parbox[c]
-               {\dim_eval:n { \linewidth - 1cm - \l__phimisci_logo_width_dim }}
-               {\raggedright\normalfont\small\textcolor{PhiMiSciBlue}
-                 {%
-                   \textbf{PhiMiSci\\Philosophy~and~the~Mind~Sciences}},\
-                   \tl_use:N \l__phimisci_locale_volume_tl 
-                   \ \tl_use:N \l_phimisci_volume_tl\  
-                   (\int_use:N \l_phimisci_publication_year_int)\par
-                   \tl_if_blank:VF \l_phimisci_issue_title_tl
-                     {
-                       Special~Issue:~
-                       \textit{\tl_use:N \l_phimisci_issue_title_tl}
-                       \seq_if_empty:NF \l_phimisci_issue_editor_seq
-                         {
-                           ,~ed.~by~\seq_use:Nnnn 
-                             \l_phimisci_issue_editor_seq
-                               {~\&~}
-                               {,~}
-                               {~\&~}
-                         }
-                        \par
-                     }
-                 }
-               \hfill
-               \parbox[c]{\dim_use:N \l__phimisci_logo_width_dim}
-                 {
-                   \tl_if_blank:VTF \l__phimisci_branding_logo_tl
-                     {
-                       \msg_warning:nn { phimisci } { missing-logo-url }
-                     }
-                     {
-                       \includegraphics
-                         [ width=\dim_use:N \l__phimisci_logo_width_dim ]
-                         { \tl_use:N \l__phimisci_branding_logo_tl }
-                     }
-                }
-            }
+       
        }
        {
           \Ifthispageodd
