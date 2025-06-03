@@ -233,6 +233,7 @@ http://www.latex-project.org/lppl.txt
 \tl_new:N \l__phimisci_custom_header_authors_tl
 \tl_new:N \l__phimisci_keywords_tl
 \tl_new:N \l__phimisci_acknowledgments_tl
+\tl_new:N \l__phimisci_dedication_tl
 \tl_new:N \l__phimisci_reviewed_book_tl
 \tl_new:N \l__phimisci_copyright_holder_tl
 \tl_new:N \l__phimisci_locale_related_tl
@@ -266,6 +267,7 @@ http://www.latex-project.org/lppl.txt
 \addtokomafont{disposition}{\sffamily}
 \newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries}
 \newkomafont{PhiMiSciAffiliationLine}{\normalfont\normalsize}
+\newkomafont{PhiMiSciDedication}{\normalfont\normalsize}
 \newkomafont{PhiMiSciEmail}{\normalfont\slshape}
 %    \end{macrocode}
 %
@@ -792,12 +794,34 @@ http://www.latex-project.org/lppl.txt
                \l__phimisci_author_ids_to_affiliations_prop
                \l__phimisci_author_ids_to_orcids_prop
         \group_end:
-        \smallskip\\
+        \tl_if_blank:VF \l_phimisci_issue_title_tl
+         {
+           \par
+           Special~Issue:~
+           \textit{\tl_use:N \l_phimisci_issue_title_tl}
+           \seq_if_empty:NF \l_phimisci_issue_editor_seq
+             {
+               ,~ed.~by~\seq_use:Nnnn 
+                 \l_phimisci_issue_editor_seq
+                   {~\&~}
+                   {,~}
+                   {~\&~}
+             }
+            \par
+         }
+        \tl_if_blank:VF \l__phimisci_dedication_tl
+          {
+            \par
+            \group_begin:
+            \usekomafont{PhiMiSciDedication}
+            \tl_use:N \l__phimisci_dedication_tl
+            \group_end:
+          }
+        \vfill
         \group_begin:
         \usekomafont{PhiMiSciAffiliationLine}
         \phimisci_output_affiliations:N 
             \l__phimisci_affiliation_id_resolver_prop
-        \par 
         \tl_use:N \l__phimisci_locale_contact_tl 
         \tl_use:N \l__phimisci_contact_tl  
         \group_end:
@@ -1246,6 +1270,16 @@ http://www.latex-project.org/lppl.txt
     \tl_set:Nn \l__phimisci_acknowledgments_tl { #1 }
   }
 %    \end{macrocode}
+%
+% \begin{function}{\dedication}
+% A user-interface for the authors to store the dedication for their article.
+% \end{function}
+%    \begin{macrocode}
+\DeclareDocumentCommand {\dedication} { +m }
+  {
+    \tl_set:Nn \l__phimisci_dedication_tl { #1 }
+  }
+%    \end{macrocode}
 % 
 % \begin{function}{\phimisci_check_abstract_length:n, \phimisci_process_keywords:n}
 % A function that 
@@ -1488,20 +1522,6 @@ http://www.latex-project.org/lppl.txt
                \tl_use:N \l__phimisci_locale_volume_tl 
                \ \tl_use:N \l_phimisci_volume_tl\ | \
                \int_use:N \l_phimisci_publication_year_int\par
-               \tl_if_blank:VF \l_phimisci_issue_title_tl
-                 {
-                   Special~Issue:~
-                   \textit{\tl_use:N \l_phimisci_issue_title_tl}
-                   \seq_if_empty:NF \l_phimisci_issue_editor_seq
-                     {
-                       ,~ed.~by~\seq_use:Nnnn 
-                         \l_phimisci_issue_editor_seq
-                           {~\&~}
-                           {,~}
-                           {~\&~}
-                     }
-                    \par
-                 }
              }
            \hfill
            \parbox[c]{\dim_use:N \l__phimisci_logo_width_dim}
@@ -1526,15 +1546,8 @@ http://www.latex-project.org/lppl.txt
     {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\fi}%
     \vskip .5em
     \PhiMiSci@OutputAuthorData{}
-    \vskip .5em
-    \begin{minipage} [b] {\linewidth}
-                \__phimisci_footer_font_settings:
-                \fullcite{phimisci-current-article}\medskip\par
-                \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
-                \tl_use:N \l__phimisci_copyright_tl
-            \end{minipage}
-    %\pagebreak
-    %\PhiMiSci@OutputMetadata{}
+    \pagebreak
+    \PhiMiSci@OutputMetadata{}
     \@afterindentfalse\@afterheading
   }
 \ExplSyntaxOff
@@ -1562,7 +1575,7 @@ http://www.latex-project.org/lppl.txt
           %\setlength{\footheight}{10\baselineskip}
         }
     }
-\cfoot{\PhiMiSci@Footer{}}
+\cfoot[\PhiMiSci@Footer{}]{}
 \chead[\PhiMiSci@Header*{}]{\PhiMiSci@Header{}}
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@Footer, \PhiMiSci@Footer*}
@@ -1573,7 +1586,18 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \NewDocumentCommand {\PhiMiSci@Footer} { }
   {%
-    \bool_if:NF \l__phimisci_output_publication_header_footer_bool
+    \bool_if:NTF \l__phimisci_output_publication_header_footer_bool
+      {
+        \begin{minipage} [b] {\columnwidth}
+            \__phimisci_footer_font_settings:
+            \fullcite{phimisci-current-article}
+        \end{minipage}\hfill
+        \begin{minipage} [b] {\columnwidth}
+            \__phimisci_footer_font_settings:
+            \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
+            \tl_use:N \l__phimisci_copyright_tl
+        \end{minipage}
+      }
       {
         \tl_use:N \l__phimisci_submission_footer_tl
       }
