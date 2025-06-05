@@ -1500,8 +1500,8 @@ http://www.latex-project.org/lppl.txt
     \emergencystretch=3em
   }
 %    \end{macrocode}
-% In citations, we prefer to have a non-breakable thin space between “p.” and 
-% the cited page number.
+% In citations, we prefer to have a non-breakable thin space between ``p.''
+% and the cited page number.
 %    \begin{macrocode}
 \RenewDocumentCommand {\ppspace} {} {\addnbthinspace}
 %    \end{macrocode}
@@ -1571,37 +1571,41 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \KOMAoption{headsepline}{true}
 %    \end{macrocode}
+% \begin{function}{\PhiMiSci@OneColumnLine}
+% A helper macro that generates a line spanning exactly the width of a 
+% column, or \cs{columnwidth}. The thickness of the line, configurable via
+% \meta{settings/head-rule-thickness}, is spread evenly to height and depth
+% of the line. 
+%    \begin{macrocode}
+\NewDocumentCommand{\PhiMiSci@OneColumnLine} {}
+  {
+    \vrule \@width \dimexpr \columnwidth \relax
+           \@height .5 \dimexpr \l__phimisci_head_rule_height_dim \relax 
+           \@depth  .5 \dimexpr \l__phimisci_head_rule_height_dim \relax
+  }
+%    \end{macrocode}
+% \end{function}
 % \begin{function}{\PhiMiSci@HeaderSepLine}
-% Places two lines, each of length \cs{columnwidth}. The margin between the 
+% Places two lines, each spanning a column. The margin between the 
 % columns is filled with white space, and the current page number is 
-% centered. The stroke width is controlled via user-customisable 
-% \meta{settings/head-rule-thickness}. “Font” options, such as colour of the
-% line, are taken from \meta{headsepline}.
+% centered. ``Font'' options, such as colour of the line, are taken from
+% \meta{headsepline}. See \cs{PhiMiSci@OneColumnLine} for configuration of
+% the stroke thickness.
 % \end{function}
 %    \begin{macrocode}
-\NewDocumentCommand{\PhiMiSci@HeaderSepLine}{}
+\NewDocumentCommand{\PhiMiSci@HeaderSepLine} {}
   {
     \group_begin:
       \normalfont
       \usekomafont{headsepline}
         {
-          \vbox to 0pt
+          \vbox spread \z@
             {
-              \vrule \@width \dimexpr \columnwidth \relax
-                     \@height
-                       \dimexpr 
-                       \l__phimisci_head_rule_height_dim
-                       \relax 
-                     \@depth 0pt \relax
+              \PhiMiSci@OneColumnLine{}
               \hfill
                 \lower .58ex \hbox{\thepage}
               \hfill
-              \vrule \@width \dimexpr \columnwidth \relax
-                     \@height
-                       \dimexpr 
-                       \l__phimisci_head_rule_height_dim
-                       \relax 
-                     \@depth 0pt \relax
+              \PhiMiSci@OneColumnLine{}
               \par
             }
         }
