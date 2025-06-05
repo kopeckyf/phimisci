@@ -147,7 +147,7 @@ http://www.latex-project.org/lppl.txt
 % Perform a check whether the used \LaTeX\ installation is recent enough.
 %    \begin{macrocode}
 \RequirePackage{xparse}
-\@ifpackagelater {xparse} {2022/01/01} 
+\@ifpackagelater {xparse} {2022/01/01}
   {} 
   {
     \ClassError {phimisci} { LaTeX~installation~too~old. }
@@ -637,6 +637,8 @@ http://www.latex-project.org/lppl.txt
     footnote-break-penalty .int_set:N = 
       \l__phimisci_settings_footnote_penalty_int,
     footnote-break-penalty .initial:n = { 1000 },
+    head-rule-thickness .dim_set:N = \l__phimisci_head_rule_height_dim,
+    head-rule-thickness .initial:n = { 0.5pt },
     logo-url .tl_set:N = \l__phimisci_branding_logo_tl,
     logo-url .initial:n = {branding/phimisci-logo-mini.pdf},
     logo-width .dim_set:N = \l__phimisci_logo_width_dim,
@@ -1568,13 +1570,71 @@ http://www.latex-project.org/lppl.txt
 % \subsection{Headers \& footers}
 %    \begin{macrocode}
 \KOMAoption{headsepline}{true}
-\AddToLayerPageStyleOptions{plain.scrheadings}
-    {
-      onselect = 
+%    \end{macrocode}
+% \begin{function}{\PhiMiSci@HeaderSepLine}
+% Places two lines, each of length \cs{columnwidth}. The margin between the 
+% columns is filled with white space, and the current page number is 
+% centered. The stroke width is controlled via user-customisable 
+% \meta{settings/head-rule-thickness}. “Font” options, such as colour of the
+% line, are taken from \meta{headsepline}.
+% \end{function}
+%    \begin{macrocode}
+\NewDocumentCommand{\PhiMiSci@HeaderSepLine}{}
+  {
+    \group_begin:
+      \normalfont
+      \usekomafont{headsepline}
         {
-          %\setlength{\footheight}{10\baselineskip}
+          \vbox to 0pt
+            {
+              \vrule \@width \dimexpr \columnwidth \relax
+                     \@height
+                       \dimexpr 
+                       \l__phimisci_head_rule_height_dim
+                       \relax 
+                     \@depth 0pt \relax
+              \hfill
+                \lower .58ex \hbox{\thepage}
+              \hfill
+              \vrule \@width \dimexpr \columnwidth \relax
+                     \@height
+                       \dimexpr 
+                       \l__phimisci_head_rule_height_dim
+                       \relax 
+                     \@depth 0pt \relax
+              \par
+            }
         }
-    }
+    \group_end:
+  }
+%    \end{macrocode}
+% Configure the page style to use \cs{PhiMiSci@HeaderSepLine} for KOMA's 
+% \meta{headsepline}.
+%    \begin{macrocode}
+\DeclareLayer[
+  background,
+  hoffset=\sls@leftmargin{head},
+  voffset=\sls@topmargin
+          + \headheight
+          - \ht\strutbox
+          + \dimexpr \l__phimisci_head_rule_height_dim
+          \relax,
+  width=\sls@headwidth,
+  height=0pt,
+  align=tl,
+  contents={{
+    \normalfont
+    \usekomafont{pageheadfoot}
+      {
+        \usekomafont{pagehead}
+        {
+          \PhiMiSci@HeaderSepLine{}
+        }
+      }
+    }}
+  ]{scrheadings.head.below.line}
+%    \end{macrocode}
+%    \begin{macrocode}
 \cfoot[\PhiMiSci@Footer{}]{}
 \chead[\PhiMiSci@Header*{}]{\PhiMiSci@Header{}}
 %    \end{macrocode}
