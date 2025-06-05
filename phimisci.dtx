@@ -1411,10 +1411,9 @@ http://www.latex-project.org/lppl.txt
 \RequirePackage[a4paper,
                 landscape,
                 twocolumn,
-                top=3cm,
-                bottom=3cm,
                 hmargin=1.5cm,
-                columnsep=1cm
+                vmargin=2cm,
+                columnsep=3cm
                 ]
                 {geometry}
 %    \end{macrocode}
@@ -1575,12 +1574,9 @@ http://www.latex-project.org/lppl.txt
     footheight  = 0pt
   }
 \AddToLayerPageStyleOptions{plain.scrheadings}
-    {
-      onselect = 
-        {
-          \setlength{\footheight}{3\baselineskip}
-        }
-    }
+  {
+    onselect = { \setlength{\footheight}{3\baselineskip} } 
+  }
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@OneColumnLine}
 % A helper macro that generates a line spanning exactly the width of a 
