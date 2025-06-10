@@ -560,14 +560,14 @@ http://www.latex-project.org/lppl.txt
 % \end{syntax}
 % \end{function}
 % Meta data that are not input through dedicated commands (such as \cs{author}
-% or \cs{title}) can be configured with \cs{PhiMiSettings}. This command
+% or \cs{title}) can be configured with \cs{PhiMiSciSettings}. This command
 % accepts a comma-separated key-value list of settings and values. 
 
 % For example, to prepare a draft for in volume 100 in the year 2100, you 
 % would set:
 %
 % \begin{quote}
-% \verb+\PhiMiSettings{stage=draft, volume=100, year=2100}+
+% \verb+\PhiMiSciSettings{stage=draft, volume=100, year=2100}+
 % \end{quote}
 %
 % The meaning of the settings below can be found in the quick reference sheet 
@@ -724,6 +724,8 @@ http://www.latex-project.org/lppl.txt
     acknowledgments .initial:n = {Acknowledgments},
     contact .tl_set:N = \l__phimisci_locale_contact_tl,
     contact .initial:n = {Primary~contact:~},
+    et-al .tl_set:N = \l__phimisci_locale_et_al_tl,
+    et-al .initial:n = {et~al.},    
     keywords .tl_set:N = \l__phimisci_locale_keywords_tl,
     keywords .initial:n = {Keywords},
     volume .tl_set:N = \l__phimisci_locale_volume_tl,
@@ -765,38 +767,59 @@ http://www.latex-project.org/lppl.txt
 % \end{function}
 % \section{Metadata processing}
 %
-% \subsection{Manage author data (\texttt{\textbackslash author}, 
-%    \texttt{\textbackslash affiliation}, \texttt{\textbackslash orcid})}
+% \subsection{Manage author data}
+% Author data, including affiliations and ORCiDs, are processed by an
+% adjusted \cs{author} command. The input is stored and processed for the 
+% output on the title page as well as in the page header and some other
+% places.
 % 
-% \begin{function}{\author}
+% \begin{function}{\author, \affiliation, \orcid}
 % \begin{arguments}
 % \item A shortened author string to be printed in the page header
-% \item Author-affiliation-ORCiD triples, separated by \cs{and}:
-%       \begin{quote}
-%       Author 1\cs{affiliation} \marg{Affiliation 1; Affiliation 2}
-%       \cs{orcid}\marg{...}\\ 
-%       \cs{and} Author 2\cs{affiliation}\marg{...}\cs{orcid}\marg{...}
-%       \end{quote}
-% It should be noted that \cs{affiliation} and \cs{orcid} are \emph{not} defined
-% commands here, but merely elements for the \LaTeX3 parsing of regex parsing to
-% hook to \cite[see][46]{Interface3}.
+% \item Author-affiliation-ORCiD triples, separated by \cs{and}
 % \end{arguments}
 % \begin{syntax}
 % \cs{author} \oarg{\#1} \marg{\#2}
 % \end{syntax}
-% We redirect user input in \cs{author} to our dedicated processing mechanism
-% but set the variable \cs{@author} nevertheless. The processing is continued
-% by the wrapper function \cs{PhiMiSci@ProcessAuthorData}.
+% If the optional argument \oarg{\#1} is not given, the list of authors to
+% be printed in the header is determined from the input in \marg{\#2} 
+% according to APA citation guidelines.
 % 
 % In the input, author data is given as \texttt{author} -- \texttt{affiliation}
 % -- \texttt{orcid} unordered triple, where the input follows the pattern:
 % \begin{quote}
 % \texttt{Author name}\cs{affiliation}\marg{list of affiliations}\cs{orcid}\marg{orcid}
 % \end{quote}
-% The position of \cs{affiliation} and \cs{orcid} is 
-% interchangeable. Within \marg{list of affiliations}, items are separated by
-% \texttt{;}. Multiple authors are separated by the marker \cs{and}. New 
-% lines are allowed in the argument to \cs{author}.
+%
+% \begin{description}
+% \item[Notes:]
+% \begin{enumerate}
+% \item[] 
+% \item Affiliations and ORCiDs are optional for each author.
+%
+% \item The position of \cs{affiliation} and \cs{orcid} is 
+% interchangeable.
+%
+% \item Within \marg{list of affiliations}, items are separated by
+% \texttt{;}. Multiple authors are separated by the marker \cs{and}. 
+%
+% \item New lines are allowed in the argument to \cs{author}.
+% 
+% \item \cs{affiliation} and \cs{orcid} are \emph{not} 
+% defined commands here, but merely elements parsing to hook on to 
+% \cite[see][46]{Interface3}.
+% \end{enumerate}
+%
+% \item[Example:] ~ 
+% \begin{quote}
+% \cs{author}\texttt{\{}\\
+% Author 1\cs{affiliation} \marg{Affiliation 1; Affiliation 2}
+% \cs{orcid}\marg{...}\\
+% \cs{and} Author 2 \cs{orcid}\marg{...} \cs{affiliation}\marg{...}\\
+% \cs{and} Author 3 \cs{affiliation}\marg{Affiliation 2}\\
+% \texttt{\}}
+% \end{quote} 
+% \end{description}
 % \end{function}
 %    \begin{macrocode}
 \RenewDocumentCommand {\author} { O{} +m }
@@ -809,6 +832,8 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@ProcessAuthorData}
+% A document-level command that forwards user input to internal author data
+% processing in \cs{phimisci_process_author_data:nNNN}.
 % \end{function}
 %    \begin{macrocode}
 \NewDocumentCommand { \PhiMiSci@ProcessAuthorData } { +m }
@@ -821,6 +846,8 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@OutputAuthorData}
+% Control the output of author data on the title page. This function is 
+% called by \cs{maketitle}.
 % \end{function}
 %    \begin{macrocode}
 \NewDocumentCommand { \PhiMiSci@OutputAuthorData } {}
@@ -869,6 +896,7 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \begin{function}{\phimisci_process_author_data:nNNN}
+% This command handles the internal author-affiliation-orcid processing.
 % \begin{arguments}
 % \item The input author-affiliation-orcid text,
 % \item[] and the following outpus:
@@ -1029,7 +1057,7 @@ http://www.latex-project.org/lppl.txt
                   { \l__phimisci_max_authors_in_header_int }
                   { 
                     \seq_item:Nn \l__phimisci_authors_header_tmp_seq { 1 }
-                    \ et\ al. 
+                    \ \tl_use:N \l__phimisci_locale_et_al_tl
                   }
                   {
                     \seq_use:Nnnn \l__phimisci_authors_header_tmp_seq
@@ -1143,11 +1171,13 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \begin{function}{\phimisci_print_orcid:n}
-% If \meta{author} exists in the property map assigning all authors to an 
-% ORCiD, output that ID with a hyperlink.
-% \begin{arguments}
-% \item A property map assigning some authors to ORCiDs
-% \end{arguments}
+% Outputs the ORCiD assigned to an author with the ID \marg{\#1}. No output
+% is given when the author is not assigned to an ORCiD (usually because none 
+% was given in user input). 
+% 
+% The ORCiD is output as a hyperlinked icon using \cs{orcidlink} from the 
+% \texttt{orcidlink} package. The color of that icon can be configured via 
+% \cs{PhiMiSciSettings}\texttt{\{settings / orcid-color = \meta{HTML color code}\}}.
 % \end{function}
 %    \begin{macrocode}
 \cs_new:Npn \phimisci_print_orcid:n #1
@@ -1162,32 +1192,6 @@ http://www.latex-project.org/lppl.txt
             \,
             \orcidlink{ \tl_use:N \l__phimisci_tmp_orcid_link_tl }
           }
-      }
-}
-%    \end{macrocode}
-% \begin{function}{\phimisci_print_email:n}
-% If \meta{author} exists in the property map assigning all authors to their 
-% emails, output that email.
-% \begin{arguments}
-% \item A property map assigning some authors to email addresses.
-% \end{arguments}
-% \end{function}
-%    \begin{macrocode}
-\cs_new:Npn \phimisci_print_email:n #1
-  {
-    \tl_if_empty:nF { #1 }
-      {
-        \par
-        \group_begin:
-        \usekomafont{PhiMiSciEmail}
-        \href
-          {
-            mailto:\tl_use:N \l__phimisci_tmp_email_link_tl
-          }
-          {
-            \tl_use:N \l__phimisci_tmp_email_link_tl
-          }
-        \group_end:
       }
 }
 %    \end{macrocode}
