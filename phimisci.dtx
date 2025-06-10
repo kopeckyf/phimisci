@@ -85,22 +85,20 @@ http://www.latex-project.org/lppl.txt
 % \fi
 % \title{Technical documentation of the \texttt{phimisci} class}
 % \author{Felix Kopecky}
-% \date{Version 1.0rc1 (\today)}
+% \date{1 August 2025}
 % \maketitle
-% \texttt{phimisci} is a document class to aid in the editorial and production
-% process of \emph{Philosophy and the Mind Sciences} (PhiMiSci), a diamond 
-% open-acess journal in philosophy, neuroscience and related disciplines. 
-% The class is targeted at authors and editors of special issues to help in the 
-% preparation of submissions to the journal, as well as at editorial staff at the 
-% journal.
+% \texttt{phimisci} is a document class for \emph{Philosophy and the Mind 
+% Sciences} (PhiMiSci), a diamond open-acess journal in philosophy, 
+% neuroscience and related disciplines.
 % 
 % This technical documentation covers the entire source code of \texttt{phimisci}. 
-% A user guide as well as general submission guidelines to the journal are 
+% A user guide as well as submission guidelines to the journal are 
 % available separately.
 %
 % Issues should be reported to the editorial staff or on GitHub at 
 % \url{https://github.com/kopeckyf/phimisci}.
-% \tableofcontents
+% {\setlength{\parskip}{0pt}
+% \tableofcontents}
 % \section{Basic set-up}
 % \subsection{Prerequisites}
 % A \LaTeX{} installation from 2022 or newer is required. Additionally, the 
@@ -134,8 +132,9 @@ http://www.latex-project.org/lppl.txt
 % \end{itemize}
 % \end{multicols}
 %
-% \noindent Documents in the \texttt{phimisci} class can be compiled with \XeLaTeX{} and 
-% PDF\LaTeX{}.
+% \noindent Documents in the \texttt{phimisci} class can be compiled with 
+% PDF\LaTeX{}, \LuaLaTeX{}, and \XeLaTeX{}.
+%
 % \subsection{Class identification and version check}
 % Start by identifying the document class.
 %    \begin{macrocode}
@@ -158,8 +157,10 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \subsection{Class inheritance}
-% This class is based on Markus Kohm's \texttt{scrartcl} class. We set load 
-% this class with apropriate settings and the package \texttt{scrlayer-scrpage}.
+% This class is based on Markus Kohm's \texttt{scrartcl} class. We load 
+% this class with apropriate settings. We also load 
+% \texttt{scrlayer-scrpage} for better controls of headers and 
+% \texttt{scrlayer-notecolumn} for the paragraph counting feature.
 %    \begin{macrocode}
 \LoadClass [fontsize=11pt, oneside] {scrartcl}
 \RequirePackage[autoenlargeheadfoot=off]{scrlayer-scrpage}
@@ -225,7 +226,8 @@ http://www.latex-project.org/lppl.txt
 \tl_const:Nn \l__phimisci_parnum_excluded_objects_base_tl
   {
     env/quote, env/quotation, env/itemize, env/enumerate, env/description, 
-    env/list, env/table, env/figure, env/tabbing, env/lstlisting, env/verbatim
+    env/list, env/table, env/figure, env/tabbing, env/lstlisting, 
+    env/verbatim
   }
 \tl_new:N \l_phimisci_header_authors_tl
 \tl_new:N \l_phimisci_authors_tl
@@ -252,23 +254,37 @@ http://www.latex-project.org/lppl.txt
 \RequirePackage[medium, scale=0.9]{noto-sans}
 %    \end{macrocode}
 % We adjust the font settings inherited from \texttt{scrartcl} and create new
-% font commands for specific \textit{PhiMiSci} elements.
+% font commands for specific PhiMiSci elements.
+%
+% The first few elements cover presentation of title, author, and other meta
+% data on the title page.
 %    \begin{macrocode}
 \setkomafont{title}{\raggedright\sffamily\normalsize\huge\bfseries}
 \setkomafont{subtitle}{\raggedright\sffamily\normalsize\huge\bfseries}
 \setkomafont{author}{\raggedright\sffamily\normalsize\large\bfseries}
 \setkomafont{subject}{\normalfont\normalsize\large\scshape\color{PhiMiSciBlue}}
-\setkomafont{pageheadfoot}{\normalfont\small}
-\addtokomafont{pagehead}{\color{Blue}}
-\setkomafont{dictum}{\normalfont\normalsize\itshape}
-\setkomafont{dictumauthor}{\normalfont\normalsize}
-\setkomafont{descriptionlabel}{\normalfont\bfseries}
-\setkomafont{notecolumn.marginpar}{\normalfont\color{black!50}}
-\addtokomafont{disposition}{\sffamily}
 \newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries}
 \newkomafont{PhiMiSciAffiliationLine}{\normalfont\normalsize}
 \newkomafont{PhiMiSciDedication}{\normalfont\normalsize}
 \newkomafont{PhiMiSciEmail}{\normalfont\slshape}
+%    \end{macrocode}
+% These next settings configure the font in the page header. Note that the 
+% colour of the header separation line is also given as a ``font'' option.
+%    \begin{macrocode}
+\setkomafont{pageheadfoot}{\normalfont\small}
+\addtokomafont{pagehead}{\color{Blue}}
+%    \end{macrocode}
+% In KOMA's font settings, the key \texttt{disposition} is inherited by all
+% section headers.
+%    \begin{macrocode}
+\addtokomafont{disposition}{\sffamily}
+%    \end{macrocode}
+% The remaining font options configure elements in the text.
+%    \begin{macrocode}
+\setkomafont{dictum}{\normalfont\normalsize\itshape}
+\setkomafont{dictumauthor}{\normalfont\normalsize}
+\setkomafont{descriptionlabel}{\normalfont\bfseries}
+\setkomafont{notecolumn.marginpar}{\normalfont\color{black!50}}
 %    \end{macrocode}
 %
 % \subsection{Bibliography management through \texttt{biblatex}}
@@ -318,16 +334,15 @@ http://www.latex-project.org/lppl.txt
 % \item[Final:] A stage to produce the publication PDF.
 % \end{description}
 %
-% These stages control the appearance of the generated document. For example,
-% no meta data are output in the \texttt{submission} stage to ensure anonymity
-% during peer review. 
-% The modes are activated by the choice \texttt{stage} (see Section~
-% \ref{sec:options} below). For example, \texttt{draft} mode is enabled with:
+% These stages control the appearance of the generated document (see 
+% Table~\ref{tab:stages}). For example, no meta data are output in the 
+% \texttt{submission} stage to ensure anonymity during peer review. 
+% The modes are activated through the class setting \texttt{stage} 
+% (see Section~\ref{sec:options} for more user options). For example, 
+% \texttt{draft} mode is enabled with:
 % \begin{center}
-% \cs{documentclass}\texttt{[stage=draft]\{phimisci\}}.
+% \cs{documentclass}\texttt{[stage=draft]\{phimisci\}}
 % \end{center}
-% Table~\ref{tab:stages} gives an overview of the information output by each
-% stage.
 %
 % \begin{table}[h]
 % \centering
@@ -489,12 +504,16 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \section{Messages, errors and warnings}
+% These pre-defined messages are used at various points in the class.
+% \begin{variable}{missing-logo-url}
+% A message that warns the user in case the logo file cannot be found.
 %    \begin{macrocode}
 \msg_new:nnnn { phimisci } { missing-logo-url } 
               { I~didn't~find~a~logo~file~to~print~in~the~article's~header. }
               {Please~supply~the~file~location~with~the~document~class~option~
                 'settings/logo-url~=~path/to/file.pdf'.}
 %    \end{macrocode}
+% \end{variable}
 % \section{User-configurable options}
 % \label{sec:options}
 % Users can configure the output of \texttt{phimisci} documents using a 
@@ -523,27 +542,36 @@ http://www.latex-project.org/lppl.txt
 % \item[Hint:] Later settings always override previous ones.
 % \item[Warning:] Many of the options will take either no effect or cause 
 % unexpected output if they are changed in the document body. It is recommended
-% to change all settings in the preamble, that is, before 
-% \verb+\begin{document}+.
+% to change all settings in the preamble, before \verb+\begin{document}+.
 % \end{description}
 % A \meta{key} can be any of the settings described below. Possible settings 
 % for the \meta{value} depend on the respective \meta{key}.
 %
 % There are three types of \meta{keys}. Document meta data can be configured 
 % with the first group. These are described in Section~\ref{sec:document-data}.
-%
-% Settings for the layout and document element behaviour are stored in the 
+% Settings for the layout and document element behavior are stored in the 
 % \meta{settings/} sub-group of keys (Section~\ref{sec:settings-layout}). 
 % Locale options are stored in the \meta{locale/} sub-group 
 % (Section~\ref{sec:settings-locale}).
 % \subsection{Configure document data}\label{sec:document-data}
+% \begin{function}{\PhiMiSciSettings}
+% \begin{syntax}
+% \cs{PhiMiSciSettings} \{ \meta{key\textsubscript{1}} = \meta{value\textsubscript{1}}, \meta{key\textsubscript{2}} = \meta{value\textsubscript{2}}, ... \}
+% \end{syntax}
+% \end{function}
 % Meta data that are not input through dedicated commands (such as \cs{author}
-% or \cs{title}) can be configured here. The code below prepares a draft for an
-% article to be printed in volume 100 of the journal in the year 2100:
+% or \cs{title}) can be configured with \cs{PhiMiSettings}. This command
+% accepts a comma-separated key-value list of settings and values. 
+
+% For example, to prepare a draft for in volume 100 in the year 2100, you 
+% would set:
 %
 % \begin{quote}
 % \verb+\PhiMiSettings{stage=draft, volume=100, year=2100}+
 % \end{quote}
+%
+% The meaning of the settings below can be found in the quick reference sheet 
+% for this class, available as a separate document.
 %    \begin{macrocode}
 \keys_define:nn { phimisci }
   {
@@ -580,9 +608,12 @@ http://www.latex-project.org/lppl.txt
 % \label{sec:settings-layout}
 % \begin{variable}{phimisci/settings}
 % \begin{syntax}
-% \cs{PhiMiSciSettings} \{ settings / \meta{key} = value \}
+% \cs{PhiMiSciSettings} \{ settings / \meta{key} = \meta{value} \}
 % \end{syntax}
 % \end{variable}
+% These settings allow you to go deep into the behavior of the class. For 
+% the features that a user is most likely to set, please refer to the quick
+% reference sheet available as a separate document.
 %    \begin{macrocode}
 \keys_define:nn { phimisci / settings }
   {
@@ -676,6 +707,14 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \subsection{Locale settings}\label{sec:settings-locale}
+% \begin{variable}{phimisci/locale}
+% \begin{syntax}
+% \cs{PhiMiSciSettings} \{ locale / \meta{key} = \meta{value} \}
+% \end{syntax}
+% \end{variable}
+% These settings control the names of document elements. For example, the 
+% key \texttt{phimisci / locale / abstract} stores the header of the abstract
+% on the title page.
 %    \begin{macrocode}
 \keys_define:nn { phimisci / locale }
   {
@@ -714,9 +753,8 @@ http://www.latex-project.org/lppl.txt
 % \begin{function}{\PhiMiSciSettings}
 % \begin{syntax} \cs{PhiMiSciSettings} \marg{ \#1 }
 % \end{syntax}
-% \begin{arguments}
-% \item A list of key-value pairs
-% \end{arguments}
+% This is the implementation of the \cs{PhiMiSciSettings} command. It serves
+% as an interface from user input to internal processing.
 %    \begin{macrocode}
 \NewDocumentCommand { \PhiMiSciSettings } { m } 
   { 
