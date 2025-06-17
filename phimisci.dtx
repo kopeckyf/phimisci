@@ -165,7 +165,8 @@ http://www.latex-project.org/lppl.txt
               {  
                 Neither~the~file~"#1"~nor~a~system-installed~font~named~
                 "#2"~could~be~found.~Please~install~the~font~(file)~or~
-                adjust~your~font~settings.
+                adjust~your~font~settings.~
+                For~now,~I'm~defaulting~to~the~default~sans~font.
               }
 %    \end{macrocode}
 % \end{variable}
@@ -306,8 +307,39 @@ http://www.latex-project.org/lppl.txt
 % PhiMiSci uses Noto as its sans font, which we load as \texttt{noto-sans}.
 %    \begin{macrocode}
 \RequirePackage[semibold]{libertinus}
-\RequirePackage[medium, scale=0.9]{noto-sans}
+\RequirePackage[regular, semibold]{noto-sans}
 %    \end{macrocode}
+% Titles and section heads use Noto Sans Display, which was not distributed
+% on CTAN when we created this class. The font is loaded additionally via 
+% fontspec.
+%    \begin{macrocode}
+\RequirePackage{fontspec}
+\ExplSyntaxOn
+\IfFontExistsTF { NotoSansDisplay-SemiBold.ttf }
+  {
+    \newfontfamily \PhiMiSciTitleFont 
+      { NotoSansDisplay-Medium.ttf }
+      [ BoldFont = NotoSansDisplay-SemiBold.ttf,
+        ItalicFont = NotoSansDisplay-SemiBoldItalic.ttf ]
+  }
+  {
+    \IfFontExistsTF { Noto Sans Display SemiBold }
+      {
+        \newfontfamily \PhiMiSciTitleFont 
+          { Noto~Sans~Display }
+          [ BoldFont = Noto~Sans~Display~SemiBold,
+            ItalicFont = Noto~Sans~Display~SemiBold~Italic ]
+      }
+      {
+        \let\PhiMiSciTitleFont\sffamily
+        \msg_error:nnnn { phimisci } { missing-font }
+                        { NotoSansDisplay-SemiBold.ttf }
+                        { Noto~Sans~Display~SemiBold }
+      }
+  }
+\ExplSyntaxOff
+%    \end{macrocode}
+% 
 % We adjust the font settings inherited from \texttt{scrartcl} and create new
 % font commands for specific PhiMiSci elements.
 %
@@ -317,21 +349,23 @@ http://www.latex-project.org/lppl.txt
 \setkomafont{title}
   {
     \raggedright
-    \sffamily
+    \PhiMiSciTitleFont
+    \bfseries
     \color{PhiMiSciHeadingBlue}
     \fontsize{23pt}{28pt}\selectfont
   }
 \setkomafont{subtitle}
   {
     \raggedright
-    \sffamily
+    \PhiMiSciTitleFont
+    \bfseries
     \color{PhiMiSciHeadingBlue}
     \fontsize{17.25pt}{22pt}\selectfont
   }
 \setkomafont{author}
   {
     \raggedright
-    \sffamily
+    \PhiMiSciTitleFont
     \color{PhiMiSciHeadingBlue}
     \fontsize{12pt}{17pt}\selectfont
   }
@@ -343,8 +377,19 @@ http://www.latex-project.org/lppl.txt
 % These next settings configure the font in the page header. Note that the 
 % colour of the header separation line is also given as a ``font'' option.
 %    \begin{macrocode}
-\setkomafont{pageheadfoot}{\normalfont\small}
-\addtokomafont{pagehead}{\color{PhiMiSciHeadingBlue}}
+\addtokomafont{pagefoot}
+  {%
+    \normalfont%
+    \color{PhiMiSciHeadingBlue}%
+  }
+\addtokomafont{pagehead}
+  {%
+    \normalfont%
+    \sffamily%
+    \bfseries%
+    \scriptsize%
+    \color{PhiMiSciHeadingBlue}%
+  }
 %    \end{macrocode}
 % In KOMA's font settings, the key \texttt{disposition} is inherited by all
 % section headers.
@@ -357,8 +402,8 @@ http://www.latex-project.org/lppl.txt
 \setkomafont{dictumauthor}{\normalfont\normalsize}
 \setkomafont{descriptionlabel}{\normalfont\bfseries}
 \setkomafont{notecolumn.marginpar}{\normalfont\color{black!50}}
-\setkomafont{footnotereference}{\sffamily\bfseries\color{PhiMiSciBlueTwo}}
 \setkomafont{footnotelabel}{\sffamily\bfseries\color{PhiMiSciBlueTwo}}
+\addtokomafont{footnotereference}{\sffamily\small\bfseries\color{PhiMiSciBlueTwo}}
 \addtokomafont{footnote}{\fontsize{9.25pt}{12.75pt}\selectfont}
 %    \end{macrocode}
 %
@@ -714,6 +759,8 @@ http://www.latex-project.org/lppl.txt
       },
     emergency-stretch .dim_set:N = \l__phimisci_settings_emergencystretch_dim,
     emergency-stretch .initial:n = { 2em },
+    paragraph-indent .dim_set:N = \parindent,
+    paragraph-indent .initial:n = { 6.5mm },
     extra-sentence-spacing .bool_set:N = 
       \l__phimisci_settings_extra_sentence_spacing_bool,
     extra-sentence-spacing .initial:n = {false},
@@ -1210,7 +1257,7 @@ http://www.latex-project.org/lppl.txt
               }
           }
         \phimisci_print_orcid:n { ##1 }
-        \int_compare:nNnT { ##1 } < { \l__phimisci_output_authors_int-1 }
+        \int_compare:nNnT { ##1 } < { \l__phimisci_output_authors_int + 1 }
           {
            \par
           }
@@ -1629,13 +1676,17 @@ http://www.latex-project.org/lppl.txt
        {
          \parbox[c]
            {\dim_eval:n { \linewidth - 1cm - \l__phimisci_logo_width_dim }}
-           {\raggedright\normalfont\small\textcolor{PhiMiSciHeadingBlue}
-             {%
-               \textbf{PhiMiSci\\Philosophy~and~the~Mind~Sciences}}\ | \
+           {\raggedright
+            \addfontfeature{LetterSpace=2.0}
+            \color{PhiMiSciHeadingBlue}
+            {\bfseries\fontsize{20pt}{24pt}\selectfont PhiMiSci\par}
+            {\bfseries\fontsize{11.2pt}{16.8pt}\selectfont 
+             Philosophy~and~the~Mind~Sciences~|~
                \tl_use:N \l__phimisci_locale_volume_tl 
                \ \tl_use:N \l_phimisci_volume_tl\ | \
                \int_use:N \l_phimisci_publication_year_int\par
-             }
+            }
+            }
            \hfill
            \parbox[c]{\dim_use:N \l__phimisci_logo_width_dim}
              {
@@ -1715,7 +1766,6 @@ http://www.latex-project.org/lppl.txt
 \NewDocumentCommand{\PhiMiSci@HeaderSepLine} {}
   {
     \group_begin:
-      \normalfont
       \usekomafont{headsepline}
         {
           \vbox spread \z@
