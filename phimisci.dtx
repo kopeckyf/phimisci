@@ -38,8 +38,9 @@ http://www.latex-project.org/lppl.txt
 \usepackage{xcolor}
 \usepackage{pifont}
 \usepackage{parskip}
-\definecolor{PhiMiSciRed}{cmyk}{0, 1, 0.91, 0.01}
-\definecolor{PhiMiSciBlue}{cmyk}{0.90, 0.73, 0, 0.62}
+\definecolor{PhiMiSciHeadingBlue}{RGB}{10, 26, 97}
+\definecolor{PhiMiSciBlueTwo}{RGB}{19, 47, 178}
+\definecolor{PhiMiSciGrey}{RGB}{157, 164, 196}
 \begin{filecontents}[overwrite]{\jobname.bib}
 @book{Talbot2015,
     author = {Talbot, Nicola L. C.},
@@ -87,7 +88,7 @@ http://www.latex-project.org/lppl.txt
 % \author{Felix Kopecky}
 % \date{1 August 2025}
 % \maketitle
-% \texttt{phimisci} is a document class for \emph{Philosophy and the Mind 
+% \texttt{phimisci} is the document class for \emph{Philosophy and the Mind 
 % Sciences} (PhiMiSci), a diamond open-acess journal in philosophy, 
 % neuroscience and related disciplines.
 % 
@@ -185,7 +186,7 @@ http://www.latex-project.org/lppl.txt
 % because some of their options have to be loaded at initial package loading.
 %    \begin{macrocode}
 \RequirePackage[final, hyperfootnotes=false, pdfusetitle=true]{hyperref}
-\RequirePackage[dvipsnames]{xcolor}
+\RequirePackage{xcolor}
 \RequirePackage{etoolbox, expl3, iftex, l3keys2e, microtype, orcidlink}
 %    \end{macrocode}
 % \subsection{Data storage, Boolean switches and command variants}
@@ -262,7 +263,6 @@ http://www.latex-project.org/lppl.txt
 \setkomafont{title}{\raggedright\sffamily\normalsize\huge\bfseries}
 \setkomafont{subtitle}{\raggedright\sffamily\normalsize\huge\bfseries}
 \setkomafont{author}{\raggedright\sffamily\normalsize\large\bfseries}
-\setkomafont{subject}{\normalfont\normalsize\large\scshape\color{PhiMiSciBlue}}
 \newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries}
 \newkomafont{PhiMiSciAffiliationLine}{\normalfont\normalsize}
 \newkomafont{PhiMiSciDedication}{\normalfont\normalsize}
@@ -272,12 +272,12 @@ http://www.latex-project.org/lppl.txt
 % colour of the header separation line is also given as a ``font'' option.
 %    \begin{macrocode}
 \setkomafont{pageheadfoot}{\normalfont\small}
-\addtokomafont{pagehead}{\color{Blue}}
+\addtokomafont{pagehead}{\color{PhiMiSciHeadingBlue}}
 %    \end{macrocode}
 % In KOMA's font settings, the key \texttt{disposition} is inherited by all
 % section headers.
 %    \begin{macrocode}
-\addtokomafont{disposition}{\sffamily}
+\addtokomafont{disposition}{\sffamily\color{PhiMiSciHeadingBlue}}
 %    \end{macrocode}
 % The remaining font options configure elements in the text.
 %    \begin{macrocode}
@@ -300,9 +300,9 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \hypersetup{breaklinks=true,
             colorlinks=true,
-            linkcolor=Blue,
-            citecolor=Blue,
-            urlcolor=Blue}
+            linkcolor=PhiMiSciBlueTwo,
+            citecolor=PhiMiSciBlueTwo,
+            urlcolor=PhiMiSciBlueTwo}
 %    \end{macrocode}
 % We delay setting the PDF meta data (author, title) to the end of the preamble 
 % to allow for meta data processing first. The meta data is output only in 
@@ -649,7 +649,7 @@ http://www.latex-project.org/lppl.txt
         Creative~Commons~Attribution~(CC-BY)~4.0~license.
       },
     emergency-stretch .dim_set:N = \l__phimisci_settings_emergencystretch_dim,
-    emergency-stretch .initial:n = { 0.5em },
+    emergency-stretch .initial:n = { 2em },
     extra-sentence-spacing .bool_set:N = 
       \l__phimisci_settings_extra_sentence_spacing_bool,
     extra-sentence-spacing .initial:n = {false},
@@ -832,7 +832,7 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@ProcessAuthorData}
-% A document-level command that forwards user input to internal author data
+% A document command that forwards user input to internal author data
 % processing in \cs{phimisci_process_author_data:nNNN}.
 % \end{function}
 %    \begin{macrocode}
@@ -1453,9 +1453,9 @@ http://www.latex-project.org/lppl.txt
 \RequirePackage[a4paper,
                 landscape,
                 twocolumn,
-                hmargin=1.5cm,
+                hmargin=25mm,
                 vmargin=2cm,
-                columnsep=3cm
+                columnsep=25mm
                 ]
                 {geometry}
 %    \end{macrocode}
@@ -1546,7 +1546,7 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \RenewDocumentCommand {\ppspace} {} {\addnbthinspace}
 %    \end{macrocode}
-% \section{Document-level elements}
+% \section{Document elements}
 % \subsection{The document title}
 % Document the |\and\relax| and |-1\baselineskip|
 % \begin{function}{\@maketitle}
@@ -1559,7 +1559,7 @@ http://www.latex-project.org/lppl.txt
        {
          \parbox[c]
            {\dim_eval:n { \linewidth - 1cm - \l__phimisci_logo_width_dim }}
-           {\raggedright\normalfont\small\textcolor{PhiMiSciBlue}
+           {\raggedright\normalfont\small\textcolor{PhiMiSciHeadingBlue}
              {%
                \textbf{PhiMiSci\\Philosophy~and~the~Mind~Sciences}}\ | \
                \tl_use:N \l__phimisci_locale_volume_tl 
@@ -1737,14 +1737,21 @@ http://www.latex-project.org/lppl.txt
         }
   }  
 %    \end{macrocode}
-% \subsection{Colours and coloured boxes}
-% \begin{function}{PhiMiSciRed, PhiMiSciBlue}
-% The journal's identity has a blue: 
-% \fcolorbox{black}{PhiMiSciBlue}{\strut ~~~~} 
-% and a red: \fcolorbox{black}{PhiMiSciRed}{\strut ~~~~}
+% \subsection{Colours}
+% \begin{function}{PhiMiSciHeadingBlue, PhiMiSciBlueTwo, PhiMiSciGrey}
+% The custom colours used in the journal's layout are:
+% \begin{itemize}
+% \item[] \fcolorbox{black}{PhiMiSciHeadingBlue}{\strut\hspace*{2em}}
+%         \texttt{PhiMiSciHeadingBlue}, in titles
+% \item[] \fcolorbox{black}{PhiMiSciBlueTwo}{\strut\hspace*{2em}} 
+%         \texttt{PhiMiSciBlueTwo}, for hyperlinks and headers
+% \item[] \fcolorbox{black}{PhiMiSciGrey}{\strut\hspace*{2em}}
+%         \texttt{PhiMiSciGrey}, for some text elements
+% \end{itemize}
 %    \begin{macrocode}
-\definecolor{PhiMiSciRed}{cmyk}{0, 1, 0.91, 0.01}
-\definecolor{PhiMiSciBlue}{cmyk}{0.90, 0.73, 0, 0.62}
+\definecolor{PhiMiSciHeadingBlue}{RGB}{10, 26, 97}
+\definecolor{PhiMiSciBlueTwo}{RGB}{19, 47, 178}
+\definecolor{PhiMiSciGrey}{RGB}{157, 164, 196}
 %    \end{macrocode}
 % \end{function}
 % \begin{function}{orcidlogocol}
@@ -1754,30 +1761,6 @@ http://www.latex-project.org/lppl.txt
 \definecolor{orcidlogocol}{HTML}{\tl_use:N \l__phimisci_orcid_color_tl}
 %    \end{macrocode}
 % \end{function}
-%
-% \begin{function}{\PhiMiSci@ColouredBox}
-% \begin{syntax} \cs{PhiMiSci@ColouredBox}\marg{string}
-% \end{syntax}
-% A general-purpose function to put single line content into a blue box. This
-% function is called by our \texttt{type} settings and can be used to output
-% the paragraph number, possibly in combination with automatic paragraph
-% counting. 
-%
-% \begin{center}
-% \hbox{} \cs{PhiMiSci@ColouredBox}\texttt{\{string\}} \hskip 1em $\rightarrow$
-% \hskip 1em \bgroup \fboxrule=0pt \colorbox {PhiMiSciBlue}
-% { \strut\sffamily\bfseries\color{white} string } \egroup
-% \end{center}
-% \end{function}
-%    \begin{macrocode}
-\NewDocumentCommand{\PhiMiSci@ColouredBox}{m}
-  {%
-    \bgroup
-    \fboxrule=0pt
-    \colorbox {PhiMiSciBlue} { \strut\sffamily\bfseries\color{white} #1 }%
-    \egroup
-  }  
-%    \end{macrocode}
 % \subsection{Paragraph counting in the margin}
 % \begin{function}{\PhiMiSciParagraphNumber}
 \NewDocumentCommand{\PhiMiSciParagraphNumber}{m}
