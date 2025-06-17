@@ -136,7 +136,7 @@ http://www.latex-project.org/lppl.txt
 % \noindent Documents in the \texttt{phimisci} class can be compiled with 
 % PDF\LaTeX{}, \LuaLaTeX{}, and \XeLaTeX{}.
 %
-% \subsection{Class identification and version check}
+% \subsection{Class identification}
 % Start by identifying the document class.
 %    \begin{macrocode}
 %<*class>
@@ -144,16 +144,70 @@ http://www.latex-project.org/lppl.txt
 \ProvidesExplClass {phimisci} {2025-08-01} {1.0}  
                    {Philosophy and the Mind Sciences Journal Template}
 %    \end{macrocode}
-% Perform a check whether the used \LaTeX\ installation is recent enough.
+% \subsection{Messages, errors and warnings}
+% These pre-defined messages are used at various points in the class.
+% \begin{variable}{missing-logo-url}
+% A message that warns the user in case the logo file cannot be found.
+%    \begin{macrocode}
+\msg_new:nnnn { phimisci } { missing-logo-url } 
+              { I~didn't~find~a~logo~file~to~print~in~the~article's~header. }
+              {
+                Please~supply~the~file~location~with~the~document~class~
+                option~'settings/logo-url~=~path/to/file.pdf'.
+              }
+%    \end{macrocode}
+% \end{variable}
+% \begin{variable}{missing-font}
+% A message that warns the user about a missing font or font file.
+%    \begin{macrocode}
+\msg_new:nnnn { phimisci } { missing-font } 
+              { A~font~could~not~be~found. } 
+              {  
+                Neither~the~file~"#1"~nor~a~system-installed~font~named~
+                "#2"~could~be~found.~Please~install~the~font~(file)~or~
+                adjust~your~font~settings.
+              }
+%    \end{macrocode}
+% \end{variable}
+% \begin{variable}{tex-installation-too-old}
+% Inform the user that their \TeX\ installation is too old.
+%    \begin{macrocode}
+\msg_new:nnn {phimisci} { tex-installation-too-old }
+             { 
+               The~phimisci~class~requires~a~TeX~installation~from~2022~or~
+               newer.~Please~update~your~TeX~installation.
+             }
+%    \end{macrocode}
+% \end{variable}
+% \begin{variable}{wrong-tex-engine}
+% Inform the user that they have selected an unsupported \TeX\ engine.
+%    \begin{macrocode}
+\msg_new:nnn { phimisci } { wrong-tex-engine } 
+             { 
+               You~are~using~the~\str_use:N \c_sys_engine_str~engine,~but~
+               either~lualatex~or~xelatex~are~required~to~compile~phimisci~
+               documents.
+             }
+%    \end{macrocode}
+% \end{variable}
+% \subsection{Version and engine checks}
+% Perform a check whether the used \LaTeX\ installation is recent enough. If
+% not, exit immediately and give user feedback.
 %    \begin{macrocode}
 \RequirePackage{xparse}
 \@ifpackagelater {xparse} {2022/01/01}
-  {} 
+  {}
   {
-    \ClassError {phimisci} { LaTeX~installation~too~old. }
-      { 
-        The~phimisci~class~requires~a~TeX~installation~from~2022~or~newer.~
-        This~is~necessary~for~some~features~to~work~properly.
+    \msg_fatal:nn { phimisci } { tex-installation-too-old }
+  }
+%    \end{macrocode}
+% Check whether an appropriate engines is used and exit immediately if not.
+%    \begin{macrocode}
+\sys_if_engine_xetex:F
+  {
+    \sys_if_engine_luatex:F
+      {
+        \msg_fatal:nn { phimisci } { wrong-tex-engine }
       }
   }
 %    \end{macrocode}
@@ -260,9 +314,27 @@ http://www.latex-project.org/lppl.txt
 % The first few elements cover presentation of title, author, and other meta
 % data on the title page.
 %    \begin{macrocode}
-\setkomafont{title}{\raggedright\sffamily\normalsize\huge\bfseries}
-\setkomafont{subtitle}{\raggedright\sffamily\normalsize\huge\bfseries}
-\setkomafont{author}{\raggedright\sffamily\normalsize\large\bfseries}
+\setkomafont{title}
+  {
+    \raggedright
+    \sffamily
+    \color{PhiMiSciHeadingBlue}
+    \fontsize{23pt}{28pt}\selectfont
+  }
+\setkomafont{subtitle}
+  {
+    \raggedright
+    \sffamily
+    \color{PhiMiSciHeadingBlue}
+    \fontsize{17.25pt}{22pt}\selectfont
+  }
+\setkomafont{author}
+  {
+    \raggedright
+    \sffamily
+    \color{PhiMiSciHeadingBlue}
+    \fontsize{12pt}{17pt}\selectfont
+  }
 \newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries}
 \newkomafont{PhiMiSciAffiliationLine}{\normalfont\normalsize}
 \newkomafont{PhiMiSciDedication}{\normalfont\normalsize}
@@ -285,6 +357,9 @@ http://www.latex-project.org/lppl.txt
 \setkomafont{dictumauthor}{\normalfont\normalsize}
 \setkomafont{descriptionlabel}{\normalfont\bfseries}
 \setkomafont{notecolumn.marginpar}{\normalfont\color{black!50}}
+\setkomafont{footnotereference}{\sffamily\bfseries\color{PhiMiSciBlueTwo}}
+\setkomafont{footnotelabel}{\sffamily\bfseries\color{PhiMiSciBlueTwo}}
+\addtokomafont{footnote}{\fontsize{9.25pt}{12.75pt}\selectfont}
 %    \end{macrocode}
 %
 % \subsection{Bibliography management through \texttt{biblatex}}
@@ -503,17 +578,6 @@ http://www.latex-project.org/lppl.txt
     \subject{ \tl_use:N \l__phimisci_locale_si_introduction_tl }
   }
 %    \end{macrocode}
-% \section{Messages, errors and warnings}
-% These pre-defined messages are used at various points in the class.
-% \begin{variable}{missing-logo-url}
-% A message that warns the user in case the logo file cannot be found.
-%    \begin{macrocode}
-\msg_new:nnnn { phimisci } { missing-logo-url } 
-              { I~didn't~find~a~logo~file~to~print~in~the~article's~header. }
-              {Please~supply~the~file~location~with~the~document~class~option~
-                'settings/logo-url~=~path/to/file.pdf'.}
-%    \end{macrocode}
-% \end{variable}
 % \section{User-configurable options}
 % \label{sec:options}
 % Users can configure the output of \texttt{phimisci} documents using a 
@@ -1454,8 +1518,11 @@ http://www.latex-project.org/lppl.txt
                 landscape,
                 twocolumn,
                 hmargin=25mm,
-                vmargin=2cm,
-                columnsep=25mm
+                top=18.5mm,
+                bottom=27.5mm,
+                columnsep=25mm,
+                headsep=8mm,
+                headheight=1.75mm
                 ]
                 {geometry}
 %    \end{macrocode}
@@ -1464,7 +1531,10 @@ http://www.latex-project.org/lppl.txt
 % These options configure how the footnotes are typed at the bottom of the
 % page. 
 %    \begin{macrocode}
-\deffootnote[1.25em]{1.25em}{\parindent}{\textsuperscript{\thefootnotemark\ }}
+\setfootnoterule[0pt]{0pt}
+\deffootnote[1em]{1em}{\parindent}{%
+  \makebox[1em][l]{\textsuperscript{\thefootnotemark\ }}%
+  }
 %    \end{macrocode}
 % Automatically type a superscripted comma in case two \cs{footnote}s are
 % called immediately following each other.
