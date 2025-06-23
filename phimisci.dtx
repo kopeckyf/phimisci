@@ -427,7 +427,27 @@ http://www.latex-project.org/lppl.txt
 % In KOMA's font settings, the key \texttt{disposition} is inherited by all
 % section headers.
 %    \begin{macrocode}
-\addtokomafont{disposition}{\sffamily\color{PhiMiSciHeadingBlue}}
+\addtokomafont{disposition}
+  {
+    \PhiMiSciTitleFont
+    \bfseries
+    \color{PhiMiSciHeadingBlue}
+  }
+\addtokomafont{section}
+  {
+    \fontsize{15.25pt}{18.5pt}
+    \selectfont
+  }
+\addtokomafont{subsection}
+  {
+    \fontsize{13.25pt}{17pt}
+    \selectfont
+  }
+\addtokomafont{subsubsection}
+  {
+    \fontsize{12pt}{17pt}
+    \selectfont
+  }
 %    \end{macrocode}
 % The remaining font options configure elements in the text.
 %    \begin{macrocode}
@@ -1548,6 +1568,26 @@ http://www.latex-project.org/lppl.txt
 \definecolor{PhiMiSciGrey}{RGB}{157, 164, 196}
 %    \end{macrocode}
 % \end{function}
+%
+% \subsection{Layout of section headings}
+% \begin{function}{\sectionformat, \subsectionformat, \subsubsectionformat}
+%    \begin{macrocode}
+\renewcommand*{\sectionformat}
+  {%
+    \makebox[22pt][l]{\thesection\autodot}%
+  }
+\renewcommand*{\subsectionformat}
+  {%
+    \makebox[7.5mm][l]{\thesubsection\autodot}%
+  }
+\renewcommand*{\subsubsectionformat}
+  {%
+    \makebox[7.144mm][l]{\thesubsubsection\autodot}%
+  }
+%    \end{macrocode}
+% \end{function}
+% 
+%
 % \subsection{Footnotes}
 % These options configure how the footnotes are typed at the bottom of the
 % page. 
