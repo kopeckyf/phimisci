@@ -242,7 +242,7 @@ http://www.latex-project.org/lppl.txt
 % because some of their options have to be loaded at initial package loading.
 %    \begin{macrocode}
 \RequirePackage[final, hyperfootnotes=false, pdfusetitle=true]{hyperref}
-\RequirePackage{xcolor}
+\RequirePackage[table]{xcolor}
 \RequirePackage{etoolbox, expl3, iftex, l3keys2e, microtype, orcidlink}
 %    \end{macrocode}
 % \subsection{Data storage, Boolean switches and command variants}
@@ -1531,9 +1531,9 @@ http://www.latex-project.org/lppl.txt
                 {geometry}
 %    \end{macrocode}
 % 
-% \subsection{Colours}
+% \subsection{Journal color definitions}
 % \begin{function}{PhiMiSciHeadingBlue, PhiMiSciBlueTwo, PhiMiSciGrey}
-% The custom colours used in the journal's layout are:
+% The custom colors used in the journal's layout are:
 % \begin{itemize}
 % \item[] \fcolorbox{black}{PhiMiSciHeadingBlue}{\strut\hspace*{2em}}
 %         \texttt{PhiMiSciHeadingBlue}, in titles
@@ -1598,8 +1598,25 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \bool_if:NF \l__phimisci_settings_extra_sentence_spacing_bool
   { \frenchspacing }
+%    \end{macrocode}
+%
+% \subsection{Table layout}
+% \begin{variable}{\heavyrulewidth, \lightrulewidth}
+% We adjust the width of \cs{toprule} and \cs{bottomrule} from 
+% \texttt{booktabs}. The width of \cs{midrule} is given as 5/8 of the other
+% rules
+%    \begin{macrocode}
+\dim_set:Nn \heavyrulewidth { 0.25pt }
+\dim_set:Nn \lightrulewidth { 0.15625pt }
 \ExplSyntaxOff
 %    \end{macrocode}
+% \end{variable}
+% \begin{variable}{\arrayrulecolor}
+% We set the color of rules in tables to our journal colors.
+%    \begin{macrocode}
+\arrayrulecolor{PhiMiSciHeadingBlue}
+%    \end{macrocode}
+% \end{variable}
 %
 % \subsection{Indentation after lists and quotations}
 % We add a hook to the end of \env{quote}, \env{quotation}, \env{itemize}, 
