@@ -410,18 +410,15 @@ http://www.latex-project.org/lppl.txt
 % These next settings configure the font in the page header. Note that the 
 % colour of the header separation line is also given as a ``font'' option.
 %    \begin{macrocode}
-\addtokomafont{pagefoot}
-  {%
-    \normalfont%
-    \color{PhiMiSciHeadingBlue}%
-  }
+\addtokomafont{pagefoot}{\normalfont\color{PhiMiSciHeadingBlue}}
 \addtokomafont{pagehead}
   {%
     \normalfont%
-    \PhiMiSciMediumFont
-    \scriptsize
+    \PhiMiSciMediumFont%
+    \scriptsize%
     \color{PhiMiSciHeadingBlue}%
   }
+\addtokomafont{headsepline}{\sffamily\bfseries}
 %    \end{macrocode}
 % In KOMA's font settings, the key \texttt{disposition} is inherited by all
 % section headers.
