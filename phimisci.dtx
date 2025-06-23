@@ -1531,6 +1531,23 @@ http://www.latex-project.org/lppl.txt
                 {geometry}
 %    \end{macrocode}
 % 
+% \subsection{Colours}
+% \begin{function}{PhiMiSciHeadingBlue, PhiMiSciBlueTwo, PhiMiSciGrey}
+% The custom colours used in the journal's layout are:
+% \begin{itemize}
+% \item[] \fcolorbox{black}{PhiMiSciHeadingBlue}{\strut\hspace*{2em}}
+%         \texttt{PhiMiSciHeadingBlue}, in titles
+% \item[] \fcolorbox{black}{PhiMiSciBlueTwo}{\strut\hspace*{2em}} 
+%         \texttt{PhiMiSciBlueTwo}, for hyperlinks and headers
+% \item[] \fcolorbox{black}{PhiMiSciGrey}{\strut\hspace*{2em}}
+%         \texttt{PhiMiSciGrey}, for some text elements
+% \end{itemize}
+%    \begin{macrocode}
+\definecolor{PhiMiSciHeadingBlue}{RGB}{10, 26, 97}
+\definecolor{PhiMiSciBlueTwo}{RGB}{19, 47, 178}
+\definecolor{PhiMiSciGrey}{RGB}{157, 164, 196}
+%    \end{macrocode}
+% \end{function}
 % \subsection{Footnotes}
 % These options configure how the footnotes are typed at the bottom of the
 % page. 
@@ -1831,28 +1848,18 @@ http://www.latex-project.org/lppl.txt
         }
   }
 %    \end{macrocode}
-% \subsection{Colours}
-% \begin{function}{PhiMiSciHeadingBlue, PhiMiSciBlueTwo, PhiMiSciGrey}
-% The custom colours used in the journal's layout are:
-% \begin{itemize}
-% \item[] \fcolorbox{black}{PhiMiSciHeadingBlue}{\strut\hspace*{2em}}
-%         \texttt{PhiMiSciHeadingBlue}, in titles
-% \item[] \fcolorbox{black}{PhiMiSciBlueTwo}{\strut\hspace*{2em}} 
-%         \texttt{PhiMiSciBlueTwo}, for hyperlinks and headers
-% \item[] \fcolorbox{black}{PhiMiSciGrey}{\strut\hspace*{2em}}
-%         \texttt{PhiMiSciGrey}, for some text elements
-% \end{itemize}
-%    \begin{macrocode}
-\definecolor{PhiMiSciHeadingBlue}{RGB}{10, 26, 97}
-\definecolor{PhiMiSciBlueTwo}{RGB}{19, 47, 178}
-\definecolor{PhiMiSciGrey}{RGB}{157, 164, 196}
-%    \end{macrocode}
-% \end{function}
+% \subsection{ORCiD logo settings}
 % \begin{function}{orcidlogocol}
 % The color used to print the ORCiD logo. ORCiD's policy prescribes this can
 % be either black or the ORCiD green, HTML code \texttt{A6CE39}.
 %    \begin{macrocode}
 \definecolor{orcidlogocol}{HTML}{\tl_use:N \l__phimisci_orcid_color_tl}
+%    \end{macrocode}
+% \end{function}
+% \begin{function}{\@OrigHeightRecip}
+% We also set a larger scaling factor for the ORCiD logo.
+%    \begin{macrocode}
+\renewcommand{\@OrigHeightRecip}{0.006}
 %    \end{macrocode}
 % \end{function}
 % \subsection{Paragraph counting in the margin}
