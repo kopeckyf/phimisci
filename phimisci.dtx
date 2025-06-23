@@ -260,11 +260,11 @@ http://www.latex-project.org/lppl.txt
 \bool_new:N \l__phimisci_output_doi_bool
 \bool_new:N \l__phimisci_output_authors_bool
 \bool_new:N \l__phimisci_output_publication_header_footer_bool
-\bool_new:N \l__phimisci_output_related_bool
 \bool_new:N \l__phimisci_output_acknowledgments_bool
 \bool_new:N \l__phimisci_output_bibliography_bool
 \bool_new:N \l__phimisci_koma_head_mode_bool
-\cs_new:Nn \__phimisci_affiliation_line_separator: { \quad }
+\cs_new:Nn \__phimisci_affiliation_line_separator: { \medspace }
+\cs_new:Nn \__phimisci_affiliation_name_separator: { \negmedspace }
 \cs_generate_variant:Nn \seq_set_split:Nnn { NVn }
 \cs_generate_variant:Nn \seq_set_split:Nnn { NVx }
 \cs_generate_variant:Nn \int_set:Nn { Nx }
@@ -295,7 +295,6 @@ http://www.latex-project.org/lppl.txt
 \tl_new:N \l__phimisci_dedication_tl
 \tl_new:N \l__phimisci_reviewed_book_tl
 \tl_new:N \l__phimisci_copyright_holder_tl
-\tl_new:N \l__phimisci_locale_related_tl
 \tl_new:N \l__phimisci_contact_tl
 \tl_new:N \l__phimisci_contact_author_tl
 \tl_new:N \l__phimisci_tmp_orcid_link_tl
@@ -316,15 +315,15 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \RequirePackage{fontspec}
 \ExplSyntaxOn
-\IfFontExistsTF { NotoSansDisplay-SemiBold.ttf }
+\IfFontExistsTF { NotoSansDisplay-Regular.ttf }
   {
     \newfontfamily \PhiMiSciTitleFont 
-      { NotoSansDisplay-Medium.ttf }
+      { NotoSansDisplay-Regular.ttf }
       [ BoldFont = NotoSansDisplay-SemiBold.ttf,
         ItalicFont = NotoSansDisplay-SemiBoldItalic.ttf ]
   }
   {
-    \IfFontExistsTF { Noto Sans Display SemiBold }
+    \IfFontExistsTF { Noto~Sans~Display }
       {
         \newfontfamily \PhiMiSciTitleFont 
           { Noto~Sans~Display }
@@ -339,6 +338,13 @@ http://www.latex-project.org/lppl.txt
       }
   }
 \ExplSyntaxOff
+%    \end{macrocode}
+%
+% The font Noto Sans Medium is distributed on CTAN via the \texttt{noto} 
+% package. We rely on it being available.
+%    \begin{macrocode}
+\newfontfamily \PhiMiSciMediumFont {NotoSans-Medium.ttf}
+  [ItalicFont = NotoSans-MediumItalic.ttf]
 %    \end{macrocode}
 % 
 % We adjust the font settings inherited from \texttt{scrartcl} and create new
@@ -363,22 +369,44 @@ http://www.latex-project.org/lppl.txt
     \color{PhiMiSciHeadingBlue}
     \fontsize{17.25pt}{22pt}\selectfont
   }
+\setkomafont{subject}
+  {
+    \PhiMiSciMediumFont
+    \fontsize{9.8pt}{13.72pt}\selectfont
+    \color{PhiMiSciHeadingBlue}
+  }
 \setkomafont{author}
   {
     \raggedright
     \PhiMiSciTitleFont
     \color{PhiMiSciHeadingBlue}
     \fontsize{12pt}{17pt}\selectfont
+    \bfseries
   }
 \newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries}
-\newkomafont{PhiMiSciAffiliationLine}{\normalfont\normalsize}
+\newkomafont{PhiMiSciAffiliationItem}
+  {
+    \sffamily\bfseries
+    \fontsize{10pt}{13.5pt}\selectfont
+    \color{PhiMiSciHeadingBlue}
+  }
+\newkomafont{PhiMiSciAffiliationLine}
+  {
+    \usekomafont{footnote}
+  }
 \newkomafont{PhiMiSciDedication}
   {
     \normalfont\normalsize
     \fontsize{10pt}{13.72pt}\selectfont
     \itshape\bfseries
+    \color{PhiMiSciHeadingBlue}
   }
 \newkomafont{PhiMiSciEmail}{\normalfont\slshape}
+\newkomafont{PhiMiSciKeywords}
+  {
+    \normalfont\fontsize{10pt}{13.5pt}\selectfont
+    \color{PhiMiSciHeadingBlue}
+  }
 %    \end{macrocode}
 % These next settings configure the font in the page header. Note that the 
 % colour of the header separation line is also given as a ``font'' option.
@@ -391,9 +419,8 @@ http://www.latex-project.org/lppl.txt
 \addtokomafont{pagehead}
   {%
     \normalfont%
-    \sffamily%
-    \bfseries%
-    \scriptsize%
+    \PhiMiSciMediumFont
+    \scriptsize
     \color{PhiMiSciHeadingBlue}%
   }
 %    \end{macrocode}
@@ -410,7 +437,8 @@ http://www.latex-project.org/lppl.txt
 \setkomafont{notecolumn.marginpar}{\normalfont\color{black!50}}
 \setkomafont{footnotelabel}{\sffamily\bfseries\color{PhiMiSciBlueTwo}}
 \addtokomafont{footnotereference}{\sffamily\small\bfseries\color{PhiMiSciBlueTwo}}
-\addtokomafont{footnote}{\fontsize{9.25pt}{12.75pt}\selectfont}
+\addtokomafont{footnote}{\fontsize{9.25pt}{11.5pt}\selectfont}
+\newkomafont{PhiMiSciQuote}{\normalfont\fontsize{10pt}{13.5pt}\selectfont}
 %    \end{macrocode}
 %
 % \subsection{Bibliography management through \texttt{biblatex}}
@@ -544,91 +572,6 @@ http://www.latex-project.org/lppl.txt
     \bool_set_true:N \l__phimisci_output_doi_bool
   }
 %    \end{macrocode}
-% \subsection{Publication type}
-% Documents of different types are published in \textit{Philosophy and the Mind
-% Sciences}. We use \cs{subject} from \texttt{scrartcl} to mark the document's
-% type in the header of the title page.
-%
-% The document type can be set using the key \texttt{type}. For example, to 
-% write an introduction for a special issue, the setting would be:
-% \begin{center}
-% \cs{documentclass}\texttt{[type=introduction]\{phimisci\}}.
-% \end{center}
-% 
-% \begin{enumerate}
-% \item Original research (\texttt{paper})
-% \item Introductions to special issues (\texttt{introduction})
-% \item Book reviews\label{item:bookreview} (\texttt{book-review})
-% \item Book symposia\label{item:booksymposium} (\texttt{book-symposium})
-% \item Errata to previously published articles\label{item:errata}
-% (\texttt{correction})
-% \end{enumerate}
-% Documents of types \ref{item:bookreview}--\ref{item:errata} are inherently
-% linked to other publications. A book review and contributions to a book
-% symposium are always linked to a previous publication (such as a monograph
-% or edited volume), and a correction is always linked to an article previously
-% published in the journal. For this purpose, the command \cs{related} is 
-% available in this class (see Section~\ref{sec:data:other}). 
-%
-% \begin{function}{\__phimisci_type_paper:}
-%
-% \end{function}
-%    \begin{macrocode}
-\cs_new:Nn \__phimisci_type_paper:
-  {
-    \bool_set_false:N \l__phimisci_output_related_bool
-    \subject{ \tl_use:N \l__phimisci_locale_original_research_tl }
-  }
-%    \end{macrocode}
-% \begin{function}{\__phimisci_type_book_review:}
-%
-% \end{function}
-%    \begin{macrocode}
-\cs_new:Nn \__phimisci_type_book_review:
-  {
-    \bool_set_true:N \l__phimisci_output_related_bool
-    \tl_set_eq:NN 
-      \l__phimisci_locale_related_tl
-      \l__phimisci_locale_reviewed_book_tl
-    \subject{ \tl_use:N \l__phimisci_locale_book_review_tl }
-  }
-%    \end{macrocode}
-% \begin{function}{\__phimisci_type_book_symposium:}
-%
-% \end{function}
-%    \begin{macrocode}
-\cs_new:Nn \__phimisci_type_book_symposium:
-  {
-    \bool_set_true:N \l__phimisci_output_related_bool
-    \tl_set_eq:NN 
-      \l__phimisci_locale_related_tl
-      \l__phimisci_locale_reviewed_book_tl
-    \subject{ \tl_use:N \l__phimisci_locale_book_symposium_tl }
-  }
-%    \end{macrocode}
-% \begin{function}{\__phimisci_type_correction:}
-%
-% \end{function}
-%    \begin{macrocode}
-\cs_new:Nn \__phimisci_type_correction:
-  {
-    \bool_set_true:N \l__phimisci_output_related_bool
-    \tl_set_eq:NN 
-      \l__phimisci_locale_related_tl
-      \l__phimisci_locale_corrected_article_tl
-    \subject{ \tl_use:N \l__phimisci_locale_correction_tl }
-  }
-%    \end{macrocode}
-% \begin{function}{\__phimisci_type_si_introduction:}
-%
-% \end{function}
-%    \begin{macrocode}
-\cs_new:Nn \__phimisci_type_si_introduction:
-  {
-    \bool_set_false:N \l__phimisci_output_related_bool
-    \subject{ \tl_use:N \l__phimisci_locale_si_introduction_tl }
-  }
-%    \end{macrocode}
 % \section{User-configurable options}
 % \label{sec:options}
 % Users can configure the output of \texttt{phimisci} documents using a 
@@ -696,13 +639,6 @@ http://www.latex-project.org/lppl.txt
     stage / draft .code:n = { \__phimisci_stage_draft: },
     stage / final .code:n = { \__phimisci_stage_final: },
     stage .default:n = {preparation},
-    type .choice:,
-    type / paper .code:n = { \__phimisci_type_paper: },
-    type / book-review .code:n = { \__phimisci_type_book_review: },
-    type / book-symposium .code:n = { \__phimisci_type_book_symposium: },
-    type / correction .code:n = { \__phimisci_type_correction: },
-    type / introduction .code:n = { \__phimisci_type_si_introduction: },
-    type / unknown .code:n = { \subject{ #1 } },
     volume .tl_set:N = \l_phimisci_volume_tl,
     volume .initial:n = {00},
     number .tl_set:N = \l_phimisci_number_tl,
@@ -760,8 +696,8 @@ http://www.latex-project.org/lppl.txt
     copyright-text .tl_set:N = \l__phimisci_copyright_tl,
     copyright-text .initial:n = 
       {
-        This~is~an~open~access~article~distributed~under~the~terms~of~the~
-        Creative~Commons~Attribution~(CC-BY)~4.0~license.
+        \href{https://philosophymindscience.org}{philosophymindscience.org}.
+        \ ISSN:\ 2699-0369.\hfill\includegraphics[width=1.75cm]{ccby.pdf}
       },
     emergency-stretch .dim_set:N = \l__phimisci_settings_emergencystretch_dim,
     emergency-stretch .initial:n = { 2em },
@@ -778,9 +714,8 @@ http://www.latex-project.org/lppl.txt
     footer-font-settings .initial:n = 
       {
         \raggedright
-        \footnotesize
-        \color{ \tl_use:N \l__phimisci_footer_color_tl }
-        \hypersetup{ urlcolor = \tl_use:N \l__phimisci_footer_color_tl }
+        \usekomafont { footnote }
+        \color{ PhiMiSciHeadingBlue }
       },
     footnote-break-penalty .int_set:N = 
       \l__phimisci_settings_footnote_penalty_int,
@@ -801,7 +736,7 @@ http://www.latex-project.org/lppl.txt
     keyword-input-separator .initial:n = { ; },
     keyword-output-separator .tl_set:N = 
       \l__phimisci_keywords_osep_tl,
-    keyword-output-separator .initial:n = {~\textperiodcentered{}~},
+    keyword-output-separator .initial:n = {~\textsf{\textbullet}\ },
     meta-data-output-font .code:n = {\setkomafont{PhiMiSciMetadataItem}{#1}},
     number-authors-header .int_set:N =
       \l__phimisci_max_authors_in_header_int,
@@ -844,7 +779,7 @@ http://www.latex-project.org/lppl.txt
     et-al .tl_set:N = \l__phimisci_locale_et_al_tl,
     et-al .initial:n = {et~al.},    
     keywords .tl_set:N = \l__phimisci_locale_keywords_tl,
-    keywords .initial:n = {Keywords},
+    keywords .initial:n = {Keywords:~},
     volume .tl_set:N = \l__phimisci_locale_volume_tl,
     volume .initial:n = {Vol.},
     number .tl_set:N = \l__phimisci_locale_number_tl,
@@ -982,8 +917,7 @@ http://www.latex-project.org/lppl.txt
          {
            \vskip 1em
            \group_begin:
-           \fontsize{9.8pt}{13.72pt}\selectfont
-           \sffamily
+           \usekomafont{subject}
            Special~Issue:~
            \textit{\tl_use:N \l_phimisci_issue_title_tl}
            \seq_if_empty:NF \l_phimisci_issue_editor_seq
@@ -1006,15 +940,13 @@ http://www.latex-project.org/lppl.txt
             \par
             \group_end:
           }
-        \vskip2em
+        \vfill
         \group_begin:
-        \usekomafont{PhiMiSciAffiliationLine}
         \phimisci_output_affiliations:N 
             \l__phimisci_affiliation_id_resolver_prop
-        \par
-        * \tl_use:N \l__phimisci_locale_contact_tl 
-        \tl_use:N \l__phimisci_contact_tl  
         \group_end:
+        \par
+        \vspace* { 2\baselineskip }
       }
   }
 %    \end{macrocode}
@@ -1287,9 +1219,34 @@ http://www.latex-project.org/lppl.txt
   {
     \prop_map_inline:Nn #1
       {
-        \textsuperscript { ##1 }
-        \tl_rescan:nn {} { ##2 }
+        \group_begin: 
+          \usekomafont { PhiMiSciAffiliationItem }
+          \textsuperscript
+            { 
+              \tl_rescan:nn {} { ##1 } 
+            }
+        \group_end:
+        \group_begin:
+          \__phimisci_affiliation_name_separator:
+          \usekomafont { PhiMiSciAffiliationLine }
+          \tl_rescan:nn {} { ##2 }
+        \group_end:
         \__phimisci_affiliation_line_separator:
+      }
+    \par
+    \tl_if_blank:nF { \l__phimisci_contact_tl }
+      {
+        \group_begin:
+          \usekomafont { PhiMiSciAffiliationItem }
+          *
+        \group_end:
+        \group_begin:
+          \__phimisci_affiliation_name_separator:
+          \usekomafont { PhiMiSciAffiliationLine }
+          \tl_use:N \l__phimisci_locale_contact_tl 
+          \tl_use:N \l__phimisci_contact_tl
+        \group_end:
+        \par
       }
   }
 %    \end{macrocode}
@@ -1418,15 +1375,6 @@ http://www.latex-project.org/lppl.txt
       }
   }
 %    \end{macrocode}
-% \begin{function}{\related}
-% Store a bib key 
-% \end{function}
-%    \begin{macrocode}
-\DeclareDocumentCommand {\related} {m} 
-  {%
-    \tl_set:Nn \l__phimisci_related_tl { #1 }
-  }
-%    \end{macrocode}
 % \begin{function}{\acknowledgments}
 % A user-interface for the authors to provide acknowledments for their article.
 % \end{function}
@@ -1485,19 +1433,20 @@ http://www.latex-project.org/lppl.txt
         \bool_if:NT \l__phimisci_output_abstract_bool
           {
             \subsubsection*{\tl_use:N \l__phimisci_locale_abstract_tl}
-            \tl_use:N \l__phimisci_abstract_tl
-          }
-        \bool_if:NT \l__phimisci_output_related_bool
-          {
-            \subsubsection*{\tl_use:N \l__phimisci_locale_related_tl}
-            \fullcite { \tl_use:N \l__phimisci_related_tl }
+            \group_begin: 
+              \usekomafont{ PhiMiSciQuote }
+              \tl_use:N \l__phimisci_abstract_tl
+            \group_end:
           }
         \bool_if:NT \l__phimisci_output_keywords_bool
           {
-            \subsubsection*{\tl_use:N \l__phimisci_locale_keywords_tl} 
+            \vskip 1em
+            \usekomafont{ PhiMiSciKeywords }
+            \textbf{\tl_use:N \l__phimisci_locale_keywords_tl} 
             \tl_use:N \l__phimisci_keywords_tl
           }
-        \vskip 1em
+        \enlargethispage{-2\baselineskip}
+        \pagebreak
       }
   }
 %    \end{macrocode}
@@ -1728,7 +1677,6 @@ http://www.latex-project.org/lppl.txt
     \pagebreak
     \vspace*{3.66\baselineskip}
     \PhiMiSci@OutputMetadata{}
-    \enlargethispage{-2\baselineskip}
     \@afterindentfalse\@afterheading
   }
 \ExplSyntaxOff
@@ -1744,6 +1692,13 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \ExplSyntaxOn
 \RenewDocumentCommand { \dictumrule } {} { \smallskip }
+%    \end{macrocode}
+%
+% \subsection{Block quotes}
+% The settings for \env{quote} are used for the abstract as well.
+%    \begin{macrocode}
+\AddToHook { env/quote/begin } { \usekomafont{PhiMiSciQuote} }
+\AddToHook { env/quotation/begin } { \usekomafont{PhiMiSciQuote} }  
 %    \end{macrocode}
 %
 % \subsection{Headers \& footers}
