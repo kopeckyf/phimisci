@@ -450,13 +450,15 @@ http://www.latex-project.org/lppl.txt
 %    \end{macrocode}
 % The remaining font options configure elements in the text.
 %    \begin{macrocode}
+\setkomafont{caption}{\usekomafont{footnote}\bfseries}
+\setkomafont{captionlabel}{\usekomafont{footnote}\bfseries}
 \setkomafont{dictum}{\normalfont\normalsize\itshape}
 \setkomafont{dictumauthor}{\normalfont\normalsize}
 \setkomafont{descriptionlabel}{\normalfont\bfseries}
-\setkomafont{notecolumn.marginpar}{\normalfont\color{black!50}}
+\addtokomafont{footnote}{\fontsize{9.25pt}{11.5pt}\selectfont}
 \setkomafont{footnotelabel}{\sffamily\bfseries\color{PhiMiSciBlueTwo}}
 \addtokomafont{footnotereference}{\sffamily\small\bfseries\color{PhiMiSciBlueTwo}}
-\addtokomafont{footnote}{\fontsize{9.25pt}{11.5pt}\selectfont}
+\setkomafont{notecolumn.marginpar}{\normalfont\color{black!50}}
 \newkomafont{PhiMiSciQuote}{\normalfont\fontsize{10pt}{13.5pt}\selectfont}
 %    \end{macrocode}
 %
@@ -1553,8 +1555,7 @@ http://www.latex-project.org/lppl.txt
                 footskip=0pt,
                 columnsep=25mm,
                 headsep=8.75mm,
-                headheight=4mm,
-                showframe,
+                headheight=4mm
                 ]
                 {geometry}
 %    \end{macrocode}
