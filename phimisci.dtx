@@ -383,7 +383,6 @@ http://www.latex-project.org/lppl.txt
     \fontsize{12pt}{17pt}\selectfont
     \bfseries
   }
-\newkomafont{PhiMiSciMetadataItem}{\normalfont\bfseries}
 \newkomafont{PhiMiSciAffiliationItem}
   {
     \sffamily\bfseries
@@ -756,8 +755,12 @@ http://www.latex-project.org/lppl.txt
     keyword-input-separator .initial:n = { ; },
     keyword-output-separator .tl_set:N = 
       \l__phimisci_keywords_osep_tl,
-    keyword-output-separator .initial:n = {~\textsf{\textbullet}\ },
-    meta-data-output-font .code:n = {\setkomafont{PhiMiSciMetadataItem}{#1}},
+    keyword-output-separator .initial:n = 
+      {
+        \nobreak\space
+        \textsf{\textbullet}
+        \space
+      },
     number-authors-header .int_set:N =
       \l__phimisci_max_authors_in_header_int,
     number-authors-header .initial:n = { 2 },
@@ -1369,7 +1372,10 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \DeclareDocumentCommand {\abstract} {+m} 
   {%
-    \tl_if_blank:nF { #1 }
+    \tl_if_blank:nTF { #1 }
+      {
+        \bool_set_false:N \l__phimisci_output_abstract_bool
+      }
       {
         \phimisci_check_abstract_length:n { #1 }
         \tl_set:Nn \l__phimisci_abstract_tl { #1 }
@@ -1384,7 +1390,10 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \DeclareDocumentCommand {\keywords} {m} 
   {%
-    \tl_if_blank:nF { #1 }
+    \tl_if_blank:nTF { #1 }
+      {
+        \bool_set_false:N \l__phimisci_output_keywords_bool
+      }
       {
         \tl_set:No \l__phimisci_keywords_tl 
           { 
@@ -1446,8 +1455,8 @@ http://www.latex-project.org/lppl.txt
   {
     \bool_if:nT 
       { 
-        \l__phimisci_output_keywords_bool || \l__phimisci_output_abstract_bool
-        || \l__phimisci_output_rights_bool
+        \l__phimisci_output_keywords_bool 
+        || \l__phimisci_output_abstract_bool
       }
       {
         \bool_if:NT \l__phimisci_output_abstract_bool
@@ -1465,7 +1474,6 @@ http://www.latex-project.org/lppl.txt
             \textbf{\tl_use:N \l__phimisci_locale_keywords_tl} 
             \tl_use:N \l__phimisci_keywords_tl
           }
-        \enlargethispage{-2\baselineskip}
         \pagebreak
       }
   }
@@ -1688,6 +1696,7 @@ http://www.latex-project.org/lppl.txt
     \widowpenalty=10000
     \emergencystretch=3em
   }
+\AtBeginBibliography{\usekomafont{footnote}} 
 %    \end{macrocode}
 % In citations, we prefer to have a non-breakable thin space between ``p.''
 % and the cited page number.
@@ -1747,9 +1756,10 @@ http://www.latex-project.org/lppl.txt
     {\ifx\@subtitle\@empty\else\usekomafont{subtitle}\@subtitle\par\vskip.5\baselineskip\fi}%
     \vskip .5em
     \PhiMiSci@OutputAuthorData{}
-    \enlargethispage{-2\baselineskip}
+    \enlargethispage{-2.5\baselineskip}
     \pagebreak
     \vspace*{3.66\baselineskip}
+    \enlargethispage{-4\baselineskip}
     \PhiMiSci@OutputMetadata{}
     \@afterindentfalse\@afterheading
   }
@@ -1875,8 +1885,11 @@ http://www.latex-project.org/lppl.txt
         \end{minipage}\hfill
         \begin{minipage} [b] {\columnwidth}
             \__phimisci_footer_font_settings:
-            \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
-            \tl_use:N \l__phimisci_copyright_tl
+            \bool_if:NT \l__phimisci_output_rights_bool
+              {
+                \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
+                \tl_use:N \l__phimisci_copyright_tl
+              }
         \end{minipage}
       }
       {
