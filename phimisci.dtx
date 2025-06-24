@@ -41,6 +41,7 @@ http://www.latex-project.org/lppl.txt
 \usepackage{parskip}
 \definecolor{PhiMiSciHeadingBlue}{RGB}{10, 26, 97}
 \definecolor{PhiMiSciBlueTwo}{RGB}{19, 47, 178}
+\definecolor{PhiMiSciBlueThree}{RGB}{12, 30, 115}
 \definecolor{PhiMiSciGrey}{RGB}{157, 164, 196}
 \begin{filecontents}[overwrite]{\jobname.bib}
 @book{Talbot2015,
@@ -346,6 +347,11 @@ http://www.latex-project.org/lppl.txt
 \newfontfamily \PhiMiSciMediumFont {NotoSans-Medium.ttf}
   [ItalicFont = NotoSans-MediumItalic.ttf]
 %    \end{macrocode}
+%
+% The main text is set in 10.5pt with 13.5pt line spacing.
+%    \begin{macrocode}
+\AtBeginDocument{\fontsize{10.5}{13.5pt}\selectfont}
+%    \end{macrocode}
 % 
 % We adjust the font settings inherited from \texttt{scrartcl} and create new
 % font commands for specific PhiMiSci elements.
@@ -416,7 +422,7 @@ http://www.latex-project.org/lppl.txt
     \normalfont%
     \PhiMiSciMediumFont%
     \scriptsize%
-    \color{PhiMiSciHeadingBlue}%
+    \color{PhiMiSciBlueThree}%
   }
 \addtokomafont{headsepline}{\sffamily\bfseries}
 %    \end{macrocode}
@@ -436,11 +442,13 @@ http://www.latex-project.org/lppl.txt
   }
 \addtokomafont{subsection}
   {
+    \color{PhiMiSciBlueThree}
     \fontsize{13.25pt}{17pt}
     \selectfont
   }
 \addtokomafont{subsubsection}
   {
+    \color{PhiMiSciBlueThree}
     \fontsize{12pt}{17pt}
     \selectfont
   }
@@ -738,6 +746,8 @@ http://www.latex-project.org/lppl.txt
     footnote-break-penalty .int_set:N = 
       \l__phimisci_settings_footnote_penalty_int,
     footnote-break-penalty .initial:n = { 1000 },
+    footnote-distance-from-main .code:n = { \setlength{\skip\footins}{#1} },
+    footnote-distance-from-main .initial:n = { 13pt plus 4pt minus 2pt },
     head-rule-thickness .dim_set:N = \l__phimisci_head_rule_height_dim,
     head-rule-thickness .initial:n = { 0.5pt },
     logo-url .tl_set:N = \l__phimisci_branding_logo_tl,
@@ -1564,19 +1574,24 @@ http://www.latex-project.org/lppl.txt
 % \item[] \fcolorbox{black}{PhiMiSciHeadingBlue}{\strut\hspace*{2em}}
 %         \texttt{PhiMiSciHeadingBlue}, in titles
 % \item[] \fcolorbox{black}{PhiMiSciBlueTwo}{\strut\hspace*{2em}} 
-%         \texttt{PhiMiSciBlueTwo}, for hyperlinks and headers
+%         \texttt{PhiMiSciBlueTwo}, for hyperlinks
+% \item[] \fcolorbox{black}{PhiMiSciBlueThree}{\strut\hspace*{2em}} 
+%         \texttt{PhiMiSciBlueThree}, for subsections and the header line
 % \item[] \fcolorbox{black}{PhiMiSciGrey}{\strut\hspace*{2em}}
 %         \texttt{PhiMiSciGrey}, for some text elements
 % \end{itemize}
 %    \begin{macrocode}
 \definecolor{PhiMiSciHeadingBlue}{RGB}{10, 26, 97}
 \definecolor{PhiMiSciBlueTwo}{RGB}{19, 47, 178}
+\definecolor{PhiMiSciBlueThree}{RGB}{12, 30, 115}
 \definecolor{PhiMiSciGrey}{RGB}{157, 164, 196}
 %    \end{macrocode}
 % \end{function}
 %
 % \subsection{Layout of section headings}
 % \begin{function}{\sectionformat, \subsectionformat, \subsubsectionformat}
+% The section number width is set to 12.5mm, twice the \cs{parindent}, and
+% the section header follows after that.
 %    \begin{macrocode}
 \renewcommand*{\sectionformat}
   {%
