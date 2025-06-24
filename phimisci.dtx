@@ -1632,11 +1632,16 @@ http://www.latex-project.org/lppl.txt
     ]{paragraph}
 %    \end{macrocode}
 % \end{function}
-% We want \cs{paragraphs} to be numbered, and set \texttt{secnumdepth}
-% accordingly.
+%
+% \begin{variable}{secnumdepth, tocdepth}
+% We want \cs{paragraphs} to be numbered and listed in the table of contents
+% (i.e., in the PDF meta data). We set \texttt{secnumdepth} and 
+% \texttt{tocdepth} accordingly.
 %    \begin{macrocode}
 \setcounter{secnumdepth}{\paragraphnumdepth}
+\setcounter{tocdepth}{\paragraphtocdepth}
 %    \end{macrocode}
+% \end{variable}
 %
 % \subsection{Footnotes}
 % These options configure how the footnotes are typed at the bottom of the
