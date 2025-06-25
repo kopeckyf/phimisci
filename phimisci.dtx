@@ -936,6 +936,14 @@ http://www.latex-project.org/lppl.txt
                \l__phimisci_author_ids_to_affiliations_prop
                \l__phimisci_author_ids_to_orcids_prop
         \group_end:
+%    \end{macrocode}
+% Check whether the article is part of a book symposium or a special issue.
+% Articles cannot be part of both; if both are given, the special issue
+% takes precedence. Whether or not the article is part of a special issue
+% or a book symposium is determined through the article's meta data. If any
+% title for a book symposium or special issue is given, the article is 
+% considered part of such.
+%    \begin{macrocode}
         \tl_if_blank:VTF \l_phimisci_issue_title_tl
           {
             \tl_if_blank:VF \l_phimisci_discussed_book_tl
