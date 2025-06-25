@@ -462,7 +462,11 @@ http://www.latex-project.org/lppl.txt
 % The remaining font options configure elements in the text.
 %    \begin{macrocode}
 \setkomafont{caption}{\usekomafont{footnote}\bfseries}
-\setkomafont{captionlabel}{\usekomafont{footnote}\bfseries}
+\setkomafont{captionlabel}
+  {
+    \usekomafont{footnote}\sffamily\scriptsize\bfseries
+    \color{PhiMiSciHeadingBlue}
+  }
 \setkomafont{dictum}{\normalfont\normalsize\itshape}
 \setkomafont{dictumauthor}{\normalfont\normalsize}
 \setkomafont{descriptionlabel}{\normalfont\bfseries}
@@ -1618,6 +1622,18 @@ http://www.latex-project.org/lppl.txt
   }
 %    \end{macrocode}
 % \end{function}
+%
+% \begin{function}{\section, \subsection, \subsubsection}
+% Our layout uses a slightly larger spacing before section headings.
+%    \begin{macrocode}
+\RedeclareSectionCommand[%
+    beforeskip=-22pt plus -1ex minus -.2ex]{section}
+\RedeclareSectionCommand[%
+    beforeskip=-7.5mm plus -1ex minus -.2ex]{subsection}
+\RedeclareSectionCommand[%
+    beforeskip=-7.144mm plus -1ex minus -.2ex]{subsubsection}    
+%    \end{macrocode}
+% \end{function}
 % 
 % \begin{function}{\paragraph}
 % We use \cs{paragraph} as a heading on the fourth level (e.g., 1.1.1.1).
@@ -1625,7 +1641,7 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \RedeclareSectionCommand[%
     afterskip=1.5ex plus .2ex,%
-    beforeskip=-3.25ex plus -1ex minus -.2ex,%
+    beforeskip=-4.762mm plus -1ex minus -.2ex,%
     indent=0pt,%
     counterwithin=subsubsection,%
     level=4%
@@ -1695,7 +1711,12 @@ http://www.latex-project.org/lppl.txt
   { \frenchspacing }
 %    \end{macrocode}
 %
-% \subsection{Table layout}
+% \subsection{Float layout}
+%
+% All floats should be centered.
+%    \begin{macrocode}
+\addto\@floatboxreset{\centering}
+%    \end{macrocode}
 % \begin{variable}{\heavyrulewidth, \lightrulewidth}
 % We adjust the width of \cs{toprule} and \cs{bottomrule} from 
 % \texttt{booktabs}. The width of \cs{midrule} is given as 5/8 of the other
@@ -1710,6 +1731,22 @@ http://www.latex-project.org/lppl.txt
 % We set the color of rules in tables to our journal colors.
 %    \begin{macrocode}
 \arrayrulecolor{PhiMiSciHeadingBlue}
+%    \end{macrocode}
+% \end{variable}
+% \begin{variable}{\topfraction, ...}
+% More liberal values for the placement of floats. These settings follow 
+% recommendations from the TeX FAQ.
+%    \begin{macrocode}
+ \renewcommand{\topfraction}{.85} 
+ \renewcommand{\bottomfraction}{.7} 
+ \renewcommand{\textfraction}{.15} 
+ \renewcommand{\floatpagefraction}{.66} 
+ \renewcommand{\dbltopfraction}{.66} 
+ \renewcommand{\dblfloatpagefraction}{.66} 
+ \setcounter{topnumber}{9} 
+ \setcounter{bottomnumber}{9} 
+ \setcounter{totalnumber}{20} 
+ \setcounter{dbltopnumber}{9} 
 %    \end{macrocode}
 % \end{variable}
 %
@@ -1743,7 +1780,8 @@ http://www.latex-project.org/lppl.txt
     \widowpenalty=10000
     \emergencystretch=3em
   }
-\AtBeginBibliography{\usekomafont{footnote}} 
+\AtBeginBibliography{\usekomafont{footnote}}
+\bibhang=6.25mm
 %    \end{macrocode}
 % In citations, we prefer to have a non-breakable thin space between ``p.''
 % and the cited page number.
