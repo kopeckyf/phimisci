@@ -740,6 +740,8 @@ http://www.latex-project.org/lppl.txt
     emergency-stretch .initial:n = { 2em },
     paragraph-indent .dim_set:N = \parindent,
     paragraph-indent .initial:n = { 6.5mm },
+    list-indent .dim_set:N = \leftmargini,
+    list-indent .initial:n = { 6.5mm },
     extra-sentence-spacing .bool_set:N = 
       \l__phimisci_settings_extra_sentence_spacing_bool,
     extra-sentence-spacing .initial:n = {false},
@@ -1909,6 +1911,17 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \AddToHook { env/quote/begin } { \usekomafont{PhiMiSciQuote} }
 \AddToHook { env/quotation/begin } { \usekomafont{PhiMiSciQuote} }  
+%    \end{macrocode}
+%
+% \subsection{Lists}
+% The label should be snug with the \cs{parindent}, which we achieve using
+% the \texttt{enumitem} package.
+%    \begin{macrocode}
+\setlist
+  { 
+    labelindent=\parindent, 
+    leftmargin=* 
+  }
 %    \end{macrocode}
 %
 % \subsection{Headers \& footers}
