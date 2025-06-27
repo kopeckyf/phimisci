@@ -1111,6 +1111,7 @@ http://www.latex-project.org/lppl.txt
             }
             {
               \prop_put:Nxx \l__phimisci_affiliation_id_resolver_prop
+                { ####1 }
                 {
                   \int_eval:n 
                     { 
@@ -1118,7 +1119,6 @@ http://www.latex-project.org/lppl.txt
                       + 1 
                     }
                 }
-                { ####1 }
               \seq_put_right:Nx \l__phimisci_author_affiliation_ids_seq
                 {
                   \prop_count:N \l__phimisci_affiliation_id_resolver_prop
@@ -1281,13 +1281,13 @@ http://www.latex-project.org/lppl.txt
           \usekomafont { PhiMiSciAffiliationItem }
           \textsuperscript
             { 
-              \tl_rescan:nn {} { ##1 } 
+              \tl_rescan:nn {} { ##2 } 
             }
         \group_end:
         \group_begin:
           \__phimisci_affiliation_name_separator:
           \usekomafont { PhiMiSciAffiliationLine }
-          \tl_rescan:nn {} { ##2 }
+          \tl_rescan:nn {} { ##1 }
         \group_end:
         \__phimisci_affiliation_line_separator:
       }
