@@ -5,8 +5,8 @@
 
 % Document layout
 % Narrow margins
-\usepackage[margin=1cm]{geometry}
-\columnsep=12pt
+\usepackage[margin=.75cm]{geometry}
+\columnsep=1cm
 
 % Tiny spacing for the titling
 \usepackage{titling}
@@ -26,8 +26,10 @@
 % Computer code
 \usepackage{listings}
 \lstset{basicstyle=\small\ttfamily,
+        keywordstyle=\small\ttfamily,
         language=[LaTeX]TeX,
-        frame=single}
+        frame=single
+        }
 
 % Commands to print LaTeX commands and their arguments
 \NewDocumentCommand{\Command}{m}{\texttt{\textbackslash #1}}
@@ -38,7 +40,6 @@
         
 % Better description environments
 \usepackage{enumitem}
-
 \usepackage{booktabs}
 
 \begin{document}
@@ -61,7 +62,7 @@
 \begin{document}
     \maketitle
     ...
-    \printbibliography[heading=phimisci]
+    \printbibliography
 \end{document}
 \end{lstlisting}
 
@@ -87,7 +88,7 @@ Affiliations are separated by semicolons:
     \and Author 3
   }
 \end{lstlisting}
-Affiliations are recognised as the same institution only if their names match \emph{exactly}. ``Ruhr-Universität Bochum'' and ``Ruhr University Bochum'' are two separate institutions as far as \texttt{phimisci} is concerned.
+Affiliations are recognised as the same institution only if their names match \emph{exactly}. ``MIT'' and ``M.I.T.'' would not be considered identical.
 
 The \Command{orcid}\MArg{\Meta{id}} is provided verbatim:
 
@@ -99,24 +100,29 @@ The \Command{orcid}\MArg{\Meta{id}} is provided verbatim:
     \and Author 2\affiliation{Uni 2; Uni 3}
   }
 \end{lstlisting}
-The optional argument for \Command{author}, \OArg{\Meta{Short name}} overwrites the author name(s) printed in the running head.
-\item[\Command{title}\OArg{\Meta{short}}\MArg{\Meta{full}}] Uses the \Meta{full} title in all places a title is used in the document. Optionally, the running head title can be overwritten by providing the \OArg{\Meta{short}} argument.
+The optional \OArg{\Meta{Short name}} argument overwrites the author name(s) printed in the running head.
+
+\item[\Command{title}\OArg{\Meta{short}}\MArg{\Meta{full}}] Uses the \Meta{full} title in all places a title is used in the document. The running head title can be overwritten by providing the \OArg{\Meta{short}} argument.
+
+\item[\Command{subtitle}\MArg{\Meta{subtitle}}] The subtitle, for papers that have one.
+
 \item[\Command{keywords}\MArg{\Meta{List of keywords}}] Keywords in the list should be separated by a semicolon. 
-\item[\Command{PhiMiSettings}\MArg{key\textsubscript{1} = value\textsubscript{1}, key\textsubscript{2} = value\textsubscript{2}, ...}]
+\item[\Command{PhiMiSciSettings}\MArg{key\textsubscript{1} = value\textsubscript{1}, key\textsubscript{2} = value\textsubscript{2}, ...}]
 Accepts further meta data settings and their values. Possible settings are:
   \begin{description}[style=sameline]
       \item[\texttt{year}] The publication year (defaults to the current year at time of compilation)
-      \item[\texttt{volume}] The publication volume (no default)
-      \item[\texttt{doi}] DOI in the format \texttt{10.33735\slash phimisci.2000.12345} (no default)
-      \item[\texttt{issue}] Specifies the title of the special issues for papers that appear in one (empty by default)
-      \item[\texttt{editor}] Editor(s), separated by a semicolon, of the special issue. Ignored if \texttt{issue} is empty or not supplied (empty by default).
+      \item[\texttt{volume}] The publication volume. Defaults to the value of the \emph{current} year minus 2019. Has to be adjusted manually if \texttt{year} is given.
+      \item[\texttt{doi}] DOI in full format, without default (e.g., \texttt{10.33735\slash phimisci.2000.12345})
+      \item[\texttt{issue}] Title of a special issues (optional, default empty)
+      \item[\texttt{editor}] Editor(s), separated by a semicolon, of a special issue (empty by default). Ignored if \texttt{issue} is empty or not supplied.
+      \item[\texttt{discussed-book}] Title of the discussed book in symposia (optional, empty by default). Is ignored if \texttt{issue} is given.
+      \item[\texttt{discussed-book-authors}] The authors of the book in a symposium, separated by semicola. Ignored if \texttt{discussed-book} not given.
       \item[\texttt{language}] A comma-separated list of language(s) used in the paper. The last item is the main language. Defaults to \texttt{english}.
       \item[\texttt{stage}] The current production step. Can be either of \texttt{preparation} (the default), \texttt{submission}, \texttt{draft} or \texttt{final}.
-      \item[\texttt{type}] The publication type. Can be either of \texttt{paper} (default), \texttt{book-review}, \texttt{book-symposium}, \texttt{correction}, \texttt{introduction}. Can be empty or a custom string.
   \end{description}
 \end{description}
 \addsec{Elements configured in the preamble}
-\textit{Note:} The following commands must be placed in the preamble, before \Command{begin}\MArg{document}. These commands will respect paragraph breaks if their content contains them.
+\textit{Note:} The following commands must be placed in the preamble, before \Command{begin}\MArg{document}. 
 \begin{description}[style=nextline]
     \item[\Command{abstract}\MArg{\Meta{text}}] Print \Meta{text} as the paper's abstract.
     \item[\Command{acknowledgments}\MArg{\Meta{thanks}}] Print \Meta{thanks} in a separate section, at the end of the paper (optional; not printed if not supplied or left empty).
@@ -125,7 +131,7 @@ Accepts further meta data settings and their values. Possible settings are:
 
 \addsec{Elements configured in the document}
 \begin{description}[style=nextline]
-    \item[\Command{PhiMiSciParagraphNumber}\MArg{\Meta{n}}] Print \Meta{n} as the paragraph number in the right margin.
+    \item[\Command{PhiMiSciParagraphNumber}\MArg{\Meta{n}}] Print \Meta{n} as the paragraph number in the outer margin.
     \item[\Command{dictum}\OArg{\Meta{source}}\MArg{\Meta{epigraph}}] An epigraph. The \Meta{source} is printed below the \Meta{epigraph}. Can be used multiple times in one paper.
 \end{description}
 
@@ -142,62 +148,55 @@ Accepts further meta data settings and their values. Possible settings are:
      \bottomrule
      \end{tabular}
 
-\addsec{Complete list of settings}
+\addsec{General settings}
 These settings are accessible in the \texttt{settings} folder via {\Command{PhiMiSciSettings}\MArg{settings/\Meta{key\textsubscript{1}} = \Meta{value\textsubscript{1}}, ...}}. Values following equation signs are the initial values.
 
 \begin{description}[style=nextline,font=\ttfamily]
     \item[author-output-separator = \{, \}] Separator between two authors on the title page.  
     \item[author-output-final-separator = \{\textbackslash\& \}] Separator between final two authors on the title page.
     \item[affiliations-input-separator = \{;\}] Separator between affiliations within \Command{affiliation}.
-    \item[affiliations-output-separator = \{ \}]
-    Output separator between affiliations
-    \item[affiliations-output-separator-single-author = \{, \}]
-    Output separator between affiliations if there is only one author (no indexes printed)
-    \item[affiliations-output-separator-single-author\-last-two = \{\textbackslash\& \}]
-    Output separator between final two affiliations if there is only one author (no indexes printed)
-    \item[affiliations-output-id-name-separator = \{\}]
-    Separator between superscripted index and affiliation name in the output
-    \item[affiliations-output-multiple-separator = \{,\}] Separator between multiple affiliation indexes (next to author name)
-    \item[copyright-text = \Meta{CC Tet}]
+    \item[citation-file = phimisci-current-article.bib] 
+    Name for the automatically generated \texttt{.bib} file that contains the data of the present article.
+    \item[copyright-text = \Meta{license text}]
     Copyright information text
-    \item[emergency-stretch = 0.5em] Maximally allowed inter word spacing, to be used only when no ideal paragraph composition can be found by \TeX (A length is expected).
+    \item[emergency-stretch = 2em] Maximally allowed inter word spacing, to be used only when no ideal paragraph composition can be found.
     \item[extra-sentence-spacing = false] Whether or not to print extra spacing after sentence punctuation (can be either \texttt{true} or \texttt{false}).
     \item[dictum-width = 0.62\Command{textwidth}] The width of dictums entered by \Command{dictum} (a length is expected).
     \item[footnote-break-penalty = 1000] The penalty for breaking footnotes across pages (an integer is expected, max. value \texttt{10000}.)
     \item[logo-url = \{\}] File path to the journal's logo. The path can be relative to the current working directory.
-    \item[logo-width = 2.5cm] The width at which the journal's logo is printed. The height is determined automatically from this width.
+    \item[logo-width = 20.6mm] The width at which the journal's logo is printed. The height is determined automatically from this width.
     \item[submission-footer-text = \Meta{Submission text}] A text printed in the footer if \texttt{stage} is set to \texttt{submission}.
     \item[keyword-input-separator = ;] The separator between items in \Command{keywords}
-    \item[keyword-output-separator = \{ \Command{textperiodcentered\{\}}\}] The output separator between keywords
-    \item[number-authors-header = 2] Maximum numbers of authors to be printed in the running head before substitution by \emph{et al.} is activated
-    \item[orcid-color = 000000] The colour of the ORCiD icon next to authors. An HTML colour code is expected.
+    \item[keyword-output-separator = \{%
+      \Command{nobreak}\Command{space}
+      \Command{textsf\MArg{\Command{textbullet}}}
+      \Command{space}%
+    \}] The output separator between keywords
+    \item[number-authors-header = 2] Maximum numbers of authors to be printed in the running head before substitution by \emph{et al.} is activated (see also \texttt{locale/et-al})
+    \item[orcid-color = A6CE39] The colour of the ORCiD icon next to authors. An HTML colour code is expected.
     \item[orphan-penalty = 300] A penalty for orphans. An integer (max \texttt{10000}) is expected, but note that \texttt{phimisci} uses \texttt{sloppy-bottom} to avoid orphans. Only change this if you know how to fight dragons, and please set \verb+sloppy-bottom=false+ before you continue.
     \item[output-orcids = true] Whether to print ORCiDs (a Boolean is expected)
-    \item[output-bibliography = true] Whether or not to print the bibliography automatically at the end of the document (a Boolean is expected). 
+    \item[output-bibliography = true] Whether or not to print the bibliography automatically at the end of the document. Disable for manual use of \Command{printbibliography}. 
     \item[sloppy-bottom = true] An advanced mechanic to avoid widows and orphans (originally due to Donald Arseneau).
     \item[widow-penalty = 500] A penalty against widows. Please read the note regarding \texttt{orphan-penalty}.
 \end{description}
 
-\addsec{List of fonts}
+\addsec{Localisation}
 
-These fonts can be set using \Command{setkomafont}\MArg{\Meta{font}}.
+The following names for objects can be configured via  \Command{PhiMiSciSettings}\MArg{locale/\Meta{key\textsubscript{1}} = \Meta{value\textsubscript{1}}, ...}.
 
 \begin{description}[font=\ttfamily]
-    \item[title] Title on the first page
-    \item[author] Author(s) on the title page.
-    \item[subject] Type of publication (paper, correction, etc.)
-    \item[PhiMiSciAffiliationLine] Affiliations below the author(s)
-    \item[PhiMiSciMetadataItem] The meta data elements in the list on the title page (e.g., abstract, rights \& permissions, etc.)
-    \item[pageheadfoot] Header and footer contents on all but the first page.
-    \item[dictum] Epigraphs (whereever the command \Command{dictum} is used).
-    \item[dictumauthor] The author below epigraphs (as input in \Command{dictum}\OArg{\Meta{author}}\Meta{epigraph})
-    \item[descriptionlabel] The label in \texttt{description} environments, i.e., the font for the \Meta{label} in \Command{item}\MArg{\Meta{label}}.
-    \item[notecolumn.marginpar] The paragraph numbers in the margin.
-    \item[section, subsection, subsubsection] The respective section heading
-    
-    
+    \item[abstract] The name of the \emph{Abstract} section on the title page
+    \item[acknowledgments] The name of the \emph{Acknowledgments} at the back of the paper (Note Acknowledg\textbf{\emph{e}}ments in BrE).
+    \item[contact] Descriptor for contact on title page
+    \item[et-al] String appended to first author if number of authors exceeds \texttt{settings/number-authors-header}  (used in the header)
+    \item[edited-by] String between SI title and editors on title page 
+    \item[authored-by] String between BS title and book author on title page
+    \item[journal-name] The name of the journal, used in various places
+    \item[journal-short-name] Short name of the journal
+    \item[keywords] Descriptor for the \emph{Keywords} on the title page
+    \item[volume] Abbreviation for volume on title page header.
+    \item[special-issue] Descriptor for SI on title page
+    \item[book-symposium] Descriptor for BS on title page
 \end{description}
-
-
-
 \end{document}
