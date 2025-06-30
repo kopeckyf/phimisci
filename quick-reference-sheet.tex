@@ -107,6 +107,9 @@ The optional \OArg{\Meta{Short name}} argument overwrites the author name(s) pri
 \item[\Command{subtitle}\MArg{\Meta{subtitle}}] The subtitle, for papers that have one.
 
 \item[\Command{keywords}\MArg{\Meta{List of keywords}}] Keywords in the list should be separated by a semicolon. 
+
+\item[\Command{contact}\OArg{\Meta{mode}}\MArg{\Meta{contact name}}\MArg{\Meta{contact details}}] Supply contact details for the primary contact. The \Meta{contact name} should match one of the authors \emph{exactly}. \Meta{contact details} are interpreted as an e-mail address as default. When \OArg{\Meta{mode}} is set to \texttt{website}, they are interpreted as a website instead. When \OArg{\Meta{mode}} is set to any other value, \Meta{contact details} are ouput verbatim.
+
 \item[\Command{PhiMiSciSettings}\MArg{key\textsubscript{1} = value\textsubscript{1}, key\textsubscript{2} = value\textsubscript{2}, ...}]
 Accepts further meta data settings and their values. Possible settings are:
   \begin{description}[style=sameline]
@@ -126,9 +129,10 @@ Accepts further meta data settings and their values. Possible settings are:
 \begin{description}[style=nextline]
     \item[\Command{abstract}\MArg{\Meta{text}}] Print \Meta{text} as the paper's abstract.
     \item[\Command{acknowledgments}\MArg{\Meta{thanks}}] Print \Meta{thanks} in a separate section, at the end of the paper (optional; not printed if not supplied or left empty).
+    \item[\Command{dedication}\MArg{\Meta{text}}] Print \Meta{text} as the dedication on the title page (different from \Command{dictum}).
 \end{description}
 
-
+\pagebreak
 \addsec{Elements configured in the document}
 \begin{description}[style=nextline]
     \item[\Command{PhiMiSciParagraphNumber}\MArg{\Meta{n}}] Print \Meta{n} as the paragraph number in the outer margin.
