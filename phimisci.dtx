@@ -969,6 +969,15 @@ http://www.latex-project.org/lppl.txt
                         {,~}
                         {,~\&~}
                   }
+                \seq_if_empty:NF \l_phimisci_issue_editor_seq
+                  {
+                    \tl_use:N \l__phimisci_locale_edited_by_tl
+                    \seq_use:Nnnn 
+                      \l_phimisci_issue_editor_seq
+                        {~\&~}
+                        {,~}
+                        {,~\&~}
+                  }                  
                  \group_end:
                  \par
               }
