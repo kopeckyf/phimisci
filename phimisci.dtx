@@ -1794,16 +1794,12 @@ http://www.latex-project.org/lppl.txt
 % \env{description} and \env{enumerate} to suppress indentation in the 
 % following paragraphs.
 %    \begin{macrocode}
-\AfterEndEnvironment{quote}
-                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterheading}
-\AfterEndEnvironment{quotation}
-                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterheading}
-\AfterEndEnvironment{itemize}
-                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterheading}
-\AfterEndEnvironment{description}
-                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterheading}
-\AfterEndEnvironment{enumerate}
-                    {\par\aftergroup\@afterindentfalse\aftergroup\@afterheading}
+\AfterEndEnvironment{quote}{\par\@afterindentfalse\@afterheading}
+\AfterEndEnvironment{quotation}{\par\@afterindentfalse\@afterheading}
+\AfterEndEnvironment{verse}{\par\@afterindentfalse\@afterheading}
+\AfterEndEnvironment{itemize}{\par\@afterindentfalse\@afterheading}
+\AfterEndEnvironment{enumerate}{\par\@afterindentfalse\@afterheading}
+\AfterEndEnvironment{description}{\par\@afterindentfalse\@afterheading}
 %    \end{macrocode}
 %
 % \subsection{Bibliography layout}
@@ -1898,7 +1894,7 @@ http://www.latex-project.org/lppl.txt
     \vspace*{3\baselineskip}
     \enlargethispage{-4\baselineskip}
     \PhiMiSci@OutputMetadata{}
-    \@afterindentfalse\@afterheading
+    \aftergroup\@afterindentfalse\aftergroup\@afterheading
   }
 \ExplSyntaxOff
 %    \end{macrocode}
