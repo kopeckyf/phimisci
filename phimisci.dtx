@@ -220,7 +220,7 @@ http://www.latex-project.org/lppl.txt
 % \texttt{scrlayer-scrpage} for better controls of headers and 
 % \texttt{scrlayer-notecolumn} for the paragraph counting feature.
 %    \begin{macrocode}
-\LoadClass [fontsize=11pt, oneside] {scrartcl}
+\LoadClass [fontsize=10.5bp, oneside] {scrartcl}
 \RequirePackage[autoenlargeheadfoot=off]{scrlayer-scrpage}
 \RequirePackage{scrlayer-notecolumn}
 %    \end{macrocode}
@@ -346,9 +346,11 @@ http://www.latex-project.org/lppl.txt
   [ItalicFont = NotoSans-MediumItalic.ttf]
 %    \end{macrocode}
 %
-% The main text is set in 10.5pt with 13.5pt line spacing.
+% The main text is set in 10.5pt with 13.5pt line spacing. \emph{Note:} We 
+% are using big points (\texttt{bp}) as our design was layed out with 
+% PostScript points.
 %    \begin{macrocode}
-\AtBeginDocument{\fontsize{10.5}{13.5pt}\selectfont}
+\AtBeginDocument{\fontsize{10.5bp}{13.5bp}\selectfont}
 %    \end{macrocode}
 % 
 % We adjust the font settings inherited from \texttt{scrartcl} and create new
@@ -363,7 +365,7 @@ http://www.latex-project.org/lppl.txt
     \PhiMiSciTitleFont%
     \bfseries%
     \color{PhiMiSciHeadingBlue}%
-    \fontsize{23pt}{28pt}\selectfont%
+    \fontsize{23bp}{28bp}\selectfont%
   }
 \setkomafont{subtitle}
   {%
@@ -371,12 +373,12 @@ http://www.latex-project.org/lppl.txt
     \PhiMiSciTitleFont%
     \bfseries%
     \color{PhiMiSciHeadingBlue}%
-    \fontsize{17.25pt}{22pt}\selectfont%
+    \fontsize{17.25bp}{22bp}\selectfont%
   }
 \setkomafont{subject}
   {%
     \PhiMiSciMediumFont%
-    \fontsize{9.8pt}{13.72pt}\selectfont%
+    \fontsize{9.8bp}{13.72bp}\selectfont%
     \color{PhiMiSciHeadingBlue}%
   }
 \setkomafont{author}
@@ -384,13 +386,13 @@ http://www.latex-project.org/lppl.txt
     \raggedright%
     \PhiMiSciTitleFont%
     \color{PhiMiSciHeadingBlue}%
-    \fontsize{12pt}{17pt}\selectfont%
+    \fontsize{12bp}{17bp}\selectfont%
     \bfseries%
   }
 \newkomafont{PhiMiSciAffiliationItem}
   {%
     \sffamily\bfseries%
-    \fontsize{10pt}{13.5pt}\selectfont%
+    \fontsize{10bp}{13.5bp}\selectfont%
     \color{PhiMiSciHeadingBlue}%
   }
 \newkomafont{PhiMiSciAffiliationLine}
@@ -400,7 +402,7 @@ http://www.latex-project.org/lppl.txt
 \newkomafont{PhiMiSciDedication}
   {%
     \normalfont\normalsize%
-    \fontsize{10pt}{13.72pt}\selectfont%
+    \fontsize{10bp}{13.72bp}\selectfont%
     \itshape\bfseries%
     \color{PhiMiSciHeadingBlue}%
   }
@@ -413,12 +415,12 @@ http://www.latex-project.org/lppl.txt
   }
 \newkomafont{PhiMiSciKeywords}
   {%
-    \normalfont\fontsize{10pt}{13.5pt}\selectfont%
+    \normalfont\fontsize{10bp}{13.5bp}\selectfont%
     \color{PhiMiSciHeadingBlue}%
   }
 \newkomafont{PhiMiSciTableBody}
   {%
-    \sffamily\fontsize{9pt}{13.5pt}\selectfont%
+    \sffamily\fontsize{9bp}{13.5bp}\selectfont%
   }
 %    \end{macrocode}
 % These next settings configure the font in the page header. Note that the 
@@ -444,25 +446,25 @@ http://www.latex-project.org/lppl.txt
   }
 \addtokomafont{section}
   {%
-    \fontsize{15.25pt}{18.5pt}%
+    \fontsize{15.25bp}{18.5bp}%
     \selectfont%
   }
 \addtokomafont{subsection}
   {%
     \color{PhiMiSciBlueThree}%
-    \fontsize{13.25pt}{17pt}%
+    \fontsize{13.25bp}{17bp}%
     \selectfont%
   }
 \addtokomafont{subsubsection}
   {%
     \color{PhiMiSciBlueThree}%
-    \fontsize{12pt}{17pt}%
+    \fontsize{12bp}{17bp}%
     \selectfont%
   }
 \addtokomafont{paragraph}
   {%
     \color{PhiMiSciBlueThree}%
-    \fontsize{10pt}{13.5pt}%
+    \fontsize{10bp}{13.5bp}%
     \selectfont%
   }
 %    \end{macrocode}
@@ -477,11 +479,11 @@ http://www.latex-project.org/lppl.txt
 \setkomafont{dictum}{\normalfont\normalsize\itshape}
 \setkomafont{dictumauthor}{\normalfont\normalsize}
 \setkomafont{descriptionlabel}{\normalfont\bfseries}
-\addtokomafont{footnote}{\fontsize{9.25pt}{11.5pt}\selectfont}
+\addtokomafont{footnote}{\fontsize{9.25bp}{11.5bp}\selectfont}
 \setkomafont{footnotelabel}{\sffamily\bfseries\color{PhiMiSciBlueTwo}}
 \addtokomafont{footnotereference}{\sffamily\small\bfseries\color{PhiMiSciBlueTwo}}
 \setkomafont{notecolumn.marginpar}{\normalfont\color{black!50}}
-\newkomafont{PhiMiSciQuote}{\normalfont\fontsize{10pt}{13.5pt}\selectfont}
+\newkomafont{PhiMiSciQuote}{\normalfont\fontsize{10bp}{13.5bp}\selectfont}
 %    \end{macrocode}
 %
 % \subsection{Bibliography management through \texttt{biblatex}}
@@ -751,9 +753,9 @@ http://www.latex-project.org/lppl.txt
       \l__phimisci_settings_footnote_penalty_int,
     footnote-break-penalty .initial:n = { 1000 },
     footnote-distance-from-main .code:n = { \setlength{\skip\footins}{#1} },
-    footnote-distance-from-main .initial:n = { 13pt plus 4pt minus 2pt },
+    footnote-distance-from-main .initial:n = { 13.5bp plus 4pt minus 2pt },
     head-rule-thickness .dim_set:N = \l__phimisci_head_rule_height_dim,
-    head-rule-thickness .initial:n = { 0.25pt },
+    head-rule-thickness .initial:n = { 0.25bp },
     logo-url .tl_set:N = \l__phimisci_branding_logo_tl,
     logo-url .initial:n = {branding/phimisci-logo-mini.pdf},
     logo-width .dim_set:N = \l__phimisci_logo_width_dim,
@@ -1140,7 +1142,8 @@ http://www.latex-project.org/lppl.txt
 % We now store all the data in three separate property lists. In the first we 
 % assign authors to (lists of) affiliations. Seconly, we map authors to their 
 % ORCIDs in a separate property list. And third, we store the e-mail address
-% in another property map. The currently processed affiliation is given by |####1|.
+% in another property map. The currently processed affiliation is given by 
+% |####1|.
 %    \begin{macrocode}
       \prop_put:Nxx { #2 }
                     { \int_use:N \l__phimisci_current_author_id_int }
@@ -1654,7 +1657,7 @@ http://www.latex-project.org/lppl.txt
 % Our layout uses a slightly larger spacing before section headings.
 %    \begin{macrocode}
 \RedeclareSectionCommand[%
-    beforeskip=-22pt plus -1ex minus -.2ex]{section}
+    beforeskip=-22bp plus -1ex minus -.2ex]{section}
 \RedeclareSectionCommand[%
     beforeskip=-7.5mm plus -1ex minus -.2ex]{subsection}
 \RedeclareSectionCommand[%
@@ -1766,8 +1769,8 @@ http://www.latex-project.org/lppl.txt
 % \texttt{booktabs}. The width of \cs{midrule} is given as 5/8 of the other
 % rules
 %    \begin{macrocode}
-\dim_set:Nn \heavyrulewidth { 0.25pt }
-\dim_set:Nn \lightrulewidth { 0.15625pt }
+\dim_set:Nn \heavyrulewidth { 0.25bp }
+\dim_set:Nn \lightrulewidth { 0.15625bp }
 \ExplSyntaxOff
 %    \end{macrocode}
 % \end{variable}
@@ -1856,11 +1859,11 @@ http://www.latex-project.org/lppl.txt
              \normalfont\normalsize
              \color{PhiMiSciHeadingBlue}
                {
-                 \bfseries\fontsize{20pt}{24pt}\selectfont
+                 \bfseries\fontsize{20bp}{24bp}\selectfont
                  \tl_use:N \l__phimisci_journal_short_name_tl \par
                }
                {
-                 \fontsize{11.2pt}{16.8pt}\selectfont 
+                 \fontsize{11.2bp}{16.8bp}\selectfont 
                  \tl_use:N \l__phimisci_journal_name_tl
                  \space |\space
                  \tl_use:N \l__phimisci_locale_volume_tl 
