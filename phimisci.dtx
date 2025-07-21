@@ -470,18 +470,19 @@ http://www.latex-project.org/lppl.txt
 %    \end{macrocode}
 % The remaining font options configure elements in the text.
 %    \begin{macrocode}
-\setkomafont{caption}{\usekomafont{footnote}\bfseries}
-\setkomafont{captionlabel}
-  {%
-    \usekomafont{footnote}\sffamily\scriptsize\bfseries%
-    \color{PhiMiSciHeadingBlue}%
-  }
 \setkomafont{dictum}{\normalfont\normalsize\itshape}
 \setkomafont{dictumauthor}{\normalfont\normalsize}
 \setkomafont{descriptionlabel}{\normalfont\bfseries}
 \addtokomafont{footnote}{\fontsize{9.25bp}{11.5bp}\selectfont}
 \setkomafont{footnotelabel}{\sffamily\bfseries\color{PhiMiSciBlueTwo}}
 \addtokomafont{footnotereference}{\sffamily\small\bfseries\color{PhiMiSciBlueTwo}}
+\setkomafont{caption}{\usekomafont{footnote}\bfseries}
+\setkomafont{captionlabel}
+  {%
+    \sffamily\bfseries%
+    \fontsize{8bp}{10bp}\selectfont%
+    \color{PhiMiSciHeadingBlue}%
+  }
 \setkomafont{notecolumn.marginpar}{\normalfont\color{black!50}}
 \newkomafont{PhiMiSciQuote}{\normalfont\fontsize{10bp}{13.5bp}\selectfont}
 %    \end{macrocode}
@@ -1657,11 +1658,11 @@ http://www.latex-project.org/lppl.txt
 % Our layout uses a slightly larger spacing before section headings.
 %    \begin{macrocode}
 \RedeclareSectionCommand[%
-    beforeskip=-22bp plus -1ex minus -.2ex]{section}
+    beforeskip=-22bp, afterskip=8.5bp]{section}
 \RedeclareSectionCommand[%
-    beforeskip=-7.5mm plus -1ex minus -.2ex]{subsection}
+    beforeskip=-13.5bp, afterskip=10bp]{subsection}
 \RedeclareSectionCommand[%
-    beforeskip=-7.144mm plus -1ex minus -.2ex]{subsubsection}    
+    beforeskip=-13.5bp, afterskip=10bp]{subsubsection}    
 %    \end{macrocode}
 % \end{function}
 % 
@@ -1670,8 +1671,8 @@ http://www.latex-project.org/lppl.txt
 % The following settings follow an example from the KOMA manual.
 %    \begin{macrocode}
 \RedeclareSectionCommand[%
-    afterskip=1.5ex plus .2ex,%
-    beforeskip=-4.762mm plus -1ex minus -.2ex,%
+    afterskip=6.75bp,%
+    beforeskip=-6.75bp,%
     indent=0pt,%
     counterwithin=subsubsection,%
     level=4%
