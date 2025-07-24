@@ -79,6 +79,16 @@ http://www.latex-project.org/lppl.txt
     note = {Version 2023-06-16},
     url = {https://texdoc.org/serve/scrartcl/0}
 }
+@article{Chernoff2022,
+    author = {Max Chernoff},
+    year = {2022},
+    doi = {10.47397/tb/43-1/tb133chernoff-widows},
+    title = {Automatically removing widows and orphans with lua-widow-control},
+    journal = {TUGboat},
+    volume = {43}, 
+    number = {1},
+    pages = {28-39}
+}
 \end{filecontents}
 \addbibresource{\jobname.bib}
 \begin{document}
@@ -188,8 +198,7 @@ http://www.latex-project.org/lppl.txt
 \msg_new:nnn { phimisci } { wrong-tex-engine } 
              { 
                You~are~using~the~\str_use:N \c_sys_engine_str~engine,~but~
-               either~lualatex~or~xelatex~are~required~to~compile~phimisci~
-               documents.
+               your~document~can~only~be~compiled~with~the~#1~engine(s).
              }
 %    \end{macrocode}
 % \end{variable}
@@ -210,7 +219,8 @@ http://www.latex-project.org/lppl.txt
   {
     \sys_if_engine_luatex:F
       {
-        \msg_fatal:nn { phimisci } { wrong-tex-engine }
+        \msg_fatal:nnn { phimisci } { wrong-tex-engine }
+                       { lualatex~or~xelatex }
       }
   }
 %    \end{macrocode}
@@ -264,6 +274,8 @@ http://www.latex-project.org/lppl.txt
 \bool_new:N \l__phimisci_output_acknowledgments_bool
 \bool_new:N \l__phimisci_output_bibliography_bool
 \bool_new:N \l__phimisci_koma_head_mode_bool
+\bool_new:N \l__phimisci_settings_sloppybottom_bool
+\bool_new:N \l__phimisci_settings_luawidow_bool
 \cs_new:Nn \__phimisci_affiliation_line_separator: { \thickspace }
 \cs_new:Nn \__phimisci_affiliation_name_separator: { \thinspace }
 \cs_generate_variant:Nn \seq_set_split:Nnn { NVn }
@@ -791,8 +803,11 @@ http://www.latex-project.org/lppl.txt
     paragraph-numbering-excluded-objects .tl_set:N = 
       \l__phimisci_parnum_excluded_objects_tl,
     paragraph-numbering-excluded-objects .initial:n = {},
-    sloppy-bottom .bool_set:N = \l__phimisci_settings_sloppybottom_bool,
-    sloppy-bottom .initial:n = {false},
+    widow-control .choice:,
+    widow-control / arseneau .code:n = 
+      { \bool_set_true:N \l__phimisci_settings_sloppybottom_bool }, 
+    widow-control / chernoff .code:n = 
+      { \bool_set_true:N \l__phimisci_settings_luawidow_bool }, 
     widow-penalty .int_set:N = \l__phimisci_settings_widow_penalty_int,
     widow-penalty .initial:n = { 500 },
   }
@@ -1658,11 +1673,14 @@ http://www.latex-project.org/lppl.txt
 % Our layout uses a slightly larger spacing before section headings.
 %    \begin{macrocode}
 \RedeclareSectionCommand[%
-    beforeskip=-22bp, afterskip=8.5bp]{section}
+    afterindent=false, beforeskip=22bp plus 22bp, afterskip=8.5bp%
+    ]{section}
 \RedeclareSectionCommand[%
-    beforeskip=-13.5bp, afterskip=10bp]{subsection}
+    afterindent=false, beforeskip=13.5bp plus 13.5bp, afterskip=10bp%
+    ]{subsection}
 \RedeclareSectionCommand[%
-    beforeskip=-13.5bp, afterskip=10bp]{subsubsection}    
+    afterindent=false, beforeskip=13.5bp plus 13.5bp, afterskip=10bp%
+    ]{subsubsection}    
 %    \end{macrocode}
 % \end{function}
 % 
@@ -1671,11 +1689,8 @@ http://www.latex-project.org/lppl.txt
 % The following settings follow an example from the KOMA manual.
 %    \begin{macrocode}
 \RedeclareSectionCommand[%
-    afterskip=6.75bp,%
-    beforeskip=-6.75bp,%
-    indent=0pt,%
-    counterwithin=subsubsection,%
-    level=4%
+    afterindent=false, afterskip=6.75bp, beforeskip=6.75bp plus 6.75bp,%
+    indent=0pt, counterwithin=subsubsection, level=4%
     ]{paragraph}
 %    \end{macrocode}
 % \end{function}
@@ -1713,8 +1728,10 @@ http://www.latex-project.org/lppl.txt
 \clubpenalty = \int_use:N \l__phimisci_settings_orphan_penalty_int
 \widowpenalty = \int_use:N \l__phimisci_settings_widow_penalty_int
 %    \end{macrocode}
-% To automatically treat widows and orphans, we use the following code from the
-% \texttt{memoir} class, originally due to Donald Arseneau.
+% The class has two ways to automatically treat widows and orphans. The first
+% is originally due to Donald Arseneau and selected via the 
+% \texttt{settings/widow-control/arseneau} option. The code here follows
+% the implementation in the \texttt{memoir} class.
 %     \begin{macrocode}
 \bool_if:NT \l__phimisci_settings_sloppybottom_bool
   {
@@ -1723,6 +1740,30 @@ http://www.latex-project.org/lppl.txt
     \def\@texttop{\vskip \z@ \@plus -0.625\topskip \@minus -0.95\topskip}
   }
 %    \end{macrocode}
+%
+% The second automatic processing for widows and orphans is provided through
+% Max Chernoff's \texttt{lua-widow-control} package \cite{Chernoff2022}. It 
+% adjusts interword spacing to reduce and remove orphans, widows and broken 
+% hyphenation. It requires \LuaLaTeX{} but ensures flush page bottoms.
+% It can be enabled via the \texttt{settings/widow-control/chernoff} option.
+%    \begin{macrocode}
+\bool_if:NT \l__phimisci_settings_luawidow_bool
+  {
+    \sys_if_engine_luatex:TF
+      {
+        \RequirePackage{lua-widow-control}
+        \lwcsetup
+          {
+            emergencystretch=\int_use:N 
+                             \l__phimisci_settings_emergencystretch_dim
+          }
+      }
+      {
+        \msg_fatal:nnn { phimisci } { wrong-tex-engine } { lualatex }
+      }
+  }
+%    \end{macrocode}
+%
 % Footnotes should break across pages only if everything else fails. Set a high
 % penalty to accomplish this. Sometimes, breaking a footnote is more desirable
 % than having a sub-optimal break in the main text.
