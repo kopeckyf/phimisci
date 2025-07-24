@@ -17,7 +17,8 @@
   \renewcommand{\droptitle}{-20pt}
   \renewcommand{\maketitlehooka}{\bfseries}
 
-% Fonts
+% Fonts and symbols
+\usepackage{metalogo}
 \usepackage{tgheros}
 \usepackage[zerostyle=d]{newtxtt}
 \usepackage{pifont}
@@ -181,7 +182,7 @@ These settings are accessible in the \texttt{settings} folder via {\Command{PhiM
     \item[orphan-penalty = 300] A penalty for orphans. An integer (max \texttt{10000}) is expected, but note that \texttt{phimisci} may use \texttt{sloppy-bottom} to avoid orphans.
     \item[output-orcids = true] Whether to print ORCiDs (a Boolean is expected)
     \item[output-bibliography = true] Whether or not to print the bibliography automatically at the end of the document. Disable for manual use of \Command{printbibliography}. 
-    \item[sloppy-bottom = false] An advanced, optional mechanic to avoid widows and orphans (originally due to Donald Arseneau).
+    \item[widow-control = \Meta{arseneau \textup{or} chernoff}] Activate one of \texttt{arseneau} or \texttt{chernoff}, two mechanisms for automatic widow and orphan treatment. Setting \texttt{widow-control=chernoff} is recommended, but requires \LuaLaTeX{}.
     \item[widow-penalty = 500] A penalty against widows. Please read the note regarding \texttt{orphan-penalty}.
 \end{description}
 
