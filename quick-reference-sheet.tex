@@ -56,7 +56,11 @@
   }
 \author{A. U. Thor
         \affiliation{Great Institution}
-        \and E. di Tor\affiliation{}}
+        \orcid{0000-1111-2222-3333}
+        \and E. di Tor
+        \affiliation{Affiliation 1; 
+            Affiliation 2}
+        }
 \title[Short title for running head]
       {My long and eloquent title}
 \keywords{philosophy;mind;thinking}
@@ -118,7 +122,7 @@ Accepts further meta data settings and their values. Possible settings are:
       \item[\texttt{volume}] The publication volume. Defaults to the value of the \emph{current} year minus 2019. Has to be adjusted manually if \texttt{year} is given.
       \item[\texttt{doi}] DOI in full format, without default (e.g., \texttt{10.33735\slash phimisci.2000.12345})
       \item[\texttt{issue}] Title of a special issues (optional, default empty)
-      \item[\texttt{editor}] Editor(s), separated by a semicolon, of a special issue (empty by default). Ignored if \texttt{issue} is empty or not supplied.
+      \item[\texttt{editor}] Editor(s), separated by a semicolon, of a special issue (empty by default). 
       \item[\texttt{discussed-book}] Title of the discussed book in symposia (optional, empty by default). Is ignored if \texttt{issue} is given.
       \item[\texttt{discussed-book-authors}] The authors of the book in a symposium, separated by semicola. Ignored if \texttt{discussed-book} not given.
       \item[\texttt{language}] A comma-separated list of language(s) used in the paper. The last item is the main language. Defaults to \texttt{english}.
@@ -129,8 +133,7 @@ Accepts further meta data settings and their values. Possible settings are:
 \textit{Note:} The following commands must be placed in the preamble, before \Command{begin}\MArg{document}. 
 \begin{description}[style=nextline]
     \item[\Command{abstract}\MArg{\Meta{text}}] Print \Meta{text} as the paper's abstract.
-    \item[\Command{acknowledgments}\MArg{\Meta{thanks}}] Print \Meta{thanks} in a separate section, at the end of the paper (optional; not printed if not supplied or left empty).
-    \item[\Command{dedication}\MArg{\Meta{text}}] Print \Meta{text} as the dedication on the title page (different from \Command{dictum}).
+    \item[\Command{dedication}\MArg{\Meta{text}}] Print \Meta{text} as the dedication on the title page (different from \Command{dictum}, which can be placed anywhere in the document).
 \end{description}
 
 \pagebreak
@@ -192,16 +195,15 @@ The following names for objects can be configured via  \Command{PhiMiSciSettings
 
 \begin{description}[font=\ttfamily]
     \item[abstract] The name of the \emph{Abstract} section on the title page
-    \item[acknowledgments] The name of the \emph{Acknowledgments} at the back of the paper (Note Acknowledg\textbf{\emph{e}}ments in BrE).
-    \item[contact] Descriptor for contact on title page
-    \item[et-al] String appended to first author if number of authors exceeds \texttt{settings/number-authors-header}  (used in the header)
-    \item[edited-by] String between SI title and editors on title page 
     \item[authored-by] String between BS title and book author on title page
+    \item[book-symposium] Descriptor for BS on title page
+    \item[contact] Descriptor for contact on title page
+    \item[edited-by] String between SI title and editors on title page
+    \item[et-al] String appended to first author if number of authors exceeds \texttt{settings/number-authors-header}  (used in the header)
     \item[journal-name] The name of the journal, used in various places
     \item[journal-short-name] Short name of the journal
     \item[keywords] Descriptor for the \emph{Keywords} on the title page
-    \item[volume] Abbreviation for volume on title page header.
     \item[special-issue] Descriptor for SI on title page
-    \item[book-symposium] Descriptor for BS on title page
+    \item[volume] Abbreviation for volume on title page header
 \end{description}
 \end{document}
