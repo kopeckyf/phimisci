@@ -272,6 +272,7 @@ http://www.latex-project.org/lppl.txt
 \bool_new:N \l__phimisci_output_doi_bool
 \bool_new:N \l__phimisci_output_authors_bool
 \bool_new:N \l__phimisci_output_publication_header_footer_bool
+\bool_new:N \l__phimisci_output_draft_footer_bool
 \bool_new:N \l__phimisci_koma_head_mode_bool
 \bool_new:N \l__phimisci_settings_sloppybottom_bool
 \bool_new:N \l__phimisci_settings_luawidow_bool
@@ -581,6 +582,7 @@ http://www.latex-project.org/lppl.txt
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
     \bool_set_false:N \l__phimisci_output_publication_header_footer_bool
+    \bool_set_false:N \l__phimisci_output_draft_footer_bool
     \bool_set_true:N \l__phimisci_output_rights_bool
     \bool_set_false:N \l__phimisci_output_doi_bool
   }
@@ -596,6 +598,7 @@ http://www.latex-project.org/lppl.txt
     \bool_set_false:N \l__phimisci_output_authors_bool
     \bool_set_false:N \l__phimisci_output_contact_bool
     \bool_set_false:N \l__phimisci_output_publication_header_footer_bool
+    \bool_set_false:N \l__phimisci_output_draft_footer_bool
     \bool_set_false:N \l__phimisci_output_rights_bool
     \bool_set_false:N \l__phimisci_output_doi_bool
   }
@@ -607,9 +610,13 @@ http://www.latex-project.org/lppl.txt
 \cs_new:Nn \__phimisci_stage_draft:
   {
     \KOMAoptions{overfullrule=true}
+    \RequirePackage{scrtime}
+    \RequirePackage[pagewise, switch]{lineno}
+    \AtBeginDocument{\linenumbers}
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
     \bool_set_true:N \l__phimisci_output_publication_header_footer_bool
+    \bool_set_true:N \l__phimisci_output_draft_footer_bool
     \bool_set_true:N \l__phimisci_output_rights_bool
     \bool_set_true:N \l__phimisci_output_doi_bool
   }
@@ -624,6 +631,7 @@ http://www.latex-project.org/lppl.txt
     \bool_set_true:N \l__phimisci_output_authors_bool
     \bool_set_true:N \l__phimisci_output_contact_bool
     \bool_set_true:N \l__phimisci_output_publication_header_footer_bool
+    \bool_set_false:N \l__phimisci_output_draft_footer_bool
     \bool_set_true:N \l__phimisci_output_rights_bool
     \bool_set_true:N \l__phimisci_output_doi_bool
   }
@@ -760,6 +768,11 @@ http://www.latex-project.org/lppl.txt
     extra-sentence-spacing .initial:n = {false},
     dictum-width .code:n = { \renewcommand* { \dictumwidth } { #1 } },
     dictum-width .initial:n = { 0.62\textwidth },
+    draft-footer-text .tl_set:N = \l__phimisci_draft_footer_tl,
+    draft-footer-text .initial:n = 
+      {
+        \textit{Draft~generated~on~\today{}~at~\thistime{}.}
+      },
     footnote-break-penalty .int_set:N = 
       \l__phimisci_settings_footnote_penalty_int,
     footnote-break-penalty .initial:n = { 1000 },
@@ -2046,7 +2059,7 @@ http://www.latex-project.org/lppl.txt
   ]{scrheadings.head.below.line}
 %    \end{macrocode}
 %    \begin{macrocode}
-\cfoot[\PhiMiSci@Footer{}]{}
+\cfoot[\PhiMiSci@Footer*{}]{\PhiMiSci@Footer{}}
 \chead[]{\PhiMiSci@Header{}}
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@Footer, \PhiMiSci@Footer*}
@@ -2055,25 +2068,39 @@ http://www.latex-project.org/lppl.txt
 % pages.
 % \end{function}
 %    \begin{macrocode}
-\NewDocumentCommand {\PhiMiSci@Footer} { }
+\NewDocumentCommand {\PhiMiSci@Footer} { s }
   {%
-    \bool_if:NTF \l__phimisci_output_publication_header_footer_bool
+    \IfBooleanTF {#1}
       {
-        \begin{minipage} [b] {\columnwidth}
-            \usekomafont{PhiMiSciFooter}
-            \fullcite{phimisci-current-article}
-        \end{minipage}\hfill
-        \begin{minipage} [b] {\columnwidth}
-            \usekomafont{PhiMiSciFooter}
-            \bool_if:NT \l__phimisci_output_rights_bool
-              {
-                \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
-                \tl_use:N \l__phimisci_copyright_tl
-              }
-        \end{minipage}
+        \bool_if:NTF \l__phimisci_output_publication_header_footer_bool
+          {
+            \begin{minipage} [b] {\columnwidth}
+                \usekomafont{PhiMiSciFooter}
+                \fullcite{phimisci-current-article}
+            \end{minipage}\hfill
+            \begin{minipage} [b] {\columnwidth}
+                \usekomafont{PhiMiSciFooter}
+                \bool_if:NT \l__phimisci_output_rights_bool
+                  {
+                    \copyright{}~\tl_use:N \l__phimisci_copyright_holder_tl.~
+                    \tl_use:N \l__phimisci_copyright_tl
+                  }
+            \end{minipage}
+          }
+          {
+            \tl_use:N \l__phimisci_submission_footer_tl
+          }
       }
       {
-        \tl_use:N \l__phimisci_submission_footer_tl
+        \bool_if:NF \l__phimisci_output_publication_header_footer_bool
+          {
+            \tl_use:N \l__phimisci_submission_footer_tl
+          }
+        \bool_if:NT \l__phimisci_output_draft_footer_bool
+          {
+            \vskip 1cm
+            \tl_use:N \l__phimisci_draft_footer_tl
+          }
       }
   }
 %    \end{macrocode}
