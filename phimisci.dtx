@@ -137,6 +137,7 @@ http://www.latex-project.org/lppl.txt
 % \item \pkg{noto}
 % \item \pkg{l3keys2e}
 % \item \pkg{libertinus}
+% \item \pkg{lua-widow-control}
 % \item \pkg{microtype}
 % \item \pkg{orcidlink}
 % \item \pkg{xcolor}
@@ -271,8 +272,6 @@ http://www.latex-project.org/lppl.txt
 \bool_new:N \l__phimisci_output_doi_bool
 \bool_new:N \l__phimisci_output_authors_bool
 \bool_new:N \l__phimisci_output_publication_header_footer_bool
-\bool_new:N \l__phimisci_output_acknowledgments_bool
-\bool_new:N \l__phimisci_output_bibliography_bool
 \bool_new:N \l__phimisci_koma_head_mode_bool
 \bool_new:N \l__phimisci_settings_sloppybottom_bool
 \bool_new:N \l__phimisci_settings_luawidow_bool
@@ -303,7 +302,6 @@ http://www.latex-project.org/lppl.txt
 \tl_new:N \l__phimisci_authors_citation_footer_tl
 \tl_new:N \l__phimisci_custom_header_authors_tl
 \tl_new:N \l__phimisci_keywords_tl
-\tl_new:N \l__phimisci_acknowledgments_tl
 \tl_new:N \l__phimisci_dedication_tl
 \tl_new:N \l__phimisci_copyright_holder_tl
 \tl_new:N \l__phimisci_contact_tl
@@ -798,8 +796,6 @@ http://www.latex-project.org/lppl.txt
     orphan-penalty .initial:n = { 300 },
     output-orcids .bool_set:N = \l__phimisci_output_orcids_bool,
     output-orcids .initial:n = {true},
-    output-bibliography .bool_set:N = \l__phimisci_output_bibliography_bool,
-    output-bibliography .initial:n = {true},
     paragraph-numbering-excluded-objects .tl_set:N = 
       \l__phimisci_parnum_excluded_objects_tl,
     paragraph-numbering-excluded-objects .initial:n = {},
@@ -826,8 +822,6 @@ http://www.latex-project.org/lppl.txt
   {
     abstract .tl_set:N = \l__phimisci_locale_abstract_tl,
     abstract .initial:n = {Abstract},
-    acknowledgments .tl_set:N = \l__phimisci_locale_acknowledgments_tl,
-    acknowledgments .initial:n = {Acknowledgments},
     contact .tl_set:N = \l__phimisci_locale_contact_tl,
     contact .initial:n = {Primary~contact:~},
     et-al .tl_set:N = \l__phimisci_locale_et_al_tl,
@@ -1469,16 +1463,6 @@ http://www.latex-project.org/lppl.txt
       }
   }
 %    \end{macrocode}
-% \begin{function}{\acknowledgments}
-% A user-interface for the authors to provide acknowledments for their article.
-% \end{function}
-%    \begin{macrocode}
-\DeclareDocumentCommand {\acknowledgments} { +m }
-  {
-    \bool_set_true:N \l__phimisci_output_acknowledgments_bool
-    \tl_set:Nn \l__phimisci_acknowledgments_tl { #1 }
-  }
-%    \end{macrocode}
 %
 % \begin{function}{\dedication}
 % A user-interface for the authors to store the dedication for their article.
@@ -1624,7 +1608,8 @@ http://www.latex-project.org/lppl.txt
 %    \end{macrocode}
 % 
 % \subsection{Journal color definitions}
-% \begin{function}{PhiMiSciHeadingBlue, PhiMiSciBlueTwo, PhiMiSciGrey}
+% \begin{function}{PhiMiSciHeadingBlue, PhiMiSciBlueTwo, PhiMiSciBlueThree,
+%                  PhiMiSciGrey}
 % The custom colors used in the journal's layout are:
 % \begin{itemize}
 % \item[] \fcolorbox{black}{PhiMiSciHeadingBlue}{\strut\hspace*{2em}}
@@ -2309,27 +2294,8 @@ http://www.latex-project.org/lppl.txt
     \PhiMiSci@ParNumSwitchDisable{env/tabbing}
   }
 %    \end{macrocode}
-% \subsection{Material to be printed at the end of an article}
-%    \begin{macrocode}
-\NewDocumentCommand { \PhiMiSci@OutputEndofDocument } {}
-  {
-    \bool_if:NT \l__phimisci_output_acknowledgments_bool
-      {
-        \addsec{\tl_use:N \l__phimisci_locale_acknowledgments_tl}
-        \tl_use:N \l__phimisci_acknowledgments_tl
-      }
-    \bool_if:NT \l__phimisci_output_bibliography_bool
-      {
-        \printbibliography
-      }
-  }
-\AtEndDocument{ \PhiMiSci@OutputEndofDocument{} }
-%    \end{macrocode}
 %    \begin{macrocode}
 \ExplSyntaxOff
-%    \end{macrocode}
-%
-%    \begin{macrocode}
 %</class>
 %    \end{macrocode}
 % \section*{Acknowledgments}
