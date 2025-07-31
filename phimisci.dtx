@@ -1971,7 +1971,7 @@ http://www.latex-project.org/lppl.txt
 % The label should be snug with the \cs{parindent}, which we achieve using
 % the \texttt{enumitem} package.
 %    \begin{macrocode}
-\setlist
+\setlist[enumerate, itemize]
   { 
     labelindent=\parindent, 
     leftmargin=* 
@@ -2092,10 +2092,6 @@ http://www.latex-project.org/lppl.txt
           }
       }
       {
-        \bool_if:NF \l__phimisci_output_publication_header_footer_bool
-          {
-            \tl_use:N \l__phimisci_submission_footer_tl
-          }
         \bool_if:NT \l__phimisci_output_draft_footer_bool
           {
             \vskip 1cm
