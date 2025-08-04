@@ -129,26 +129,28 @@ http://www.latex-project.org/lppl.txt
 % \item \pkg{csquotes}
 % \item \pkg{enumitem}
 % \item \pkg{etoolbox}
-% \item \pkg{expl3}
+% \item \pkg{geometry}
+% \item \pkg{fontspec}
 % \item \pkg{graphicx}
 % \item \pkg{hyperref}
-% \item \pkg{iftex}
+% \item \pkg{hyphenat}
 % \item \pkg{koma-script}
-% \item \pkg{noto}
-% \item \pkg{l3keys2e}
+% \item \pkg{l3kernel}
+% \item \pkg{l3packages}
 % \item \pkg{libertinus}
+% \item \pkg{lineno}
 % \item \pkg{lua-widow-control}
 % \item \pkg{microtype}
+% \item \pkg{noto}
 % \item \pkg{orcidlink}
 % \item \pkg{xcolor}
 % \item \pkg{xparse}
-% \item []
 % \end{itemize}
 % \end{multicols}
 %
 % \noindent Documents in the \texttt{phimisci} class can be compiled with 
 % \LuaLaTeX{} and \XeLaTeX{}.
-%
+% \pagebreak
 % \subsection{Class identification}
 % Start by identifying the document class.
 %    \begin{macrocode}
@@ -342,9 +344,9 @@ http://www.latex-project.org/lppl.txt
       }
       {
         \let\PhiMiSciTitleFont\sffamily
-        \msg_error:nnnn { phimisci } { missing-font }
-                        { NotoSansDisplay-SemiBold.ttf }
-                        { Noto~Sans~Display~SemiBold }
+        \msg_warning:nnnn { phimisci } { missing-font }
+                          { NotoSansDisplay-SemiBold.ttf }
+                          { Noto~Sans~Display~SemiBold }
       }
   }
 \ExplSyntaxOff
@@ -750,13 +752,7 @@ http://www.latex-project.org/lppl.txt
     citation-file .tl_set:N = \l__phimisci_citation_file_name_tl,
     citation-file .initial:n = { phimisci-current-article.bib },
     copyright-text .tl_set:N = \l__phimisci_copyright_tl,
-    copyright-text .initial:n = 
-      {
-        \href{https://philosophymindscience.org}{philosophymindscience.org}.
-        \ ISSN:\ 2699-0369.\hfill
-        \href{https://creativecommons.org/licenses/by/4.0}
-        {\includegraphics[width=1.75cm]{ccby.pdf}}
-      },
+    copyright-text .initial:n = { },
     emergency-stretch .dim_set:N = \l__phimisci_settings_emergencystretch_dim,
     emergency-stretch .initial:n = { 2em },
     paragraph-indent .dim_set:N = \parindent,
@@ -781,7 +777,7 @@ http://www.latex-project.org/lppl.txt
     head-rule-thickness .dim_set:N = \l__phimisci_head_rule_height_dim,
     head-rule-thickness .initial:n = { 0.25bp },
     logo-url .tl_set:N = \l__phimisci_branding_logo_tl,
-    logo-url .initial:n = {branding/phimisci-logo-mini.pdf},
+    logo-url .initial:n = { },
     logo-width .dim_set:N = \l__phimisci_logo_width_dim,
     logo-width .initial:n = { 20.6mm },
     submission-footer-text .tl_set:N = \l__phimisci_submission_footer_tl,
