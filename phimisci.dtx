@@ -257,7 +257,7 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \RequirePackage[final, hyperfootnotes=false, pdfusetitle=true]{hyperref}
 \RequirePackage[table]{xcolor}
-\RequirePackage{etoolbox, expl3, iftex, l3keys2e, microtype, orcidlink}
+\RequirePackage{etoolbox, expl3, l3keys2e, microtype, orcidlink}
 %    \end{macrocode}
 % \subsection{Data storage, Boolean switches and command variants}
 % These Booleans, control sequences, integer variables, mappings, sequences and
@@ -517,7 +517,7 @@ http://www.latex-project.org/lppl.txt
             citecolor=PhiMiSciBlueTwo,
             urlcolor=PhiMiSciBlueTwo}
 %    \end{macrocode}
-% We delay setting the PDF meta data (author, title) to the end of the preamble 
+% We delay setting the PDF title string to the end of the preamble 
 % to allow for meta data processing first. The meta data is output only in 
 % some publication stages (see Section~\ref{sec:stages}).
 %    \begin{macrocode}
@@ -526,7 +526,6 @@ http://www.latex-project.org/lppl.txt
   {
     \hypersetup
       {
-        pdfauthor = { \tl_use:N \l_phimisci_authors_tl },
         pdftitle  = { \tl_use:N \l_phimisci_document_title_tl }
       }
   }
@@ -946,6 +945,7 @@ http://www.latex-project.org/lppl.txt
                    \l__phimisci_authors_to_ids_prop
                    \l__phimisci_author_ids_to_affiliations_prop
                    \l__phimisci_author_ids_to_orcids_prop
+    \hypersetup { pdfauthor  = { \tl_use:N \l_phimisci_authors_tl } }
   }
 %    \end{macrocode}
 % \begin{function}{\PhiMiSci@OutputAuthorData}
