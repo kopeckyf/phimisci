@@ -614,6 +614,16 @@ http://www.latex-project.org/lppl.txt
   {
     \KOMAoptions{overfullrule=true}
     \RequirePackage{scrtime}
+    \RequirePackage{tikz}
+    \AddToHook{shipout/background}{%
+      \put(0pt, 0pt) {%
+        \begin{tikzpicture}[remember~picture, overlay]
+          \node [rotate=45, scale=5, text~opacity=0.15] at 
+                (current~page.center) 
+                {\tl_use:N \l__phimisci_draft_watermark_tl};
+        \end{tikzpicture}
+      }
+    }
     \RequirePackage[pagewise, switch]{lineno}
     \AtBeginDocument{\linenumbers}
     \bool_set_true:N \l__phimisci_output_authors_bool
@@ -770,6 +780,8 @@ http://www.latex-project.org/lppl.txt
       {
         \textit{Draft~generated~on~\today{}~at~\thistime{}.}
       },
+    draft-watermark .tl_set:N = \l__phimisci_draft_watermark_tl,
+    draft-watermark .initial:n = {PhiMiSci~uncorrected~proofs},
     footnote-break-penalty .int_set:N = 
       \l__phimisci_settings_footnote_penalty_int,
     footnote-break-penalty .initial:n = { 1000 },
