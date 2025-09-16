@@ -618,9 +618,13 @@ http://www.latex-project.org/lppl.txt
     \AddToHook{shipout/background}{%
       \put(0pt, 0pt) {%
         \begin{tikzpicture}[remember~picture, overlay]
-          \node [rotate=45, scale=5, text~opacity=0.15] at 
-                (current~page.center) 
-                {\tl_use:N \l__phimisci_draft_watermark_tl};
+          \node [rotate=45, scale=5] at (current~page.center) 
+                {
+                  \normalfont
+                  \normalcolor
+                  \color{black!15}
+                  \tl_use:N \l__phimisci_draft_watermark_tl
+                };
         \end{tikzpicture}
       }
     }
