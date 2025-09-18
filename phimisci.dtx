@@ -109,7 +109,7 @@ http://www.latex-project.org/lppl.txt
 % available separately.
 %
 % Issues should be reported to the editorial staff or on GitHub at 
-% \url{https://github.com/kopeckyf/phimisci}.
+% \url{https://github.com/phimisci/latex}.
 % {\setlength{\parskip}{0pt}
 % \tableofcontents}
 % \section{Basic set-up}
@@ -1504,7 +1504,13 @@ http://www.latex-project.org/lppl.txt
 %    \end{macrocode}
 % 
 % \begin{function}{\phimisci_check_abstract_length:n, \phimisci_process_keywords:n}
-% A function that 
+% Functions to process the abstract and keyword. 
+%
+% The length of the abstract is 
+% estimated based on an average of eight characters per word. A warning is 
+% issued if the function suspects that the abstract might be longer than the 
+% journal's limit of 250 words. Long abstract can break the layout of the 
+% title page, but this function can give false warnings. 
 %    \begin{macrocode}
 \cs_new:Npn \phimisci_check_abstract_length:n #1
   {
