@@ -98,7 +98,7 @@ http://www.latex-project.org/lppl.txt
 % \fi
 % \title{Technical documentation of the \texttt{phimisci} class}
 % \author{Felix Kopecky}
-% \date{1 August 2025}
+% \date{18 September 2025}
 % \maketitle
 % \texttt{phimisci} is the document class for \emph{Philosophy and the Mind 
 % Sciences} (PhiMiSci), a diamond open-acess journal in philosophy, 
@@ -156,7 +156,7 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 %<*class>
 \NeedsTeXFormat {LaTeX2e} 
-\ProvidesExplClass {phimisci} {2025-08-01} {1.0}  
+\ProvidesExplClass {phimisci} {2025-09-18} {1.0}  
                    {Philosophy and the Mind Sciences Journal Template}
 %    \end{macrocode}
 % \subsection{Messages, errors and warnings}
@@ -437,6 +437,10 @@ http://www.latex-project.org/lppl.txt
   {%
     \sffamily\fontsize{9bp}{13.5bp}\selectfont%
   }
+\newkomafont{PhiMiSciWatermark}
+  {%
+    \normalfont\normalcolor\color{black!15}%
+  }
 %    \end{macrocode}
 % These next settings configure the font in the page header. Note that the 
 % colour of the header separation line is also given as a ``font'' option.
@@ -620,9 +624,7 @@ http://www.latex-project.org/lppl.txt
         \begin{tikzpicture}[remember~picture, overlay]
           \node [rotate=45, scale=5] at (current~page.center) 
                 {
-                  \normalfont
-                  \normalcolor
-                  \color{black!15}
+                  \usekomafont{PhiMiSciWatermark}
                   \tl_use:N \l__phimisci_draft_watermark_tl
                 };
         \end{tikzpicture}
