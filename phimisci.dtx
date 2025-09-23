@@ -293,7 +293,6 @@ http://www.latex-project.org/lppl.txt
 \prop_new:N \l__phimisci_affiliation_id_resolver_prop
 \seq_new:N \l__phimisci_keywords_seq
 \seq_new:N \l__phimisci_authors_seq
-\seq_new:N \l_phimisci_issue_editor_seq
 \tl_const:Nn \l__phimisci_parnum_excluded_objects_base_tl
   {
     env/quote, env/quotation, env/itemize, env/enumerate, env/description, 
@@ -975,6 +974,8 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \NewDocumentCommand { \PhiMiSci@OutputAuthorData } {}
   {
+    \group_begin:
+    \parindent 0pt
     \bool_if:NT \l__phimisci_output_authors_bool
       {
         \group_begin:
@@ -1058,6 +1059,7 @@ http://www.latex-project.org/lppl.txt
         \par
         \vspace* { 2\baselineskip }
       }
+    \group_end:
   }
 %    \end{macrocode}
 % \begin{function}{\phimisci_process_author_data:nNNN}
@@ -1549,16 +1551,21 @@ http://www.latex-project.org/lppl.txt
             \group_begin: 
               \usekomafont{ PhiMiSciQuote }
               \tl_use:N \l__phimisci_abstract_tl
+              \par
             \group_end:
           }
         \bool_if:NT \l__phimisci_output_keywords_bool
           {
             \vskip 1em
-            \usekomafont{ PhiMiSciKeywords }
-            \textbf{\tl_use:N \l__phimisci_locale_keywords_tl} 
-            \tl_use:N \l__phimisci_keywords_tl
+            \noindent
+            \group_begin:
+              \usekomafont{ PhiMiSciKeywords }
+              \textbf{\tl_use:N \l__phimisci_locale_keywords_tl} 
+              \tl_use:N \l__phimisci_keywords_tl
+              \par
+            \group_end:
           }
-        \pagebreak
+        \clearpage
       }
   }
 %    \end{macrocode}
@@ -1902,9 +1909,10 @@ http://www.latex-project.org/lppl.txt
 % \end{function}
 %    \begin{macrocode}
 \ExplSyntaxOn
-\RenewDocumentCommand {\@maketitle} {} 
+\RenewDocumentCommand {\maketitle} {} 
   {%
     {
+      \thispagestyle{plain.scrheadings}
 %    \end{macrocode}
 % The header, including journal logo, title, volume number, and 
 % publication year, is only printed for some publication stages. It is printed
@@ -1995,21 +2003,21 @@ http://www.latex-project.org/lppl.txt
 % also outputs information about the special issue and/or book symposium, in 
 % the article is part of one. Various \cs{enlargethispage} commands ensure there
 % is enough space for the footer.
-%    \begin{macrocode}      
+%    \begin{macrocode}    
     \PhiMiSci@OutputAuthorData{}
     \enlargethispage{-2.5\baselineskip}
 %    \end{macrocode}
 % The right column on the title page, started by a \cs{pagebreak}, contains the
 % abstract and keywords.
 %    \begin{macrocode}    
-    \pagebreak
+    \newpage
     \vspace*{3.25\baselineskip}
     \enlargethispage{-4\baselineskip}
     \PhiMiSci@OutputMetadata{}
 %    \end{macrocode}
 % Finally, ensure that the paper does not begin with a paragraph indent.
 %    \begin{macrocode}    
-    \aftergroup\@afterindentfalse\aftergroup\@afterheading
+    \@afterindentfalse\@afterheading
   }
 %    \end{macrocode}
 % \subsection{Epigraphs}
