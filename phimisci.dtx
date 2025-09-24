@@ -1150,32 +1150,36 @@ http://www.latex-project.org/lppl.txt
                          } 
 %    \end{macrocode}
 % We now loop over all the affiliations of an author. We first check whether
-% the current affiliation, \#\#\#\#1, is already assigned to an affiliation 
-% ID. If not, we create a new global ID for this affiliation. We then add the
-% affiliation ID to the author's sequence of affiliation IDs.
+% the current affiliation, \#\#\#\#1, is empty or is already assigned to an 
+% affiliation ID. If neither is the case, we create a new global ID for this 
+% affiliation. We then add the affiliation ID to the author's sequence of 
+% affiliation IDs.
 %    \begin{macrocode}
       \seq_map_inline:Nn \l__phimisci_author_affiliation_seq
         {
-          \prop_get:NnNTF \l__phimisci_affiliation_id_resolver_prop { ####1 }
-            \l__phimisci_afil_loop_tl
+          \tl_if_blank:nF { ####1 } 
             {
-              \seq_put_right:NV 
-                \l__phimisci_author_affiliation_ids_seq
+              \prop_get:NnNTF \l__phimisci_affiliation_id_resolver_prop { ####1 }
                 \l__phimisci_afil_loop_tl
-            }
-            {
-              \prop_put:Nxx \l__phimisci_affiliation_id_resolver_prop
-                { ####1 }
                 {
-                  \int_eval:n 
-                    { 
-                      \prop_count:N \l__phimisci_affiliation_id_resolver_prop 
-                      + 1 
-                    }
+                  \seq_put_right:NV 
+                    \l__phimisci_author_affiliation_ids_seq
+                    \l__phimisci_afil_loop_tl
                 }
-              \seq_put_right:Nx \l__phimisci_author_affiliation_ids_seq
                 {
-                  \prop_count:N \l__phimisci_affiliation_id_resolver_prop
+                  \prop_put:Nxx \l__phimisci_affiliation_id_resolver_prop
+                    { ####1 }
+                    {
+                      \int_eval:n 
+                        { 
+                          \prop_count:N \l__phimisci_affiliation_id_resolver_prop 
+                          + 1 
+                        }
+                    }
+                  \seq_put_right:Nx \l__phimisci_author_affiliation_ids_seq
+                    {
+                      \prop_count:N \l__phimisci_affiliation_id_resolver_prop
+                    }
                 }
             }
         }
