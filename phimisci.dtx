@@ -98,7 +98,7 @@ http://www.latex-project.org/lppl.txt
 % \fi
 % \title{Technical documentation of the \texttt{phimisci} class}
 % \author{Felix Kopecky}
-% \date{26 September 2025}
+% \date{25 October 2025}
 % \maketitle
 % \texttt{phimisci} is the document class for \emph{Philosophy and the Mind 
 % Sciences} (PhiMiSci), a diamond open-acess journal in philosophy, 
@@ -156,7 +156,7 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 %<*class>
 \NeedsTeXFormat {LaTeX2e} 
-\ProvidesExplClass {phimisci} {2025-09-26} {1.0.1}  
+\ProvidesExplClass {phimisci} {2025-10-25} {1.0.2}  
                    {Philosophy and the Mind Sciences Journal Template}
 %    \end{macrocode}
 % \subsection{Messages, errors and warnings}
@@ -2039,6 +2039,23 @@ http://www.latex-project.org/lppl.txt
 %    \begin{macrocode}
 \AddToHook { env/quote/begin } { \usekomafont{PhiMiSciQuote} }
 \AddToHook { env/quotation/begin } { \usekomafont{PhiMiSciQuote} }  
+%    \end{macrocode}
+% We overwrite the layout of block quotes in footnotes. These are typeset 
+% smaller than block quotes in the main text.
+%    \begin{macrocode}
+\AddtoDoHook { footnote/text/begin } 
+  {
+    \AddToHook { env/quote/begin } [ PhiMiSciFnQuoteFont ] { \footnotesize }
+    \AddToHook { env/quotation/begin } [ PhiMiSciFnQuoteFont ] { \footnotesize }
+  }
+%    \end{macrocode}
+% The font setting for footnotes is cleaned up at the end of each footnote.
+%    \begin{macrocode}
+\AddtoDoHook { footnote/text/end }
+  {
+    \RemoveFromHook { env/quote/begin } [ PhiMiSciFnQuoteFont ]
+    \RemoveFromHook { env/quotation/begin } [ PhiMiSciFnQuoteFont ]
+  }
 %    \end{macrocode}
 %
 % \subsection{Lists}
