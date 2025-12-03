@@ -1604,7 +1604,7 @@ http://www.latex-project.org/lppl.txt
           \iow_newline:
           \tl_if_blank:VF \@subtitle
             {
-              subtitle = { {\@subtitle} },
+              subtitle = { {\unexpanded\expandafter{\@subtitle}} },
               \iow_newline:
             }
           journal = { \tl_use:N \l__phimisci_journal_name_tl },
