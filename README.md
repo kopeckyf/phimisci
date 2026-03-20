@@ -6,7 +6,7 @@ LaTeX document class for the journal [*Philosophy and the Mind Sciences*](https:
 The development of this class was funded by the DFG (project no. 514161146).
 
 ### License
-Copyright (c) 2025 Ruhr-Universität Bochum
+Copyright (c) 2026 Ruhr-Universität Bochum
 
 These files may be distributed and/or modified under the conditions of the LaTeX 
 Project Public License, either version 1.3c of this license or (at your option) 
